@@ -1,7 +1,8 @@
+import AppRoutes from "./routes/index";
 const App = () => {
   return (
     <div>
-      <h1>Welcome to Vite + React + TypeScript</h1>
+      <AppRoutes />
     </div>
   )
 }
