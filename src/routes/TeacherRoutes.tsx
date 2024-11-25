@@ -1,23 +1,17 @@
-import { Routes, Route, Navigate } from 'react-router-dom'
-// import TeacherDashboard from '../pages/teacher/Dashboard'
-// import TeacherCourses from '../pages/teacher/Courses'
-// import TeacherProfile from '../pages/teacher/Profile'
+import React from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
+import TeacherDashboard from "../pages/teacher/Dashboard";
+import TeacherCourses from "../pages/teacher/Courses";
 
-const TeacherRoutes = () => {
-  const isTeacher = true // Kiểm tra logic thực tế.
-
-  if (!isTeacher) {
-    return <Navigate to="/login" />
-  }
-
+const TeacherRoutes: React.FC = () => {
   return (
     <Routes>
-      {/* <Route path="dashboard" element={<TeacherDashboard />} />
-      <Route path="courses" element={<TeacherCourses />} />
-      <Route path="profile" element={<TeacherProfile />} /> */}
-      <Route path="*" element={<Navigate to="/teacher/dashboard" />} />
+      <Route path="/" element={<Navigate to="/teacher/dashboard" replace />} />
+      <Route path="/dashboard" element={<TeacherDashboard />} />
+      <Route path="/courses" element={<TeacherCourses />} />
+      <Route path="*" element={<Navigate to="/teacher/dashboard" replace />} />
     </Routes>
-  )
-}
+  );
+};
 
-export default TeacherRoutes
+export default TeacherRoutes;

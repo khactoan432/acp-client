@@ -1,23 +1,24 @@
-import { Routes, Route, Navigate } from 'react-router-dom'
-// import UserDashboard from '../pages/user/Dashboard'
-// import UserCourses from '../pages/user/Courses'
-// import UserProfile from '../pages/user/Profile'
+import React from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
+import Home from "../pages/user/Home";
+import Course from "../pages/user/Course";
+import CourseDetail from "../pages/user/CourseDetail";
+import Exam from "../pages/user/Exam";
+import ExamDetail from "../pages/user/ExamDetail";
+import About from "../pages/user/About";
 
-const UserRoutes = () => {
-  const isUser = true // Kiểm tra logic thực tế.
-
-  if (!isUser) {
-    return <Navigate to="/login" />
-  }
-
+const UserRoutes: React.FC = () => {
   return (
     <Routes>
-      {/* <Route path="dashboard" element={<UserDashboard />} />
-      <Route path="courses" element={<UserCourses />} />
-      <Route path="profile" element={<UserProfile />} /> */}
-      <Route path="*" element={<Navigate to="/user/dashboard" />} />
+      <Route path="/" element={<Home />} />
+      <Route path="/course" element={<Course />} />
+      <Route path="/course/:id" element={<CourseDetail />} />
+      <Route path="/exam" element={<Exam />} />
+      <Route path="/exam/:id" element={<ExamDetail />} />
+      <Route path="/about" element={<About />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
-  )
-}
+  );
+};
 
-export default UserRoutes
+export default UserRoutes;

@@ -1,24 +1,25 @@
-import { Routes, Route, Navigate } from 'react-router-dom'
-// import AdminDashboard from '../pages/admin/Dashboard'
-// import AdminUsers from '../pages/admin/Users'
-// import AdminSettings from '../pages/admin/Settings'
+import React from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
+import Dashboard from "../pages/admin/Dashboard";
+import Courses from "../pages/admin/Courses";
+import Banners from "../pages/admin/Banners";
+import Achievement from "../pages/admin/Achievement";
+import Teacher from "../pages/admin/Teacher";
+import Orders from "../pages/admin/Orders";
 
-const AdminRoutes = () => {
-  // Giả sử bạn kiểm tra quyền admin tại đây (thay bằng logic thực tế)
-  const isAdmin = true // Thay bằng logic kiểm tra token hoặc role.
-
-  if (!isAdmin) {
-    return <Navigate to="/login" />
-  }
-
+const AdminRoutes: React.FC = () => {
   return (
     <Routes>
-      {/* <Route path="dashboard" element={<AdminDashboard />} />
-      <Route path="users" element={<AdminUsers />} />
-      <Route path="settings" element={<AdminSettings />} /> */}
-      <Route path="*" element={<Navigate to="/admin/dashboard" />} />
+      <Route path="/" element={<Navigate to="/admin/dashboard" replace />} />
+      <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/courses" element={<Courses />} />
+      <Route path="/banners" element={<Banners />} />
+      <Route path="/achievement" element={<Achievement />} />
+      <Route path="/teachers" element={<Teacher />} />
+      <Route path="/orders" element={<Orders />} />
+      <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
     </Routes>
-  )
-}
+  );
+};
 
-export default AdminRoutes
+export default AdminRoutes;
