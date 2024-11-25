@@ -1,15 +1,17 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import Home from "../pages/Home"
-import About from "../pages/About"
+// routes/index.tsx
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+// import AdminRoutes from './AdminRoutes'
+// import TeacherRoutes from './TeacherRoutes'
+// import UserRoutes from './UserRoutes'
+// import Login from '../pages/Login'
+// import NotFound from '../pages/NotFound'
 
 const AppRoutes = () => {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/about" element={<About />} />
-      </Routes>
-    </Router>
+    <div>
+      routes
+    </div>
+
   )
 }
 
