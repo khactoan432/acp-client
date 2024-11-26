@@ -1,8 +1,8 @@
-// src/pages/Login.tsx
 import React, { useState } from 'react'
-import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { setAuth } from '../redux/slices/authSlice'
+import { useDispatch } from 'react-redux'
+import { postData } from "../axios"
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState('')
@@ -11,20 +11,25 @@ const Login: React.FC = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    // Giả lập xác thực - Gọi API trong thực tế
-    if (username === 'admin' && password === 'password') {
-      dispatch(setAuth({ role: 'admin', token: 'fake-jwt-token' }))
-      navigate('/admin') // Điều hướng đến trang admin
-    } else if (username === 'teacher' && password === 'password') {
-      dispatch(setAuth({ role: 'teacher', token: 'fake-jwt-token' }))
-      navigate('/teacher') // Điều hướng đến trang teacher
-    } else if (username === 'user' && password === 'password') {
-      dispatch(setAuth({ role: 'user', token: 'fake-jwt-token' }))
-      navigate('/user') // Điều hướng đến trang user
-    } else {
+    try {
+      const response = await postData('/api/auth/login', { email: username, password: password })
+      if (response.token) {
+        console.log("logining: ", response);
+
+        // Điều hướng tới trang tương ứng
+        if (response.user.role === 'ADMIN') {
+          navigate('/admin/dashboard');
+        } else if (response.user.role === 'TEACHER') {
+          navigate('/teacher/dashboard');
+        } else {
+          navigate('/')
+        }
+        dispatch(setAuth({ user: response.user, access_token: response.token  }))
+      }
+    } catch (error) {
       setError('Invalid username or password')
     }
   }
