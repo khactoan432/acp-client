@@ -35,28 +35,30 @@ const Login: React.FC = () => {
   }
 
   return (
-    <div style={styles.container}>
-      <h1 style={styles.title}>Login</h1>
-      <form onSubmit={handleSubmit} style={styles.form}>
-        {error && <p style={styles.error}>{error}</p>}
-        <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          style={styles.input}
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          style={styles.input}
-        />
-        <button type="submit" style={styles.button}>
-          Login
-        </button>
-      </form>
+    <div style={{width: "100%"}}>
+        <div style={styles.container}>
+        <h1 style={styles.title}>Login</h1>
+        <form onSubmit={handleSubmit} style={styles.form}>
+            {error && <p style={styles.error}>{error}</p>}
+            <input
+            type="text"
+            placeholder="Username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            style={styles.input}
+            />
+            <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            style={styles.input}
+            />
+            <button type="submit" style={styles.button}>
+            Login
+            </button>
+        </form>
+        </div>
     </div>
   )
 }
