@@ -1,4 +1,6 @@
-const UserCourse = () => {
+import React from 'react';
+
+const UserCourse: React.FC = () => {
   return <h1>User Course</h1>
 }
 
