@@ -16,8 +16,8 @@ interface AuthState {
 }
 
 const initialState: AuthState = {
-  user: null,
-  access_token: null,
+  user: JSON.parse(localStorage.getItem('user') || 'null'),
+  access_token: localStorage.getItem('access_token'),
 }
 
 const authSlice = createSlice({
@@ -27,6 +27,9 @@ const authSlice = createSlice({
     setAuth(state, action: PayloadAction<{ user: User, access_token: string }>) {
       state.user = action.payload.user
       state.access_token = action.payload.access_token
+
+      localStorage.setItem('user', JSON.stringify(action.payload.user))
+      localStorage.setItem('access_token', action.payload.access_token)
     },
     logout(state) {
       state.user = null
