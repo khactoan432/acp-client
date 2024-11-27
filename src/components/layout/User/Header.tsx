@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { useNavigate } from 'react-router-dom';
-import Button from '../../common/Button';
-import Logo from '../../../assets/logoacp.jpg';
+import { useNavigate } from "react-router-dom";
+import Button from "../../common/Button";
+import Logo from "../../../assets/logoacp.jpg";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -12,7 +12,7 @@ const Header = () => {
       <div className="container max-w-[1228px] mx-auto px-4 sm:px-4 lg:px-2 flex items-center justify-between h-16">
         {/* Logo */}
         <div className="flex items-center">
-          <img className="w-[50px] h-[50px]" src={Logo} alt="alt"/>
+          <img className="w-[50px] h-[50px]" src={Logo} alt="alt" />
           <div className="text-2xl font-bold">
             <span className="text-green-500">AC</span>
             <span className="text-yellow-400">P</span>
@@ -24,13 +24,22 @@ const Header = () => {
           <a href="/" className="text-gray-600 hover:text-sky-500 font-medium">
             Trang chủ
           </a>
-          <a href="/course" className="text-gray-600 hover:text-sky-500 font-medium">
+          <a
+            href="/course"
+            className="text-gray-600 hover:text-sky-500 font-medium"
+          >
             Chương trình học
           </a>
-          <a href="/exam" className="text-gray-600 hover:text-sky-500 font-medium">
+          <a
+            href="/exam"
+            className="text-gray-600 hover:text-sky-500 font-medium"
+          >
             Đề thi online
           </a>
-          <a href="/about" className="text-gray-600 hover:text-sky-500 font-medium">
+          <a
+            href="/about"
+            className="text-gray-600 hover:text-sky-500 font-medium"
+          >
             Về chúng tôi
           </a>
           <a href="/" className="text-gray-600 hover:text-sky-500 font-medium">
@@ -38,7 +47,12 @@ const Header = () => {
           </a>
         </nav>
 
-        <Button onClick={() => navigate('/about')} className="hidden md:block h-[36px] rounded-[17px]">Đăng nhập</Button>
+        <Button
+          onClick={() => navigate("/login")}
+          className="hidden md:block h-[36px] rounded-[17px]"
+        >
+          Đăng nhập
+        </Button>
 
         {/* Mobile Menu Button */}
         <button
@@ -66,22 +80,42 @@ const Header = () => {
       {isOpen && (
         <nav className="md:hidden bg-white shadow-md px-8">
           <div className="flex flex-col items-start space-y-4 pb-4">
-            <a href="#" className="text-gray-600 hover:text-sky-500 font-medium">
+            <a
+              href="#"
+              className="text-gray-600 hover:text-sky-500 font-medium"
+            >
               Trang chủ
             </a>
-            <a href="#" className="text-gray-600 hover:text-sky-500 font-medium">
+            <a
+              href="#"
+              className="text-gray-600 hover:text-sky-500 font-medium"
+            >
               Chương trình học
             </a>
-            <a href="#" className="text-gray-600 hover:text-sky-500 font-medium">
+            <a
+              href="#"
+              className="text-gray-600 hover:text-sky-500 font-medium"
+            >
               Đề thi online
             </a>
-            <a href="#" className="text-gray-600 hover:text-sky-500 font-medium">
+            <a
+              href="#"
+              className="text-gray-600 hover:text-sky-500 font-medium"
+            >
               Về chúng tôi
             </a>
-            <a href="#" className="text-gray-600 hover:text-sky-500 font-medium">
+            <a
+              href="#"
+              className="text-gray-600 hover:text-sky-500 font-medium"
+            >
               Liên hệ
             </a>
-            <Button onClick={() => navigate('/about')} className="md::hidden h-[36px] w-full rounded-[17px]">Đăng nhập</Button>
+            <Button
+              onClick={() => navigate("/login")}
+              className="md::hidden h-[36px] w-full rounded-[17px]"
+            >
+              Đăng nhập
+            </Button>
           </div>
         </nav>
       )}

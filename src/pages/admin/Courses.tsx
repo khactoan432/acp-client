@@ -3,7 +3,7 @@ import Nav from "../../components/layout/Admin/nav";
 
 const AdminCourse = () => {
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col h-screen">
       <AdminHeader />
       <div className="flex flex-1">
         <Nav />

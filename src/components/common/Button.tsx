@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 interface ButtonProps {
   onClick: () => void;
@@ -7,13 +7,20 @@ interface ButtonProps {
   disabled?: boolean;
 }
 
-const Button: React.FC<ButtonProps> = ({ onClick, children, className, disabled }) => {
+const Button: React.FC<ButtonProps> = ({
+  onClick,
+  children,
+  className,
+  disabled,
+}) => {
   return (
     <button
       onClick={onClick}
       className={`${className}
-                  px-4 py-2 bg-[#00095bbc] hover:bg-[#00095B] rounded-lg text-white focus:outline-none transition duration-200
-                  ${disabled ? 'bg-gray-400 cursor-not-allowed opacity-50' : ''}`}
+                  px-4 bg-[#00095bbc] hover:bg-[#00095B] rounded-lg text-white focus:outline-none transition duration-200
+                  ${
+                    disabled ? "bg-gray-400 cursor-not-allowed opacity-50" : ""
+                  }`}
       disabled={disabled}
     >
       {children}
