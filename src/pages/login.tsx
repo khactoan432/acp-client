@@ -3,37 +3,49 @@ import { useNavigate } from 'react-router-dom'
 import { setAuth } from '../redux/slices/authSlice'
 import { useDispatch } from 'react-redux'
 import { postData } from "../axios"
+import Loading from '../components/loading'
 
 const Login: React.FC = () => {
+  const [isLoading, setIsLoading] = React.useState(false)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
+  const redirectPath = new URLSearchParams(location.search).get('redirect');
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
+    setIsLoading(true)
     try {
       const response = await postData('/api/auth/login', { email: username, password: password })
       if (response.token) {
-        console.log("logining: ", response);
-
-        // Điều hướng tới trang tương ứng
-        if (response.user.role === 'ADMIN') {
-          navigate('/admin/dashboard');
-        } else if (response.user.role === 'TEACHER') {
-          navigate('/teacher/dashboard');
-        } else {
-          navigate('/')
+        if(redirectPath) {
+          localStorage.setItem('redirectHistory', redirectPath);
+          navigate(redirectPath)
+        } else{
+          if (response.user.role === 'ADMIN') {
+            navigate('/admin/dashboard')
+          } else if (response.user.role === 'TEACHER') {
+            navigate('/teacher/dashboard')
+          } else {
+            navigate('/')
+          }
         }
-        dispatch(setAuth({ user: response.user, access_token: response.token  }))
+        dispatch(setAuth({ user: response.user, access_token: response.token }))
       }
     } catch (error) {
       setError('Invalid username or password')
+    } finally {
+      setTimeout(() => {
+        setIsLoading(false)
+      }, 3000)
     }
   }
-
+  if (isLoading) {
+    return <Loading message="Đang tải dữ liệu..." size="large" />
+  }
   return (
     <div style={{width: "100%"}}>
         <div style={styles.container}>
