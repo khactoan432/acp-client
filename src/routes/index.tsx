@@ -5,6 +5,7 @@ import AdminRoutes from './AdminRoutes'
 import TeacherRoutes from './TeacherRoutes'
 import UserRoutes from './UserRoutes'
 import Login from "../pages/login"
+import Register from "../pages/register"
 import NotFound from "../pages/NotFound"
 
 const AppRoutes = () => {
@@ -14,6 +15,11 @@ const AppRoutes = () => {
         <Route path="/login" element={
           <ProtectedRoute invertCheck redirectPath="/">
             <Login />
+          </ProtectedRoute>
+        } />
+        <Route path="/register" element={
+          <ProtectedRoute invertCheck redirectPath="/">
+            <Register />
           </ProtectedRoute>
         } />
 

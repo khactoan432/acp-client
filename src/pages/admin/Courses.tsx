@@ -1,5 +1,19 @@
-const AdminCourse = () => {
-  return <h1>Admin Course</h1>
-}
+import AdminHeader from "../../components/layout/Admin/header";
+import Nav from "../../components/layout/Admin/nav";
 
-export default AdminCourse
+const AdminCourse = () => {
+  return (
+    <div className="flex flex-col">
+      <AdminHeader />
+      <div className="flex flex-1">
+        <Nav />
+        {/* content */}
+        <div>
+          <h1>Welcome to Admin Course</h1>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default AdminCourse;

@@ -1,7 +1,7 @@
 import AdminHeader from "../../components/layout/Admin/header";
 import Nav from "../../components/layout/Admin/nav";
 
-const AdminBanner = () => {
+const PersonalSetting = () => {
   return (
     <div className="flex flex-col h-screen">
       <AdminHeader />
@@ -9,11 +9,11 @@ const AdminBanner = () => {
         <Nav />
         {/* content */}
         <div>
-          <h1>Welcome to Admin Banner</h1>
+          <h1>Welcome to Admin Personal setting</h1>
         </div>
       </div>
     </div>
   );
 };
 
-export default AdminBanner;
+export default PersonalSetting;

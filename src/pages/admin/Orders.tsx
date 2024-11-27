@@ -1,5 +1,19 @@
-const AdminOrder = () => {
-  return <h1>Admin Order</h1>
-}
+import AdminHeader from "../../components/layout/Admin/header";
+import Nav from "../../components/layout/Admin/nav";
 
-export default AdminOrder
+const AdminOrder = () => {
+  return (
+    <div className="flex flex-col h-screen">
+      <AdminHeader />
+      <div className="flex flex-1">
+        <Nav />
+        {/* content */}
+        <div>
+          <h1>Welcome to Admin Orders</h1>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default AdminOrder;

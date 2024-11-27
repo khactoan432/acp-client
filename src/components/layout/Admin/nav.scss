@@ -1,0 +1,25 @@
+/* Nav.css */
+.ant-menu-inline .ant-menu-item {
+  color: white !important;
+}
+
+.ant-menu-inline .ant-menu-item:hover {
+  background-color: #1e2753 !important;
+}
+
+.ant-menu-inline .ant-menu-item-selected {
+  color: #1e2753 !important;
+}
+
+.ant-menu-inline .ant-menu-item-selected:hover {
+  background-color: rgb(235 235 235) !important;
+}
+.nav-container {
+  transition: width 0.3s ease; /* Thêm hiệu ứng transition cho chiều rộng */
+  width: 252px;
+  background-color: #1e2753;
+}
+
+.nav-container.collapsed {
+  width: 80px;
+}

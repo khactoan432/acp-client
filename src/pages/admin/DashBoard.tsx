@@ -1,5 +1,19 @@
-const AdminDashboard = () => {
-    return <h1>Admin Dashboard</h1>
-  }
+import AdminHeader from "../../components/layout/Admin/header";
+import Nav from "../../components/layout/Admin/nav";
 
-export default AdminDashboard
+const AdminDashboard = () => {
+  return (
+    <div className="flex flex-col h-screen">
+      <AdminHeader />
+      <div className="flex flex-1">
+        <Nav />
+        {/* content */}
+        <div>
+          <h1>Welcome to Admin Dashboard</h1>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default AdminDashboard;
