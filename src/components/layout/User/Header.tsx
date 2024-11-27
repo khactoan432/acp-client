@@ -9,7 +9,7 @@ const Header = () => {
 
   return (
     <header className="bg-white shadow-md sticky top-0 z-50">
-      <div className="container max-w-[1228px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
+      <div className="container max-w-[1228px] mx-auto px-4 sm:px-4 lg:px-2 flex items-center justify-between h-16">
         {/* Logo */}
         <div className="flex items-center">
           <img className="w-[50px] h-[50px]" src={Logo} alt="alt"/>
@@ -38,7 +38,7 @@ const Header = () => {
           </a>
         </nav>
 
-        <Button onClick={() => navigate('/about')} className="hidden md:block h-[36px] rounded-[17px] bg-green-500 hover:bg-green-600">Đăng nhập</Button>
+        <Button onClick={() => navigate('/about')} className="hidden md:block h-[36px] rounded-[17px]">Đăng nhập</Button>
 
         {/* Mobile Menu Button */}
         <button
@@ -81,7 +81,7 @@ const Header = () => {
             <a href="#" className="text-gray-600 hover:text-sky-500 font-medium">
               Liên hệ
             </a>
-            <Button onClick={() => navigate('/about')} className="md::hidden h-[36px] w-full rounded-[17px] bg-green-500 hover:bg-green-600">Đăng nhập</Button>
+            <Button onClick={() => navigate('/about')} className="md::hidden h-[36px] w-full rounded-[17px]">Đăng nhập</Button>
           </div>
         </nav>
       )}
