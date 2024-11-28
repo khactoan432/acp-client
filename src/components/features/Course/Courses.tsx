@@ -91,8 +91,8 @@ const Courses: React.FC = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-2 sm:p-4 lg:p-6 ">
-      <h2 className="text-2xl font-semibold text-[#00095B] mb-6 text-center">KHÓA HỌC NỔI BẬT</h2>
+    <div className="max-w-7xl mx-auto p-2 sm:p-4 lg:p-6 mt-12">
+      <h2 className="text-4xl font-semibold text-[#00095B] mb-14 text-center">Khóa học nổi bật</h2>
       <Slider {...settings}>
         {courses.map(course => (
           <div key={course.id} className="px-2">

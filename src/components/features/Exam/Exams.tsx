@@ -86,8 +86,8 @@ const Exams: React.FC = () => {
   ];
 
   return (
-    <div className="max-w-7xl mx-auto p-2 sm:p-4 lg:p-6 ">
-      <h2 className="text-2xl font-semibold text-[#00095B] mb-6 text-center">ĐỀ THI MỚI NHẤT</h2>
+    <div className="max-w-7xl mx-auto p-2 sm:p-4 lg:p-6 mt-12">
+      <h2 className="text-4xl font-semibold text-[#00095B] mb-14 text-center">Đề thi mới nhất</h2>
       <div className='grid grid-cols-1 gap-x-4 gap-y-6 md:grid-cols-2 lg:grid-cols-4'>
         {exams.map(exam => (
           <div key={exam.id}>

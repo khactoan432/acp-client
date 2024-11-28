@@ -21,28 +21,28 @@ const Header = () => {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex space-x-6">
-          <a href="/" className="text-gray-600 hover:text-sky-500 font-medium">
+          <a href="/" className="text-gray-600 hover:text-[#00095B] font-medium">
             Trang chủ
           </a>
           <a
             href="/course"
-            className="text-gray-600 hover:text-sky-500 font-medium"
+            className="text-gray-600 hover:text-[#00095B] font-medium"
           >
             Chương trình học
           </a>
           <a
             href="/exam"
-            className="text-gray-600 hover:text-sky-500 font-medium"
+            className="text-gray-600 hover:text-[#00095B] font-medium"
           >
             Đề thi online
           </a>
           <a
             href="/about"
-            className="text-gray-600 hover:text-sky-500 font-medium"
+            className="text-gray-600 hover:text-[#00095B] font-medium"
           >
             Về chúng tôi
           </a>
-          <a href="/" className="text-gray-600 hover:text-sky-500 font-medium">
+          <a href="/" className="text-gray-600 hover:text-[#00095B] font-medium">
             Liên hệ
           </a>
         </nav>
@@ -82,31 +82,31 @@ const Header = () => {
           <div className="flex flex-col items-start space-y-4 pb-4">
             <a
               href="#"
-              className="text-gray-600 hover:text-sky-500 font-medium"
+              className="text-gray-600 hover:text-[#00095B] font-medium"
             >
               Trang chủ
             </a>
             <a
               href="#"
-              className="text-gray-600 hover:text-sky-500 font-medium"
+              className="text-gray-600 hover:text-[#00095B] font-medium"
             >
               Chương trình học
             </a>
             <a
               href="#"
-              className="text-gray-600 hover:text-sky-500 font-medium"
+              className="text-gray-600 hover:text-[#00095B] font-medium"
             >
               Đề thi online
             </a>
             <a
               href="#"
-              className="text-gray-600 hover:text-sky-500 font-medium"
+              className="text-gray-600 hover:text-[#00095B] font-medium"
             >
               Về chúng tôi
             </a>
             <a
               href="#"
-              className="text-gray-600 hover:text-sky-500 font-medium"
+              className="text-gray-600 hover:text-[#00095B] font-medium"
             >
               Liên hệ
             </a>

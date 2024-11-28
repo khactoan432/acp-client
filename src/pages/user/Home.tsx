@@ -1,25 +1,24 @@
 import React from 'react';
-import { useState } from "react";
-import Modal from "../../components/ui/Modal";
-import Spinner from "../../components/ui/Spinner";
-import Tooltip from "../../components/ui/Tooltip";
 import Banner from '../../components/features/Banner/Banner';
 import Courses from '../../components/features/Course/Courses';
 import Exams from '../../components/features/Exam/Exams';
 
 import banner2 from '../../assets/Picture1.png';
 import benifit from '../../assets/benefit.png';
+import Advisory from '../../components/features/Advisory/Advisory';
+import Teachers from '../../components/features/Teacher/Teachers';
+import Achievements from '../../components/features/Achievement/Achievements';
+import Testimonials from '../../components/features/Testimonial/Testimonial';
+import Footer from '../../components/layout/Footer';
 
 const UserHome: React.FC = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
   return (
     <div>
       <Banner/>
       
       <Courses/>
 
-      <div className='w-full mt-4'>
+      <div className='w-full mt-20'>
         <div className='max-w-[1228px] mx-auto'>
           <img src={banner2} alt="alt"/>
         </div>
@@ -27,12 +26,12 @@ const UserHome: React.FC = () => {
 
       <Exams/>
 
-      <div className='max-w-[1228px] mx-auto mt-6 text-[#00095B]'>
-        <p className='text-2xl font-semibold mb-2 text-center'>Than gia cùng ACP - Học tập không giới hạn</p>
-        <p className='text-base font-normal mb-6 text-center'>Với hơn 500 học viên tham gia mỗi tháng</p>
-        <div className='flex gap-10'>
-          <img src={benifit} alt='alt' className='w-[50%]'/>
-          <div className='w-[50%] flex flex-col gap-4'>
+      <div className='max-w-[1228px] mx-auto mt-20 text-[#00095B]'>
+        <p className='text-3xl font-semibold mb-2 text-center'>Tham gia cùng ACP - Học tập không giới hạn</p>
+        <p className='text-lg font-normal mb-10 text-center'>Với hơn 500 học viên tham gia mỗi tháng</p>
+        <div className='gap-10 px-4 md:flex lg:flex'>
+          <img src={benifit} alt='alt' className='md:w-[50%]'/>
+          <div className='md:w-[50%] flex flex-col gap-4'>
             <div>
               <p className='text-lg font-semibold'>Ngân hàng đề thi chất lượng cao</p>
               <p className='text-base'>Nội dung đề thi được biên soạn bởi đội ngũ chuyên gia
@@ -62,26 +61,15 @@ const UserHome: React.FC = () => {
         </div>
       </div>
 
-      <div className="p-8">
-        {/* Tooltip */}
-        <Tooltip text="Click to open modal">
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="bg-green-500 text-white px-4 py-2 rounded"
-          >
-            Open Modal
-          </button>
-        </Tooltip>
+      <Teachers />
 
-        {/* Modal */}
-        <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Loading Example">
-          <div className="flex items-center justify-center">
-            {/* Spinner */}
-            <Spinner size="8" color="blue-500" />
-          </div>
-          <p className="text-center mt-4">Loading data...</p>
-        </Modal>
-      </div>
+      <Achievements />  
+
+      <Testimonials />
+
+      <Advisory />
+
+      <Footer />
     </div>
   );
 }
