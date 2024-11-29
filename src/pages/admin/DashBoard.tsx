@@ -170,34 +170,30 @@ const AdminDashboard = () => {
   return (
     <div className="flex flex-col h-screen">
       <AdminHeader />
-      <div className="flex flex-1">
+      <div className="flex flex-1 md:flex-row">
         <Nav />
-        {/* content */}
-        <div className="w-full h-full overflow-y-hidden">
-          <div className="px-5 w-full h-full bg-[rgba(255,246,244,1)] overflow-y-hidden">
+        <div className="w-full h-full overflow-y-auto bg-[rgba(255,246,244,1)]">
+          <div className="px-3 md:px-5">
             <div className="text-2xl font-semibold my-3">
               <h2>DashBoard</h2>
             </div>
+
             {/* Doanh thu */}
-            <div className="flex justify-around justify-center my-3">
-              <div className="min-w-[208px] bg-white rounded-lg flex p-2 items-center justify-around">
-                <div className="left">
+            <div className="flex flex-wrap justify-center gap-4 my-3">
+              <div className="w-full sm:w-[45%] lg:w-[208px] bg-white rounded-lg flex p-2 items-center justify-around">
+                <div>
                   <p className="text-[20px] font-semibold">100.000.000đ</p>
-                  <p style={{ fontSize: "12px" }}>Tổng lợi nhuận</p>
+                  <p className="text-xs">Tổng lợi nhuận</p>
                   <div className="flex items-center text-[rgb(6,165,97)]">
                     12%
-                    <FaArrowTrendUp
-                      style={{ color: "#06A561", marginLeft: "4px" }}
-                    />
+                    <FaArrowTrendUp className="ml-1 text-green-600" />
                   </div>
                 </div>
-                <div className="right">
-                  <div className="bg-[#ECF2FF] rounded-full p-2">
-                    <MdAttachMoney className="primary-color-text" />
-                  </div>
+                <div className="bg-[#ECF2FF] rounded-full p-2">
+                  <MdAttachMoney className="primary-color-text" />
                 </div>
               </div>
-              <div className="min-w-[208px] bg-white rounded-lg flex p-2 items-center justify-around">
+              <div className="w-full sm:w-[45%] lg:w-[208px] bg-white rounded-lg flex p-2 items-center justify-around">
                 <div className="left">
                   <p className="text-[20px] font-semibold">1.056</p>
                   <p style={{ fontSize: "12px" }}>Mua khoá học</p>
@@ -214,7 +210,7 @@ const AdminDashboard = () => {
                   </div>
                 </div>
               </div>
-              <div className="min-w-[208px] bg-white rounded-lg flex p-2 items-center justify-around">
+              <div className="w-full sm:w-[45%] lg:w-[208px] bg-white rounded-lg flex p-2 items-center justify-around">
                 <div className="left">
                   <p className="text-[20px] font-semibold">1.567</p>
                   <p style={{ fontSize: "12px" }}>Mua đề thi</p>
@@ -231,7 +227,7 @@ const AdminDashboard = () => {
                   </div>
                 </div>
               </div>
-              <div className="min-w-[208px] bg-white rounded-lg flex p-2 items-center justify-around">
+              <div className="w-full sm:w-[45%] lg:w-[208px] bg-white rounded-lg flex p-2 items-center justify-around">
                 <div className="left">
                   <p className="text-[20px] font-semibold">201</p>
                   <p style={{ fontSize: "12px" }}>Người quay lại</p>
@@ -248,7 +244,7 @@ const AdminDashboard = () => {
                   </div>
                 </div>
               </div>
-              <div className="min-w-[208px] bg-white rounded-lg flex p-2 items-center justify-around">
+              <div className="w-full sm:w-[45%] lg:w-[208px] bg-white rounded-lg flex p-2 items-center justify-around">
                 <div className="left">
                   <p className="text-[20px] font-semibold">9.678</p>
                   <p style={{ fontSize: "12px" }}>Tổng người dùng</p>
@@ -265,84 +261,41 @@ const AdminDashboard = () => {
                   </div>
                 </div>
               </div>
+
+              {/* Repeat similar blocks for other cards */}
             </div>
-            {/* Thong ke */}
-            <div className="flex justify-around my-3">
-              <div className="w-[55%] bg-white p-2 rounded-lg">
+
+            {/* Thống kê */}
+            <div className="flex flex-col md:flex-row gap-4 my-3">
+              <div className="w-full md:w-[55%] bg-white p-2 rounded-lg">
                 <div className="flex justify-between px-3">
-                  <h2 style={{ fontWeight: "600" }}>Đồ thị overtime </h2>
-                  <div className="flex items-center">
-                    <span style={{ fontSize: "12px", paddingRight: "4px" }}>
-                      12 tháng gần nhất
-                    </span>
-                    <IoIosArrowDown />
+                  <h2 className="font-semibold">Đồ thị overtime</h2>
+                  <div className="flex items-center text-xs">
+                    12 tháng gần nhất
+                    <IoIosArrowDown className="ml-1" />
                   </div>
                 </div>
-                <div className="flex px-3">
-                  <div style={{ color: "rgba(30, 39, 83, 1)" }}>
-                    <h2 style={{ fontWeight: "600" }}>645</h2>
-                    <span style={{ fontSize: "12px", paddingRight: "4px" }}>
-                      Mua khoá học
-                    </span>
-                  </div>
-                  <div
-                    className="ml-4"
-                    style={{ color: "rgba(31, 210, 134, 1)" }}
-                  >
-                    <h2 style={{ fontWeight: "600" }}>45</h2>
-                    <span style={{ fontSize: "12px", paddingRight: "4px" }}>
-                      Mua đề thi
-                    </span>
-                  </div>
-                </div>
-                <div></div>
-                <div className="w-full">
-                  <SalesChart data={dataLine} options={optionsLine} />
-                </div>
+                <SalesChart data={dataLine} options={optionsLine} />
               </div>
 
-              <div className="w-[35%] bg-white p-2 rounded-lg">
-                <h2 className="text-center" style={{ fontWeight: "600" }}>
+              <div className="w-full md:w-[35%] bg-white p-2 rounded-lg">
+                <h2 className="text-center font-semibold">
                   Đồ thị 7 ngày gần nhất
                 </h2>
-                <div className="flex">
-                  <div style={{ color: "rgba(30, 39, 83, 1)" }}>
-                    <h2 style={{ fontWeight: "600" }}>64</h2>
-                    <span style={{ fontSize: "12px", paddingRight: "4px" }}>
-                      Mua khoá học
-                    </span>
-                  </div>
-                  <div
-                    className="ml-4"
-                    style={{ color: "rgba(31, 210, 134, 1)" }}
-                  >
-                    <h2 style={{ fontWeight: "600" }}>12</h2>
-                    <span style={{ fontSize: "12px", paddingRight: "4px" }}>
-                      Mua đề thi
-                    </span>
-                  </div>
-                </div>
-                <div className="w-full">
-                  <ChartCol data={dataCol} options={optionsCol} />
-                </div>
+                <ChartCol data={dataCol} options={optionsCol} />
               </div>
             </div>
-            {/* table */}
-            <div className="flex justify-around my-3">
-              <div className="w-2/5 h-[400px] bg-white rounded-lg overflow-auto">
-                <h2
-                  className="px-5 py-4"
-                  style={{ fontWeight: "600", color: "rgba(30, 39, 83, 1)" }}
-                >
+
+            {/* Table */}
+            <div className="flex flex-col lg:flex-row gap-4 my-3 justify-around">
+              <div className="w-full lg:w-[49%] h-[400px] bg-white rounded-lg overflow-auto">
+                <h2 className="px-5 py-4 font-semibold text-[rgba(30,39,83,1)]">
                   Những khoá học bán chạy
                 </h2>
                 <Table columns={columnsCourse} data={dataCourse} />
               </div>
-              <div className="w-2/5 h-[400px] bg-white rounded-lg overflow-auto">
-                <h2
-                  className="px-5 py-4"
-                  style={{ fontWeight: "600", color: "rgba(30, 39, 83, 1)" }}
-                >
+              <div className="w-full lg:w-[49%] h-[400px] bg-white rounded-lg overflow-auto">
+                <h2 className="px-5 py-4 font-semibold text-[rgba(30,39,83,1)]">
                   Những đề thi bán chạy
                 </h2>
                 <Table columns={columnsExam} data={dataExam} />
