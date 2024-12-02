@@ -30,3 +30,37 @@ body {
   border-color: #1e2753;
   color: #fff;
 }
+
+/* Định nghĩa các lớp cho nút Cancel */
+.button-cancel {
+  background-color: white;
+  color: #1e2753;
+  border: 2px solid #1e2753;
+  padding: 8px 16px;
+  border-radius: 8px;
+  transition: all 0.3s ease-in-out;
+}
+
+.button-cancel:hover {
+  background-color: #1e2753;
+  color: white;
+  opacity: 1;
+  filter: brightness(1.6); /* Làm sáng nền khi hover */
+}
+
+/* Định nghĩa các lớp cho nút Save */
+.button-save {
+  background-color: #1e2753;
+  color: white;
+  border: 2px solid #1e2753;
+  padding: 8px 16px;
+  border-radius: 8px;
+  transition: all 0.3s ease-in-out;
+}
+
+.button-save:hover {
+  background-color: white;
+  color: #1e2753;
+  opacity: 1;
+  filter: brightness(1.6); /* Làm sáng nền khi hover */
+}
