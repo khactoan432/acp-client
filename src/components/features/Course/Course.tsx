@@ -1,5 +1,6 @@
 import React from 'react';
 import Button from '../../common/Button';
+import { useNavigate } from 'react-router-dom';
 
 interface CourseProps {
   id: number;
@@ -19,8 +20,12 @@ const Rating: React.FC<{ rating: number }> = ({ rating }) => {
 };
 
 const Course: React.FC<CourseProps> = ({ id, name, image, price, description, rating }) => {
+  const navigate = useNavigate();
+
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300" id={id.toString()}>
+    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300" id={id.toString()}
+      onClick={() => navigate("/course/"+id)}
+    >
       <div className="relative">
         <img src={image} alt={name} className="w-full h-64 object-cover" />
       </div>

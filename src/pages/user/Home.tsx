@@ -2,14 +2,13 @@ import React from 'react';
 import Banner from '../../components/features/Banner/Banner';
 import Courses from '../../components/features/Course/Courses';
 import Exams from '../../components/features/Exam/Exams';
-
-import banner2 from '../../assets/Picture1.png';
-import benifit from '../../assets/benefit.png';
 import Advisory from '../../components/features/Advisory/Advisory';
 import Teachers from '../../components/features/Teacher/Teachers';
 import Achievements from '../../components/features/Achievement/Achievements';
 import Testimonials from '../../components/features/Testimonial/Testimonial';
-import Footer from '../../components/layout/Footer';
+
+import banner2 from '../../assets/banner2.png';
+import benifit from '../../assets/benefit.png';
 
 const UserHome: React.FC = () => {
   return (
@@ -68,8 +67,6 @@ const UserHome: React.FC = () => {
       <Testimonials />
 
       <Advisory />
-
-      <Footer />
     </div>
   );
 }

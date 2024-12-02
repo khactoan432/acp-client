@@ -8,7 +8,7 @@ const Header = () => {
   const [isOpen, setIsOpen] = useState(false); // Trạng thái mở menu di động
 
   return (
-    <header className="bg-white shadow-md sticky top-0 z-50">
+    <header className="bg-white shadow-[0_4px_4px_-4px_rgba(0,0,0,0.2)] sticky top-0 z-50">
       <div className="container max-w-[1228px] mx-auto px-4 sm:px-4 lg:px-2 flex items-center justify-between h-16">
         {/* Logo */}
         <div className="flex items-center">
@@ -21,28 +21,28 @@ const Header = () => {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex space-x-6">
-          <a href="/" className="text-gray-600 hover:text-[#00095B] font-medium">
+          <a href="/" className="text-gray-500 hover:text-blue-600 font-semibold">
             Trang chủ
           </a>
           <a
             href="/course"
-            className="text-gray-600 hover:text-[#00095B] font-medium"
+            className="text-gray-500 hover:text-blue-600 font-semibold"
           >
             Chương trình học
           </a>
           <a
             href="/exam"
-            className="text-gray-600 hover:text-[#00095B] font-medium"
+            className="text-gray-500 hover:text-blue-600 font-semibold"
           >
             Đề thi online
           </a>
           <a
             href="/about"
-            className="text-gray-600 hover:text-[#00095B] font-medium"
+            className="text-gray-500 hover:text-blue-600 font-semibold"
           >
             Về chúng tôi
           </a>
-          <a href="/" className="text-gray-600 hover:text-[#00095B] font-medium">
+          <a href="/" className="text-gray-500 hover:text-blue-600 font-semibold">
             Liên hệ
           </a>
         </nav>
@@ -82,31 +82,31 @@ const Header = () => {
           <div className="flex flex-col items-start space-y-4 pb-4">
             <a
               href="#"
-              className="text-gray-600 hover:text-[#00095B] font-medium"
+              className="text-gray-500 hover:text-blue-600 font-semibold"
             >
               Trang chủ
             </a>
             <a
               href="#"
-              className="text-gray-600 hover:text-[#00095B] font-medium"
+              className="text-gray-500 hover:text-blue-600 font-semibold"
             >
               Chương trình học
             </a>
             <a
               href="#"
-              className="text-gray-600 hover:text-[#00095B] font-medium"
+              className="text-gray-500 hover:text-blue-600 font-semibold"
             >
               Đề thi online
             </a>
             <a
               href="#"
-              className="text-gray-600 hover:text-[#00095B] font-medium"
+              className="text-gray-500 hover:text-blue-600 font-semibold"
             >
               Về chúng tôi
             </a>
             <a
               href="#"
-              className="text-gray-600 hover:text-[#00095B] font-medium"
+              className="text-gray-500 hover:text-blue-600 font-semibold"
             >
               Liên hệ
             </a>
