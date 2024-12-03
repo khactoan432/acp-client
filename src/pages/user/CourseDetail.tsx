@@ -81,7 +81,7 @@ const UserCourseDetail: React.FC = () => {
 
         <div className="flex items-center justify-center w-full h-full shadow-md bg-[#010101]">
           <div className="relative max-w-[1228px] my-10 py-6 rounded-lg w-full">
-            <div className='w-2/3 text-white'>
+            <div className='w-2/3 text-white px-3'>
               <h2 className="text-3xl font-bold mb-2">
                 [ACP General training] Class A: Bài Giảng - Chiến Lược Làm Bài - Chữa Bài Chi Tiết
               </h2>
@@ -113,25 +113,25 @@ const UserCourseDetail: React.FC = () => {
       <div className=''>
         {/* Header phụ */}
         <div
-          className={`h-14 border-b-2 border-[#e0e0e0] border-solid z-40 bg-white duration-300 ${
+          className={`h-14 border-b-2 border-[#e0e0e0] border-solid z-30 bg-white duration-300 ${
             isSticky ? "sticky top-[64px]" : "relative"
           }`}
         >
-          <nav className="max-w-[1228px] mx-auto container py-4 flex justify-between items-center">
+          <nav className="max-w-[1228px] mx-auto container py-4 px-3 flex justify-between items-center">
             <ul className="flex space-x-6 md:space-x-10 text-sm md:text-base font-medium">
               {[
                 { name: "Tổng quan", to: "overview" },
                 { name: "Nội dung khóa học", to: "content" },
                 { name: "Giảng viên", to: "teacher" },
                 { name: "Đánh giá", to: "rate" },
-                { name: "Nhận xét", to: "comment" },
+                { name: "Bình luận", to: "comment" },
               ].map((item, index) => (
                 <li key={index} className='text-gray-500'>
                   <Link
                     to={item.to}
                     spy={true}
                     smooth={true}
-                    offset={-70}
+                    offset={-140}
                     duration={500}
                     className="cursor-pointer font-semibold hover:text-blue-600 transition duration-200"
                     activeClass="text-blue-600"
@@ -146,8 +146,8 @@ const UserCourseDetail: React.FC = () => {
 
 
         {/* Content Sections */}
-        <div className='max-w-[1228px] mx-auto'>
-          <div className='w-2/3'>
+        <div className='flex max-w-[1228px] mx-auto'>
+          <div className='w-2/3 px-3'>
             <div id="overview" className="text-[#00095B] my-6 bg-white p-4 rounded-[0.65rem] border border-solid border-[#e0e0e0] shadow-[0_4px_0_0_rgba(143,156,173,0.2)]">
               <div className="flex flex-col items-center justify-center w-full h-full">
                 <div className="relative rounded-lg w-full">
@@ -233,9 +233,45 @@ const UserCourseDetail: React.FC = () => {
             </div>
             
           </div>
+          <div className='w-1/3 px-3'>
+            <div className={`bg-white shadow-lg rounded-lg p-3 mx-auto mt-[-320px] z-40 ${
+              isSticky ? "sticky top-[70px]" : "relative"
+              }`}>
+              <img className='rounded-md w-full h-[180px]' src={banner} alt='alt' />
+              <div className="mt-6">
+                <p className="text-gray-700 text-lg font-semibold">Ưu đãi đặc biệt tháng 12/2024:</p>
+                <div className="flex gap-4 mt-2">
+                  <p className="text-green-600 text-2xl font-bold mt-2">689.000đ</p>
+                  <div>
+                    <p className="text-gray-400 line-through text-sm">Giá gốc: 1.799.000đ</p>
+                    <p className="text-red-500 text-sm font-medium">Tiết kiệm: 810.000đ (-45%)</p>
+                  </div>
+                </div>
+              </div>
+              <button className="w-full bg-blue-600 text-white font-semibold py-3 rounded-lg mt-4 hover:bg-blue-700">
+                ĐĂNG KÝ HỌC NGAY
+              </button>
+              <button className="w-full bg-gray-200 text-gray-800 font-semibold py-3 rounded-lg mt-3 hover:bg-gray-300">
+                Học thử miễn phí
+              </button>
+              <ul className="mt-6 text-sm text-gray-600 space-y-2">
+                <li>👥 63,042 học viên đã đăng ký</li>
+                <li>📚 83 chủ đề, 477 bài học</li>
+                <li>📝 1,391 bài tập thực hành</li>
+                <li>📦 Combo 2 khóa học có giá trị 12 tháng</li>
+                <li>💻 Có thể học trên điện thoại và máy tính</li>
+              </ul>
+              <p className="text-sm text-gray-500 mt-6">
+                Chưa chắc chắn khóa học này dành cho bạn?{" "}
+                <a href="#" className="text-blue-600 underline">
+                  Liên hệ để nhận tư vấn miễn phí!
+                </a>
+              </p>
+            </div>
+          </div>
         </div>
 
-        <div className='max-w-[1228px] mx-auto'>
+        <div className='max-w-[1228px] mx-auto px-3'>
           <div id="rate" className="text-[#00095B] mb-6">
             <div className="flex flex-col items-center justify-center w-full h-full">
               <div className="relative mt-6 mb-6 rounded-lg w-full">
