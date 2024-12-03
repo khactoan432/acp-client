@@ -6,9 +6,11 @@ import Logo from "../../../assets/logoacp.jpg";
 const Header = () => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false); // Trạng thái mở menu di động
+  const [isUserOpen, setIsUserOpen] = useState(false);
+  const [isLogin, setIsLogin] = useState(false);
 
   return (
-    <header className="bg-white shadow-md sticky top-0 z-50">
+    <header className="bg-white shadow-[0_4px_4px_-4px_rgba(0,0,0,0.2)] sticky top-0 z-50">
       <div className="container max-w-[1228px] mx-auto px-4 sm:px-4 lg:px-2 flex items-center justify-between h-16">
         {/* Logo */}
         <div className="flex items-center">
@@ -21,38 +23,103 @@ const Header = () => {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex space-x-6">
-          <a href="/" className="text-gray-600 hover:text-[#00095B] font-medium">
+          <a href="/" className="text-gray-500 hover:text-blue-600 font-semibold">
             Trang chủ
           </a>
           <a
             href="/course"
-            className="text-gray-600 hover:text-[#00095B] font-medium"
+            className="text-gray-500 hover:text-blue-600 font-semibold"
           >
             Chương trình học
           </a>
           <a
             href="/exam"
-            className="text-gray-600 hover:text-[#00095B] font-medium"
+            className="text-gray-500 hover:text-blue-600 font-semibold"
           >
             Đề thi online
           </a>
           <a
             href="/about"
-            className="text-gray-600 hover:text-[#00095B] font-medium"
+            className="text-gray-500 hover:text-blue-600 font-semibold"
           >
             Về chúng tôi
           </a>
-          <a href="/" className="text-gray-600 hover:text-[#00095B] font-medium">
+          <a href="/" className="text-gray-500 hover:text-blue-600 font-semibold">
             Liên hệ
           </a>
         </nav>
 
-        <Button
-          onClick={() => navigate("/login")}
-          className="hidden md:block h-[36px] rounded-[17px]"
-        >
-          Đăng nhập
-        </Button>
+        {isLogin
+          ?<div className="relative">
+            {/* User Icon/Button */}
+            <div className=" w-[110px] flex justify-end">
+            <button
+              className="flex items-center focus:outline-none"
+              onClick={()=>setIsUserOpen(!isUserOpen)}
+            >
+              <img
+                src="https://via.placeholder.com/40" // Replace with actual user avatar
+                alt="User Avatar"
+                className="w-10 h-10 rounded-full"
+              />
+              {/* <span className="ml-2 text-gray-600">
+                <i className="fa-solid fa-chevron-down">User</i>
+              </span> */}
+            </button>
+            </div>
+      
+            {/* Dropdown Menu */}
+            {isUserOpen && (
+              <div className="absolute right-0 mt-2 w-60 bg-white rounded-lg shadow-lg border border-gray-200">
+                {/* Notification Section */}
+                <div className="p-4 border-b border-gray-300">
+                  <h3 className="text-gray-700 font-semibold">Thông báo</h3>
+                  <p className="text-gray-500 text-sm mt-1">Bạn chưa có thông báo mới.</p>
+                  <a
+                    href="#"
+                    className="text-blue-500 text-sm hover:underline mt-1 block"
+                  >
+                    Xem tất cả &gt;&gt;
+                  </a>
+                </div>
+      
+                {/* Links Section */}
+                <ul className="p-4 text-gray-700">
+                  <li className="mb-2">
+                    <a
+                      href="#"
+                      className="hover:text-blue-500 hover:underline"
+                    >
+                      Lịch học của tôi
+                    </a>
+                  </li>
+                  <li className="mb-2">
+                    <a
+                      href="#"
+                      className="hover:text-blue-500 hover:underline"
+                    >
+                      Trang cá nhân
+                    </a>
+                  </li>
+                  <li>
+                    <button
+                      className="hover:text-blue-500 hover:underline"
+                      onClick={() => setIsLogin(false)}
+                    >
+                      Đăng xuất
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            )}
+          </div>
+          :<Button
+            onClick={() => setIsLogin(true)}
+            className="hidden md:block h-[36px] rounded-[17px]"
+          >
+            Đăng nhập
+          </Button>
+        }   
 
         {/* Mobile Menu Button */}
         <button
@@ -82,31 +149,31 @@ const Header = () => {
           <div className="flex flex-col items-start space-y-4 pb-4">
             <a
               href="#"
-              className="text-gray-600 hover:text-[#00095B] font-medium"
+              className="text-gray-500 hover:text-blue-600 font-semibold"
             >
               Trang chủ
             </a>
             <a
               href="#"
-              className="text-gray-600 hover:text-[#00095B] font-medium"
+              className="text-gray-500 hover:text-blue-600 font-semibold"
             >
               Chương trình học
             </a>
             <a
               href="#"
-              className="text-gray-600 hover:text-[#00095B] font-medium"
+              className="text-gray-500 hover:text-blue-600 font-semibold"
             >
               Đề thi online
             </a>
             <a
               href="#"
-              className="text-gray-600 hover:text-[#00095B] font-medium"
+              className="text-gray-500 hover:text-blue-600 font-semibold"
             >
               Về chúng tôi
             </a>
             <a
               href="#"
-              className="text-gray-600 hover:text-[#00095B] font-medium"
+              className="text-gray-500 hover:text-blue-600 font-semibold"
             >
               Liên hệ
             </a>
