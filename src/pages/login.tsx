@@ -113,7 +113,7 @@ const Login: React.FC = () => {
           </div>
 
           <button
-            className="primary-color-background"
+            className="secondary-color-bg"
             type="submit"
             style={styles.button}
           >

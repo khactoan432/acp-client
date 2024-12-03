@@ -16,9 +16,14 @@ body {
 .primary-color-text {
   color: #1e2753;
 }
-.primary-color-background {
+.secondary-color-bg {
   background-color: #1e2753;
 }
+
+.secondary-color-bg {
+  background-color: #00095b;
+}
+
 .btn-primary {
   background-color: #1e2753;
   border-color: #1e2753;
@@ -63,4 +68,8 @@ body {
   color: #1e2753;
   opacity: 1;
   filter: brightness(1.6); /* Làm sáng nền khi hover */
+}
+
+.disable-bg {
+  background-color: #00095b70;
 }

@@ -199,7 +199,7 @@ const Register: React.FC = () => {
           )}
 
           <button
-            className="primary-color-background"
+            className="secondary-color-bg"
             type="submit"
             style={styles.button}
           >

@@ -11,6 +11,7 @@ interface HoverCardProps {
   paddingLeft?: string; //
   paddingRight?: string; //
   onClick?: () => void; // Callback function khi click vào nút
+  disabled?: boolean;
 }
 
 const ButtonPlus: React.FC<HoverCardProps> = ({
@@ -23,11 +24,14 @@ const ButtonPlus: React.FC<HoverCardProps> = ({
   paddingLeft = "pl-9",
   paddingRight = "pr-4",
   onClick, // Nhận prop onClick
+  disabled = false,
 }) => {
   return (
     <div>
       <div
-        className={`flex py-4 relative group cursor-pointer ${width}`}
+        className={`flex py-4 relative group cursor-pointer ${width}  ${
+          disabled ? "cursor-not-allowed pointer-events-none" : ""
+        }`}
         onClick={onClick} // Gắn sự kiện click tại đây
       >
         <div className="absolute z-[1] bg-[#fff6f4] rounded-full icon-plus transform transition-transform duration-300 group-hover:translate-x-4">
@@ -35,7 +39,9 @@ const ButtonPlus: React.FC<HoverCardProps> = ({
         </div>
         <div className="w-[32px] absolute"></div>
         <div
-          className={`primary-color-background flex justify-center text-center items-center ${paddingLeft} ${paddingRight} ${height} relative left-[15px] transition-all duration-300
+          className={`secondary-color-bg flex justify-center text-center items-center ${paddingLeft} ${paddingRight} ${height} ${
+            disabled ? "disable-bg" : ""
+          } relative left-[15px] transition-all duration-300
             rounded-tr-[16px] rounded-br-[16px] group-hover:rounded-[16px]`}
         >
           <h4 className={`${textSize} text-white`}>{content}</h4>
