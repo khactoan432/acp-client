@@ -61,6 +61,7 @@ const RatingPage: React.FC = () => {
         comment: form.comment,
       };
       setRatings([newRating, ...ratings]);
+      console.log(newRating);
       setForm({ stars: 0, comment: "", name: "", phone: "", email: "" });
       setShowForm(false);
     } else {

@@ -263,9 +263,7 @@ const UserExam: React.FC = () => {
                     : 'bg-blue-500 text-white hover:bg-blue-600'
                 } rounded`}
                 disabled={currentPage === totalPages}
-                onClick={() => {
-                  if (currentPage < totalPages) handlePageChange(currentPage + 1);
-                }}
+                onClick={() => handlePageChange(currentPage + 1)}
               >
                 Next
               </button>
