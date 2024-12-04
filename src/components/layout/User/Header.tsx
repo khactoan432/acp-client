@@ -1,13 +1,32 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../../../redux/store';
+import { logout } from '../../../redux/slices/authSlice'; 
+
 import Button from "../../common/Button";
+
 import Logo from "../../../assets/logoacp.jpg";
+import User from "../../../assets/user3.png";
 
 const Header = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const { user, access_token } = useSelector((state: RootState) => state.auth);
+
+  const isLogin = !!user && !!access_token;
+
   const [isOpen, setIsOpen] = useState(false); // Trạng thái mở menu di động
   const [isUserOpen, setIsUserOpen] = useState(false);
-  const [isLogin, setIsLogin] = useState(false);
+
+  const handleLogout = () => {
+    dispatch(logout());
+    localStorage.removeItem('user');
+    localStorage.removeItem('access_token');
+    navigate("/login");
+  };
 
   return (
     <header className="bg-white shadow-[0_4px_4px_-4px_rgba(0,0,0,0.2)] sticky top-0 z-50">
@@ -58,9 +77,9 @@ const Header = () => {
               onClick={()=>setIsUserOpen(!isUserOpen)}
             >
               <img
-                src="https://via.placeholder.com/40" // Replace with actual user avatar
+                src={User} // Replace with actual user avatar
                 alt="User Avatar"
-                className="w-10 h-10 rounded-full"
+                className="w-10 h-10 rounded-full bg-gray-200"
               />
               {/* <span className="ml-2 text-gray-600">
                 <i className="fa-solid fa-chevron-down">User</i>
@@ -77,7 +96,7 @@ const Header = () => {
                   <p className="text-gray-500 text-sm mt-1">Bạn chưa có thông báo mới.</p>
                   <a
                     href="#"
-                    className="text-blue-500 text-sm hover:underline mt-1 block"
+                    className="text-blue-500 text-sm mt-1 block"
                   >
                     Xem tất cả &gt;&gt;
                   </a>
@@ -88,7 +107,7 @@ const Header = () => {
                   <li className="mb-2">
                     <a
                       href="#"
-                      className="hover:text-blue-500 hover:underline"
+                      className="hover:text-blue-500"
                     >
                       Lịch học của tôi
                     </a>
@@ -96,15 +115,15 @@ const Header = () => {
                   <li className="mb-2">
                     <a
                       href="#"
-                      className="hover:text-blue-500 hover:underline"
+                      className="hover:text-blue-500"
                     >
                       Trang cá nhân
                     </a>
                   </li>
                   <li>
                     <button
-                      className="hover:text-blue-500 hover:underline"
-                      onClick={() => setIsLogin(false)}
+                      className="hover:text-blue-500"
+                      onClick={handleLogout}
                     >
                       Đăng xuất
                     </button>
@@ -114,8 +133,8 @@ const Header = () => {
             )}
           </div>
           :<Button
-            onClick={() => setIsLogin(true)}
             className="hidden md:block h-[36px] rounded-[17px]"
+            onClick={()=>navigate("/login")}
           >
             Đăng nhập
           </Button>

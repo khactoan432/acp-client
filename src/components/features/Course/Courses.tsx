@@ -32,7 +32,7 @@ const Courses: React.FC = () => {
     {
       id: 1,
       name: 'React for Beginners 1',
-      description: 'Learn React from scratch with hands-on examples to get frequent.',
+      description: '8 chủ đề - 47 bài học - 86 bài tập',
       image: banner,
       price: 299000,
       rating: 4,
@@ -40,7 +40,7 @@ const Courses: React.FC = () => {
     {
       id: 2,
       name: 'Advanced JavaScript 1',
-      description: 'Deep dive into JavaScript concepts and advanced features.',
+      description: '5 chủ đề - 32 bài học - 54 bài tập',
       image: banner,
       price: 399000,
       rating: 5,
@@ -48,7 +48,7 @@ const Courses: React.FC = () => {
     {
       id: 3,
       name: 'React for Beginners 2',
-      description: 'Learn React from scratch with hands-on examples to get frequent.',
+      description: '7 chủ đề - 39 bài học - 67 bài tập',
       image: banner,
       price: 299000,
       rating: 4,
@@ -56,7 +56,7 @@ const Courses: React.FC = () => {
     {
       id: 4,
       name: 'Advanced JavaScript 2',
-      description: 'Deep dive into JavaScript concepts and advanced features.',
+      description: '5 chủ đề - 32 bài học - 54 bài tập',
       image: banner,
       price: 399000,
       rating: 5,
