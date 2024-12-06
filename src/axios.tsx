@@ -19,9 +19,9 @@ export const getData = async (endpoint: string) => {
 };
 
 // Hàm gửi yêu cầu POST
-export const postData = async (endpoint: string, data: object) => {
+export const postData = async (endpoint: string, data: object, header:object) => {
   try {
-    const response = await api.post(endpoint, data);
+    const response = await api.post(endpoint, data, header);
     return response.data;
   } catch (error) {
     console.error('Error posting data', error);
