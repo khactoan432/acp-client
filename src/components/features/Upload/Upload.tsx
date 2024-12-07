@@ -1,54 +1,82 @@
-import React, { useState } from "react";
-import { postData } from "../../../axios";
-import { toast } from "react-toastify";
+import React, { useState } from 'react';
+import { postData } from '../../../axios';
+import Button from '../../common/Button';
 
-const FileUpload: React.FC = () => {
-  const [file, setFile] = useState<File | null>(null);
+const UploadMultipleFilesFromBody: React.FC = () => {
+  const [files, setFiles] = useState<File[]>([]);
+  const [uploadedFiles, setUploadedFiles] = useState<{ fileName: string; url: string }[] | null>(
+    null
+  );
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = event.target.files?.[0] || null;
-    setFile(selectedFile);
+    if (event.target.files) {
+      setFiles(Array.from(event.target.files)); // Lưu danh sách file
+    }
   };
 
   const handleUpload = async () => {
-    if (!file) {
-      toast.error("Vui lòng chọn file để upload!");
+    if (files.length === 0) {
+      alert('Please select files to upload.');
       return;
     }
 
-    const formData = new FormData();
-    formData.append("file", file);
-
     try {
-      const response = await postData("/api/upload/upload", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+      // Chuyển đổi mỗi file sang Base64
+      const filesData = await Promise.all(
+        files.map(async (file) => {
+          const fileData = await new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result as string);
+            reader.onerror = reject;
+            reader.readAsDataURL(file); // Đọc file dưới dạng Base64
+          });
+
+          return {
+            fileName: file.name, // Tên file
+            fileData: fileData.split(',')[1], // Loại bỏ prefix 'data:<mime-type>;base64,'
+          };
+        })
+      );
+
+      console.log(filesData);
+
+      // Gửi danh sách file qua API
+      const response = await postData('/api/file/upload', {
+        files: filesData,
       });
+
       console.log(response);
-      toast.success("Upload thành công!");
-      // onUploadSuccess();
+
+      setUploadedFiles(response.files);
+      alert('Files uploaded successfully!');
     } catch (error) {
-      toast.error("Upload thất bại!");
       console.error(error);
+      alert('File upload failed.');
     }
   };
 
   return (
-    <div className="mb-4">
-      <input
-        type="file"
-        onChange={handleFileChange}
-        className="border p-2 rounded w-full"
-      />
-      <button
-        onClick={handleUpload}
-        className="bg-blue-500 text-white px-4 py-2 rounded mt-2 hover:bg-blue-600"
-      >
-        Upload
-      </button>
+    <div>
+      <h1>Upload Multiple Files from Body</h1>
+      <input type="file" multiple onChange={handleFileChange} />
+      <Button onClick={handleUpload}>Upload</Button>
+
+      {uploadedFiles && (
+        <div>
+          <h2>Uploaded Files:</h2>
+          <ul>
+            {uploadedFiles.map((file) => (
+              <li key={file.fileName}>
+                <a href={file.url} target="_blank" rel="noopener noreferrer">
+                  {file.fileName}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 };
 
-export default FileUpload;
+export default UploadMultipleFilesFromBody;

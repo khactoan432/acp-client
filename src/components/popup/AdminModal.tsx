@@ -80,6 +80,7 @@ const AdminModal: React.FC<AdminModalProps> = ({
               onChange={handleUploadChange}
               multiple
               maxCount={5}
+              beforeUpload={() => false}
             >
               <Button icon={<UploadOutlined />}>Add File</Button>
             </Upload>
