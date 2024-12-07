@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Modal, Input, Button, Upload } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 
 type AdminModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  fields: { name: string; placeholder: string }[]; // Mảng các trường thông tin
+  fields?: { name: string; placeholder: string }[]; // Mảng các trường thông tin
   enableImageUpload?: boolean; // Bật/tắt upload ảnh
   onSave: (data: any) => void; // Hàm callback khi lưu dữ liệu
 };
@@ -18,16 +18,13 @@ type FormData = {
 const AdminModal: React.FC<AdminModalProps> = ({
   isOpen,
   onClose,
-  fields,
+  fields = [], // Mặc định là mảng rỗng nếu không được cung cấp
   enableImageUpload = false,
   onSave,
 }) => {
-  const initialFormData = fields.reduce(
-    (acc, field) => ({ ...acc, [field.name]: "" }),
-    enableImageUpload ? { images: [] } : {}
-  );
+  const [formData, setFormData] = useState<FormData>({});
 
-  const [formData, setFormData] = useState<FormData>(initialFormData);
+  // Khởi tạo formData dựa trên fields và enableImageUpload
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -57,20 +54,22 @@ const AdminModal: React.FC<AdminModalProps> = ({
       width={720}
     >
       <div className="flex flex-col space-y-6">
-        <div>
-          <h3 className="text-lg font-semibold mb-4">Information</h3>
-          <div className="grid grid-cols-2 gap-4">
-            {fields.map((field) => (
-              <Input
-                key={field.name}
-                placeholder={field.placeholder}
-                name={field.name}
-                value={formData[field.name]}
-                onChange={handleInputChange}
-              />
-            ))}
+        {fields.length > 0 && (
+          <div>
+            <h3 className="text-lg font-semibold mb-4">Information</h3>
+            <div className="grid grid-cols-2 gap-4">
+              {fields.map((field) => (
+                <Input
+                  key={field.name}
+                  placeholder={field.placeholder}
+                  name={field.name}
+                  value={formData[field.name] || ""}
+                  onChange={handleInputChange}
+                />
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         {enableImageUpload && (
           <div className="border-2 border-dashed rounded-lg p-4 cursor-pointer text-center">
@@ -80,6 +79,7 @@ const AdminModal: React.FC<AdminModalProps> = ({
               onChange={handleUploadChange}
               multiple
               maxCount={5}
+              beforeUpload={() => false}
             >
               <Button icon={<UploadOutlined />}>Add File</Button>
             </Upload>

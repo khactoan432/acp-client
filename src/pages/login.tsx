@@ -21,10 +21,14 @@ const Login: React.FC = () => {
 
     setIsLoading(true);
     try {
-      const response = await postData("/api/auth/login", {
-        email: username,
-        password: password,
-      });
+      const response = await postData(
+        "/api/auth/login",
+        {
+          email: username,
+          password: password,
+        },
+        {}
+      );
       if (response.token) {
         if (redirectPath) {
           localStorage.setItem("redirectHistory", redirectPath);

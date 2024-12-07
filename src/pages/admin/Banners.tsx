@@ -1,8 +1,12 @@
 import React, { useState } from "react";
+import { Buffer } from "buffer";
+// import axios
+import { postData } from "../../axios";
 // import components
 import AdminModal from "../../components/popup/AdminModal";
 import AdminHeader from "../../components/layout/Admin/header";
 import Nav from "../../components/layout/Admin/nav";
+import Loading from "../../components/loading";
 // import ant
 import { Table, Button, Input, Checkbox, Pagination } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
@@ -10,13 +14,13 @@ import "antd/dist/reset.css";
 
 import ExampleImageBanner from "../../assets/admin/addBanner/example.png";
 
-const AdminBanner = () => {
+const AdminBanner: React.FC = () => {
   const [isModal, setIsModal] = useState(false);
+  const [isLoading, setIsLoading] = React.useState(false);
 
   const data = Array.from({ length: 10 }, (_, index) => ({
     key: index,
     image: ExampleImageBanner,
-    name: "banner học C++",
   }));
 
   const columns = [
@@ -38,10 +42,6 @@ const AdminBanner = () => {
       ),
     },
     {
-      title: "Name",
-      dataIndex: "name",
-    },
-    {
       title: "Actions",
       dataIndex: "actions",
       render: (_: any, record: any) => (
@@ -56,11 +56,79 @@ const AdminBanner = () => {
 
   // handle click
 
-  const handleSave = (data: any) => {
-    console.log("Data saved:", data);
-    // Gửi dữ liệu đến server hoặc xử lý thêm
+  const convertImageData = async (image: any) => {
+    return new Promise((resolve, reject) => {
+      // Kiểm tra xem image.originFileObj có phải là đối tượng File hay không
+      if (!(image.originFileObj instanceof File)) {
+        reject(new Error("originFileObj is not a valid File object"));
+        return;
+      }
+
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        const buffer = Buffer.from(
+          new Uint8Array(reader.result as ArrayBuffer)
+        );
+        resolve({
+          fieldname: "file",
+          originalname: image.name,
+          encoding: "7bit", // Encoding mặc định
+          mimetype: image.type,
+          buffer: buffer,
+          size: image.size,
+        });
+      };
+
+      reader.onerror = (error) => {
+        reject(error);
+      };
+
+      // Đọc file thực sự từ originFileObj (chắc chắn rằng nó là File)
+      reader.readAsArrayBuffer(image.originFileObj);
+    });
   };
 
+  // Sử dụng hàm này để xử lý toàn bộ danh sách ảnh
+  const processImages = async (images: any) => {
+    const processedImages = await Promise.all(images.map(convertImageData));
+    console.log(processedImages);
+    return processedImages;
+  };
+
+  // Gọi hàm xử lý
+
+  const handleSave = async (data: any) => {
+    setIsLoading(true);
+    console.log(data);
+    const imagesArray = Array.isArray(data) ? data : [data];
+    processImages(imagesArray).then((result) => {
+      console.log("Kết quả:", result);
+    });
+    return;
+    try {
+      const header = localStorage.getItem("access_token");
+      const res = await postData(
+        "/api/admin/banner",
+        {
+          image: data,
+        },
+        {
+          headers: {
+            Authorization: `${header}`,
+          },
+        }
+      );
+      console.log("res banner: ", res);
+    } catch (err) {
+      console.error("Error saving banner", err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  if (isLoading) {
+    return <Loading message="Đang tải dữ liệu..." size="large" />;
+  }
   return (
     <div className="flex flex-col h-screen">
       <AdminHeader />
@@ -88,9 +156,6 @@ const AdminBanner = () => {
               <AdminModal
                 isOpen={isModal}
                 onClose={() => setIsModal(false)}
-                fields={[
-                  { name: "Banner name", placeholder: "Banner Name ..." },
-                ]}
                 enableImageUpload={true}
                 onSave={handleSave}
               />

@@ -65,14 +65,23 @@ const Register: React.FC = () => {
     }
 
     try {
-      const response = await postData("/api/auth/register", {
-        name: username,
-        email: email,
-        password: password,
-        repassword: repassword,
-        phone_number: phoneNumber,
-        codeforce_name: codeforceName,
-      });
+      const header = localStorage.getItem("access_token");
+      const response = await postData(
+        "/api/auth/register",
+        {
+          name: username,
+          email: email,
+          password: password,
+          repassword: repassword,
+          phone_number: phoneNumber,
+          codeforce_name: codeforceName,
+        },
+        {
+          headers: {
+            Authorization: `${header}`,
+          },
+        }
+      );
     } catch (error) {
       setErrorValid("general");
     } finally {
