@@ -15,7 +15,10 @@ const Login: React.FC = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const redirectPath = new URLSearchParams(location.search).get("redirect");
+  let redirectPath = new URLSearchParams(location.search).get("redirect");
+  if (redirectPath === "/login") {
+    redirectPath = "";
+  }
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -30,6 +33,7 @@ const Login: React.FC = () => {
           localStorage.setItem("redirectHistory", redirectPath);
           navigate(redirectPath);
         } else {
+          localStorage.removeItem("redirectHistory");
           if (response.user.role === "ADMIN") {
             navigate("/admin/dashboard");
           } else if (response.user.role === "TEACHER") {
