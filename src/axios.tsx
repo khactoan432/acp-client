@@ -19,9 +19,20 @@ export const getData = async (endpoint: string) => {
 };
 
 // Hàm gửi yêu cầu POST
-export const postData = async (endpoint: string, data: object, header:object) => {
+export const postData = async (endpoint: string, data: object) => {
   try {
-    const response = await api.post(endpoint, data, header);
+    const response = await api.post(endpoint, data);
+    return response.data;
+  } catch (error) {
+    console.error('Error posting data', error);
+    throw error;
+  }
+};
+
+// Hàm gửi yêu cầu POST
+export const deleteData = async (endpoint: string, data: object) => {
+  try {
+    const response = await api.delete(endpoint, data);
     return response.data;
   } catch (error) {
     console.error('Error posting data', error);
