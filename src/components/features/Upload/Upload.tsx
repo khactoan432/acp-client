@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { postData } from "../../../axios";
-import Button from "../../common/Button";
+import { toast } from "react-toastify";
 
 const MultiFileUpload: React.FC = () => {
   const [files, setFiles] = useState<File[]>([]); // Lưu danh sách file đã chọn
@@ -11,6 +11,7 @@ const MultiFileUpload: React.FC = () => {
     const selectedFiles = event.target.files
       ? Array.from(event.target.files)
       : [];
+
     setFiles((prevFiles) => [...prevFiles, ...selectedFiles]); // Thêm file mới vào danh sách
   };
 

@@ -1,42 +1,50 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
 import { TiDelete } from "react-icons/ti";
 import { Button } from "antd";
 
 // Định nghĩa interface
-interface ImageFile {
-  name: string;
-  url: string;
-}
 
 interface ImageUploaderProps {
   titleBtn?: string;
-  onImagesChange?: (images: ImageFile[]) => void;
+  onImagesChange?: (files: File[]) => void;
+  urls?: string[];
+  typefile: string;
+  reset?: boolean;
 }
 
 const ImageUploader: React.FC<ImageUploaderProps> = ({
   titleBtn = "Chọn ảnh/video",
   onImagesChange,
+  urls,
+  typefile = "image/*,video/*",
+  reset = false,
 }) => {
-  const [images, setImages] = useState<ImageFile[]>([]);
+  const [files, setFiles] = useState<File[]>([]);
 
   const onDrop = (acceptedFiles: File[]) => {
-    const uploadedImages = acceptedFiles.map((file) => ({
-      name: file.name,
-      url: URL.createObjectURL(file),
-    }));
-    setImages((prev) => {
+    const uploadedImages = acceptedFiles.map((file) => file);
+    setFiles((prev) => {
       const newImages = [...prev, ...uploadedImages];
-      onImagesChange?.(newImages);
+      onImagesChange?.(newImages); // Callback truyền danh sách ảnh mới
       return newImages;
     });
   };
+  useEffect(() => {
+    if (reset) {
+      setFiles([]); // Reset lại mảng files
+      onImagesChange?.([]); // Callback với mảng trống
+    }
+  }, [reset]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    accept: {
-      "image/*": [],
-    },
+    accept: typefile
+      ? typefile.split(",").reduce<Record<string, []>>((acc, mimeType) => {
+          acc[mimeType.trim()] = [];
+          return acc;
+        }, {})
+      : undefined,
     multiple: true,
   });
 
@@ -57,31 +65,62 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
         )}
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
-        {images.map((image, index) => (
+      <div className="grid gap-2 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 mt-4">
+        {/* grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 */}
+        {files.map((file, index) => (
           <div
             key={index}
             className="relative w-full h-32 overflow-hidden rounded-lg border"
           >
-            <img
-              src={image.url}
-              alt={image.name}
-              className="object-cover w-full h-full"
-            />
+            {file.type.startsWith("image/") && (
+              <img
+                src={URL.createObjectURL(file)}
+                alt={file.name}
+                className="object-cover w-full h-full"
+              />
+            )}
+            {file.type.startsWith("video/") && (
+              <video
+                src={URL.createObjectURL(file)}
+                controls
+                className="h-24 w-full object-cover rounded"
+              />
+            )}
             <button
               onClick={() =>
-                setImages((prev) => {
+                setFiles((prev) => {
                   const newImages = prev.filter((_, i) => i !== index);
                   onImagesChange?.(newImages); // Gọi callback khi xóa ảnh
                   return newImages;
                 })
               }
-              className="absolute top-[0.5] right-[0.5] bg-red-500 text-white rounded-full text-xs"
+              className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1"
             >
               <TiDelete className="text-base" />
             </button>
           </div>
         ))}
+        {urls &&
+          urls.map((url, index) => (
+            <div
+              key={index}
+              className="relative w-full h-32 overflow-hidden rounded-lg border"
+            >
+              <img src={url} alt={url} className="object-cover w-full h-full" />
+              <button
+                onClick={() =>
+                  setFiles((prev) => {
+                    const newImages = prev.filter((_, i) => i !== index);
+                    onImagesChange?.(newImages); // Gọi callback khi xóa ảnh
+                    return newImages;
+                  })
+                }
+                className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1"
+              >
+                <TiDelete className="text-base" />
+              </button>
+            </div>
+          ))}
       </div>
     </div>
   );

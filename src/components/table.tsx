@@ -3,11 +3,15 @@ import React from "react";
 interface TableProps<T> {
   columns: string[];
   data: T[];
+  onRowEdit: (row: T) => void;
+  onRowDelete: (row: T) => void;
 }
 
 const Table = <T extends Record<string, any>>({
   columns,
   data,
+  onRowEdit = () => {},
+  onRowDelete = () => {},
 }: TableProps<T>) => {
   return (
     <div style={{ padding: "20px", width: "100%" }}>
@@ -30,6 +34,7 @@ const Table = <T extends Record<string, any>>({
                 {col}
               </th>
             ))}
+            <th style={{ padding: "8px", textAlign: "center" }}>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -41,7 +46,13 @@ const Table = <T extends Record<string, any>>({
                   style={{ padding: "8px", textAlign: "center" }}
                 >
                   {col === "Name" && row[col]?.image ? (
-                    <div style={{ display: "flex", alignItems: "center" }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
                       <img
                         src={row[col].image}
                         alt={row[col].text}
@@ -51,13 +62,55 @@ const Table = <T extends Record<string, any>>({
                           marginRight: "8px",
                         }}
                       />
-                      <span>{row[col].text}</span>
+
+                      {row[col]?.text}
+                    </div>
+                  ) : col === "image" ? (
+                    <div style={{ display: "flex", alignItems: "center" }}>
+                      <img
+                        src={row[col]}
+                        alt={row[col]}
+                        style={{
+                          width: "30px",
+                          height: "30px",
+                          marginRight: "8px",
+                        }}
+                      />
                     </div>
                   ) : (
                     row[col]
                   )}
                 </td>
               ))}
+              <td style={{ padding: "8px", textAlign: "center" }}>
+                <button
+                  style={{
+                    marginRight: "8px",
+                    padding: "4px 8px",
+                    backgroundColor: "#4CAF50",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "4px",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => onRowEdit(row)}
+                >
+                  Edit
+                </button>
+                <button
+                  style={{
+                    padding: "4px 8px",
+                    backgroundColor: "#f44336",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "4px",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => onRowDelete(row)}
+                >
+                  Delete
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>
