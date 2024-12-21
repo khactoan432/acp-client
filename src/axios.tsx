@@ -6,23 +6,7 @@ const api = axios.create({
     "Content-Type": "application/json",
   },
 });
-const api = axios.create({
-  baseURL: "http://localhost:5050",
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
 
-// Hàm gửi yêu cầu GET
-export const getData = async (endpoint: string, header: object) => {
-  try {
-    const response = await api.get(endpoint, header);
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching data", error);
-    throw error;
-  }
-};
 // Hàm gửi yêu cầu GET
 export const getData = async (endpoint: string, header: object) => {
   try {
