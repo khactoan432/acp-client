@@ -1,33 +1,120 @@
-import React, { useState } from "react";
-import { Buffer } from "buffer";
-// import axios
-import { postData } from "../../axios";
-// import components
+import React, { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 import AdminModal from "../../components/popup/AdminModal";
 import AdminHeader from "../../components/layout/Admin/header";
 import Nav from "../../components/layout/Admin/nav";
 import Loading from "../../components/loading";
-// import ant
+import { useSelector, useDispatch } from "react-redux";
 import { Table, Button, Input, Checkbox, Pagination } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
-import "antd/dist/reset.css";
+import { RootState, AppDispatch } from "../../redux/store";
+import {
+  fetchAdminBanners,
+  createBanner,
+  updateBanner,
+  deleteBanner,
+} from "../../redux/slices/bannerSlice";
 
-import ExampleImageBanner from "../../assets/admin/addBanner/example.png";
+interface Banner {
+  _id: string;
+  image: string;
+}
+
+interface SaveData {
+  files?: File[];
+  default_file: { name: string; url: string }[];
+}
+
+const PAGE_SIZE = 10;
 
 const AdminBanner: React.FC = () => {
-  const [isModal, setIsModal] = useState(false);
-  const [isLoading, setIsLoading] = React.useState(false);
+  const [isModalSaveOpen, setIsModalSaveOpen] = useState(false);
+  const [isModalUpdateOpen, setIsModalUpdateOpen] = useState(false);
+  const [currentEdit, setCurrentEdit] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
-  const data = Array.from({ length: 10 }, (_, index) => ({
-    key: index,
-    image: ExampleImageBanner,
-  }));
+  const dispatch = useDispatch<AppDispatch>();
+  const { adminBanners, totalAdmin, loading, error } = useSelector(
+    (state: RootState) => state.banners
+  );
+
+  useEffect(() => {
+    dispatch(fetchAdminBanners({ page: currentPage, limit: PAGE_SIZE }));
+  }, [dispatch, currentPage]);
+
+  const getDataForEdit = (id: string | null): SaveData => {
+    const banner = adminBanners.find((b) => b._id === id);
+    return {
+      default_file: [
+        {
+          name: banner?.image.split("/").pop() || "",
+          url: banner?.image || "",
+        },
+      ],
+    };
+  };
+
+  const handleSave = async (data: SaveData): Promise<void> => {
+    if (!data.files || data.files.length === 0) {
+      toast.error("Please upload at least one file.");
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      data.files.forEach((file) => formData.append("files", file));
+      formData.append("folderPath", "Banners");
+
+      await dispatch(createBanner(formData)).unwrap();
+      toast.success("Upload successful!");
+
+      setIsModalSaveOpen(false);
+    } catch (err) {
+      toast.error("Upload failed!");
+      console.error(err);
+    }
+  };
+
+  const handleUpdate = async (data: SaveData): Promise<void> => {
+    if (!currentEdit) {
+      toast.error("Invalid banner selection.");
+      return;
+    }
+
+    if (!data.files || data.files.length === 0) {
+      toast.error("Please upload at least one file.");
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      data.files.forEach((file) => formData.append("files", file));
+
+      await dispatch(updateBanner({ bannerId: currentEdit, updatedData: formData })).unwrap();
+      toast.success("Update successful!");
+
+      setIsModalUpdateOpen(false);
+    } catch (err) {
+      toast.error("Update failed!");
+      console.error(err);
+    }
+  };
+
+  const handleDelete = async (bannerId: string): Promise<void> => {
+    try {
+      await dispatch(deleteBanner(bannerId)).unwrap();
+      toast.success("Banner deleted successfully!");
+    } catch (err) {
+      toast.error("Failed to delete banner!");
+      console.error(err);
+    }
+  };
 
   const columns = [
     {
       title: <Checkbox />,
       dataIndex: "checkbox",
-      render: (_: any, record: any) => <Checkbox />,
+      render: () => <Checkbox />,
       width: 50,
     },
     {
@@ -36,7 +123,7 @@ const AdminBanner: React.FC = () => {
       render: (src: string) => (
         <img
           src={src}
-          alt="banner"
+          alt={src?.split("/").pop() || ""}
           style={{ width: "100px", height: "50px", objectFit: "cover" }}
         />
       ),
@@ -44,144 +131,93 @@ const AdminBanner: React.FC = () => {
     {
       title: "Actions",
       dataIndex: "actions",
-      render: (_: any, record: any) => (
+      render: (_: unknown, record: Banner) => (
         <div style={{ display: "flex", gap: "8px" }}>
-          <Button type="text" icon={<EditOutlined />} />
-          <Button type="text" icon={<DeleteOutlined />} danger />
+          <Button
+            type="text"
+            icon={<EditOutlined />}
+            onClick={() => {
+              setCurrentEdit(record._id);
+              setIsModalUpdateOpen(true);
+            }}
+          />
+          <Button
+            type="text"
+            icon={<DeleteOutlined />}
+            danger
+            onClick={() => handleDelete(record._id)}
+          />
         </div>
       ),
       width: 100,
     },
   ];
 
-  // handle click
-
-  const convertImageData = async (image: any) => {
-    return new Promise((resolve, reject) => {
-      // Kiểm tra xem image.originFileObj có phải là đối tượng File hay không
-      if (!(image.originFileObj instanceof File)) {
-        reject(new Error("originFileObj is not a valid File object"));
-        return;
-      }
-
-      const reader = new FileReader();
-
-      reader.onload = () => {
-        const buffer = Buffer.from(
-          new Uint8Array(reader.result as ArrayBuffer)
-        );
-        resolve({
-          fieldname: "file",
-          originalname: image.name,
-          encoding: "7bit", // Encoding mặc định
-          mimetype: image.type,
-          buffer: buffer,
-          size: image.size,
-        });
-      };
-
-      reader.onerror = (error) => {
-        reject(error);
-      };
-
-      // Đọc file thực sự từ originFileObj (chắc chắn rằng nó là File)
-      reader.readAsArrayBuffer(image.originFileObj);
-    });
-  };
-
-  // Sử dụng hàm này để xử lý toàn bộ danh sách ảnh
-  const processImages = async (images: any) => {
-    const processedImages = await Promise.all(images.map(convertImageData));
-    console.log(processedImages);
-    return processedImages;
-  };
-
-  // Gọi hàm xử lý
-
-  const handleSave = async (data: any) => {
-    setIsLoading(true);
-    console.log(data);
-    const imagesArray = Array.isArray(data) ? data : [data];
-    processImages(imagesArray).then((result) => {
-      console.log("Kết quả:", result);
-    });
-    return;
-    try {
-      const header = localStorage.getItem("access_token");
-      const res = await postData(
-        "/api/admin/banner",
-        {
-          image: data,
-        },
-        {
-          headers: {
-            Authorization: `${header}`,
-          },
-        }
-      );
-      console.log("res banner: ", res);
-    } catch (err) {
-      console.error("Error saving banner", err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  if (isLoading) {
-    return <Loading message="Đang tải dữ liệu..." size="large" />;
+  if (loading) {
+    return <Loading message="Loading data..." size="large" />;
   }
+
+  if (error) {
+    toast.error(error);
+  }
+
   return (
     <div className="flex flex-col h-screen">
       <AdminHeader />
       <div className="flex flex-1">
         <Nav />
-        {/* content */}
-        <div
-          style={{ padding: "20px", backgroundColor: "#f9f9f9", width: "100%" }}
-        >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              marginBottom: "16px",
-            }}
-          >
+        <div style={{ padding: "20px", backgroundColor: "#f9f9f9", width: "100%" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "16px" }}>
             <div style={{ display: "flex", gap: "8px" }}>
               <Input placeholder="Search..." style={{ width: "200px" }} />
               <Button>Filter</Button>
             </div>
-            <div style={{ display: "flex", gap: "8px" }}>
-              <Button type="primary" onClick={() => setIsModal(true)}>
-                + Add Banner
-              </Button>
-              <AdminModal
-                isOpen={isModal}
-                onClose={() => setIsModal(false)}
-                enableImageUpload={true}
-                onSave={handleSave}
-              />
-            </div>
+            <Button type="primary" onClick={() => setIsModalSaveOpen(true)}>
+              + Add Banner
+            </Button>
           </div>
 
           <Table
-            dataSource={data}
+            dataSource={adminBanners.map((banner) => ({ ...banner, key: banner._id }))}
             columns={columns}
             pagination={false}
             bordered
+            rowKey="_id"
           />
-
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginTop: "16px",
-            }}
-          >
-            <span>150 Results</span>
-            <Pagination defaultCurrent={2} total={150} pageSize={10} />
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "16px" }}>
+            <span>{totalAdmin} Results</span>
+            <Pagination
+              current={currentPage}
+              total={totalAdmin}
+              pageSize={PAGE_SIZE}
+              onChange={(page) => setCurrentPage(page)}
+            />
           </div>
         </div>
       </div>
+
+      <AdminModal
+        isOpen={isModalSaveOpen}
+        multiple={true}
+        onClose={() => setIsModalSaveOpen(false)}
+        enableImageUpload={true}
+        onSave={handleSave}
+        data={{}}
+        title="Upload New Banner"
+      />
+
+      <AdminModal
+        isOpen={isModalUpdateOpen}
+        multiple={false}
+        onClose={() => {
+          setIsModalUpdateOpen(false);
+          setCurrentEdit(null);
+        }}
+        enableImageUpload={true}
+        onSave={handleUpdate}
+        data={getDataForEdit(currentEdit)}
+        title="Edit Banner"
+      />
     </div>
   );
 };

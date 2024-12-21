@@ -69,22 +69,22 @@ const Header = () => {
         </nav>
 
         {isLogin
-          ?<div className="relative">
+          ?<div className="hidden md:block relative">
             {/* User Icon/Button */}
             <div className=" w-[110px] flex justify-end">
-            <button
-              className="flex items-center focus:outline-none"
-              onClick={()=>setIsUserOpen(!isUserOpen)}
-            >
-              <img
-                src={User} // Replace with actual user avatar
-                alt="User Avatar"
-                className="w-10 h-10 rounded-full bg-gray-200"
-              />
-              {/* <span className="ml-2 text-gray-600">
-                <i className="fa-solid fa-chevron-down">User</i>
-              </span> */}
-            </button>
+              <button
+                className="flex items-center focus:outline-none"
+                onClick={()=>setIsUserOpen(!isUserOpen)}
+              >
+                <img
+                  src={User} // Replace with actual user avatar
+                  alt="User Avatar"
+                  className="w-10 h-10 rounded-full bg-gray-200"
+                />
+                {/* <span className="ml-2 text-gray-600">
+                  <i className="fa-solid fa-chevron-down">User</i>
+                </span> */}
+              </button>
             </div>
       
             {/* Dropdown Menu */}
@@ -196,12 +196,20 @@ const Header = () => {
             >
               Liên hệ
             </a>
-            <Button
-              onClick={() => navigate("/login")}
-              className="md::hidden h-[36px] w-full rounded-[17px]"
-            >
-              Đăng nhập
-            </Button>
+            {isLogin
+              ? <Button
+                  onClick={handleLogout}
+                  className="md::hidden h-[36px] w-full rounded-[17px]"
+                >
+                  Đăng xuất
+                </Button>
+              : <Button
+                  onClick={() => navigate("/login")}
+                  className="md::hidden h-[36px] w-full rounded-[17px]"
+                >
+                  Đăng nhập
+                </Button>
+            } 
           </div>
         </nav>
       )}

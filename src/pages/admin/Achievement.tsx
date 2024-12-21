@@ -1,33 +1,148 @@
-import React, { useState } from "react";
-
-// import component
-import Nav from "../../components/layout/Admin/nav";
-import AdminHeader from "../../components/layout/Admin/header";
+import React, { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 import AdminModal from "../../components/popup/AdminModal";
-
+import AdminHeader from "../../components/layout/Admin/header";
+import Nav from "../../components/layout/Admin/nav";
+import Loading from "../../components/loading";
+import { useSelector, useDispatch } from "react-redux";
 import { Table, Button, Input, Checkbox, Pagination } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
-import "antd/dist/reset.css";
+import { RootState, AppDispatch } from "../../redux/store";
+import {
+  fetchAdminAchievements,
+  createAchievement,
+  updateAchievement,
+  deleteAchievement,
+} from "../../redux/slices/achievementSlice";
 
-import ExampleImageBanner from "../../assets/admin/addBanner/example.png";
+interface Achievement {
+  _id: string;
+  image: string;
+  email_user: string;
+  prize: string;
+  competition: string;
+}
 
-const AdminAchievement = () => {
-  const [isModal, setIsModal] = useState(false);
+interface SaveData {
+  files?: File[];
+  default_file: [{name: string, url: string}];
+  email_user: string;
+  prize: string;
+  competition: string;
+}
 
-  const data = Array.from({ length: 10 }, (_, index) => ({
-    key: index,
-    image: ExampleImageBanner,
-    school: "Chuyên Lê quý đôn",
-    province: "Hà Nội",
-    achivement: "Giải nhất",
-    competition: "Olympic tin học",
-  }));
+const PAGE_SIZE = 10;
+
+const AdminAchievement: React.FC = () => {
+  const [isModalSaveOpen, setIsModalSaveOpen] = useState(false);
+  const [isModalUpdateOpen, setIsModalUpdateOpen] = useState(false);
+  const [currentEdit, setCurrentEdit] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const fields= [
+    { name: "email_user", placeholder: "Student Email ..." },
+    { name: "prize", placeholder: "Prize ..." },
+    { name: "competition", placeholder: "Competition ..." },
+  ]
+
+  const dispatch = useDispatch<AppDispatch>();
+    const { adminAchievements, totalAdmin, loading, error } = useSelector(
+      (state: RootState) => state.achievements
+    );
+  
+  useEffect(() => {
+    dispatch(fetchAdminAchievements({ page: currentPage, limit: PAGE_SIZE }));
+  }, [dispatch, currentPage]);
+
+  const getDataForEdit = (id: string|null): SaveData => {
+    const achievement = adminAchievements.find((b) => b._id === id);
+    return {
+      default_file: [{
+        name: achievement?.image.split("/").pop() || "",
+        url: achievement?.image || "",
+      }],
+      email_user: achievement?.email_user || "",
+      prize: achievement?.prize || "",
+      competition: achievement?.competition || "",
+    }
+  };
+
+  const handleSave = async (data: SaveData): Promise<void> => {
+    if (!data.files || data.files.length === 0) {
+      toast.error("Please upload at least one file.");
+      return;
+    }
+
+    if (!data.email_user || !data.prize || !data.competition) {
+      toast.error("Please fill all information.");
+      return;
+    }
+  
+    try {
+      const formData = new FormData();
+      data.files.forEach((file) => formData.append("files", file));
+      formData.append("email_user", data.email_user);
+      formData.append("prize", data.prize);
+      formData.append("competition", data.competition);
+  
+      await dispatch(createAchievement(formData)).unwrap();
+      toast.success("Upload successful!");
+
+      setIsModalSaveOpen(false);
+    } catch (error) {
+      toast.error("Upload failed!");
+      console.error(error);
+    }
+  };
+  
+  const handleUpdate = async (data: SaveData): Promise<void> => {
+    if (!currentEdit) {
+      toast.error("Please upload at least one file.");
+      return;
+    }
+  
+    try {
+      const formData = new FormData();
+      data.files?.forEach((file) => formData.append("files", file));
+      const fields = [
+        { key: "email_user", value: data.email_user },
+        { key: "prize", value: data.prize },
+        { key: "competition", value: data.competition },
+      ];
+      
+      fields.forEach((field) => {
+        if (field.value && String(field.value).trim() !== "") {
+          formData.append(field.key, field.value);
+        }
+      });      
+  
+      await dispatch(updateAchievement({ achievementId: currentEdit, updatedData: formData })).unwrap();
+      toast.success("Update successful!");
+
+      setIsModalUpdateOpen(false);
+    } catch (error) {
+      toast.error("Update failed!");
+      console.error(error);
+    }
+  };
+  
+
+  const handleDelete = async (achievementId: string): Promise<void> => {
+    try {
+      await dispatch(deleteAchievement(achievementId)).unwrap();
+
+      toast.success("Achievement deleted successfully!");
+    } catch (error) {
+      toast.error("Failed to delete achievement!");
+      console.error(error);
+    }
+  };
 
   const columns = [
     {
       title: <Checkbox />,
       dataIndex: "checkbox",
-      render: (_: any, record: any) => <Checkbox />,
+      render: () => <Checkbox />,
       width: 50,
     },
     {
@@ -36,22 +151,18 @@ const AdminAchievement = () => {
       render: (src: string) => (
         <img
           src={src}
-          alt="banner"
+          alt="achievement"
           style={{ width: "100px", height: "50px", objectFit: "cover" }}
         />
       ),
     },
     {
-      title: "School",
-      dataIndex: "school",
+      title: "Student Email",
+      dataIndex: "email_user",
     },
     {
-      title: "Province",
-      dataIndex: "province",
-    },
-    {
-      title: "Achivement",
-      dataIndex: "achivement",
+      title: "Prize",
+      dataIndex: "prize",
     },
     {
       title: "Competition",
@@ -60,20 +171,36 @@ const AdminAchievement = () => {
     {
       title: "Actions",
       dataIndex: "actions",
-      render: (_: any, record: any) => (
+      render: (_: unknown, record: Achievement) => (
         <div style={{ display: "flex", gap: "8px" }}>
-          <Button type="text" icon={<EditOutlined />} />
-          <Button type="text" icon={<DeleteOutlined />} danger />
+          <Button
+            type="text"
+            icon={<EditOutlined />}
+            onClick={() => {
+              setCurrentEdit(record._id);
+              setIsModalUpdateOpen(true);
+            }}
+          />
+          <Button
+            type="text"
+            icon={<DeleteOutlined />}
+            danger
+            onClick={() => handleDelete(record._id)}
+          />
         </div>
       ),
       width: 100,
     },
   ];
 
-  const handleSave = (data: any) => {
-    console.log("Data saved:", data);
-    // Gửi dữ liệu đến server & xử lý thêm
-  };
+  if (loading) {
+    return <Loading message="Loading data..." size="large" />;
+  }
+
+  if (error) {
+    toast.error(error);
+  }
+
   return (
     <div className="flex flex-col h-screen">
       <AdminHeader />
@@ -96,46 +223,57 @@ const AdminAchievement = () => {
             </div>
             <div style={{ display: "flex", gap: "8px" }}>
               <Button>Export</Button>
-              <Button type="primary" onClick={() => setIsModal(true)}>
+              <Button type="primary" onClick={() => setIsModalSaveOpen(true)}>
                 + Add student
               </Button>
-              <AdminModal
-                isOpen={isModal}
-                onClose={() => setIsModal(false)}
-                fields={[
-                  { name: "studentName", placeholder: "Student Name ..." },
-                  { name: "class", placeholder: "Class ..." },
-                  { name: "school", placeholder: "School ..." },
-                  { name: "province", placeholder: "Province ..." },
-                  { name: "achievement", placeholder: "Achievement ..." },
-                  { name: "competition", placeholder: "Competition ..." },
-                ]}
-                enableImageUpload={true} // Bật upload ảnh
-                onSave={handleSave}
-              />
             </div>
           </div>
 
           <Table
-            dataSource={data}
+            dataSource={adminAchievements}
             columns={columns}
             pagination={false}
             bordered
+            rowKey="_id"
           />
 
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginTop: "16px",
-            }}
-          >
-            <span>150 Results</span>
-            <Pagination defaultCurrent={2} total={150} pageSize={10} />
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "16px" }}>
+            <span>{totalAdmin} Results</span>
+            <Pagination
+              current={currentPage}
+              total={totalAdmin}
+              pageSize={PAGE_SIZE}
+              onChange={(page) => setCurrentPage(page)}
+            />
           </div>
+          
         </div>
       </div>
+
+      <AdminModal
+        isOpen={isModalSaveOpen}
+        multiple={false}
+        onClose={() => setIsModalSaveOpen(false)}
+        fields={fields}
+        enableImageUpload={true}
+        onSave={handleSave}
+        data={{}}
+        title="Upload New Achievement"
+      />
+
+      <AdminModal
+        isOpen={isModalUpdateOpen}
+        multiple={false}
+        onClose={() => {
+          setIsModalUpdateOpen(false);
+          setCurrentEdit(null);
+        }}
+        fields={fields}
+        enableImageUpload={true}
+        onSave={handleUpdate}
+        data={getDataForEdit(currentEdit)}
+        title="Edit Achievement"
+      />
     </div>
   );
 };
