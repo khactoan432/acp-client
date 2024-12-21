@@ -6,7 +6,8 @@ interface PopupNotificationProps {
   title: string;
   status: "success" | "error"; // Trạng thái: success hoặc error
   buttonText?: string; // Nội dung của button (có thể không có nếu không truyền)
-  onButtonClick?: () => void; // Hàm khi nhấn nút button
+  onButtonClick?: (arg?: any) => void; // Hàm khi nhấn nút button
+  buttonClose?: () => void;
 }
 
 const PopupNotification: React.FC<PopupNotificationProps> = ({
@@ -14,6 +15,7 @@ const PopupNotification: React.FC<PopupNotificationProps> = ({
   status,
   buttonText,
   onButtonClick,
+  buttonClose,
 }) => {
   // Cài đặt icon và màu sắc tùy thuộc vào trạng thái
   const icon =
@@ -33,23 +35,34 @@ const PopupNotification: React.FC<PopupNotificationProps> = ({
       width={400}
     >
       <div style={styles.content}>
-        {icon}
+        <div
+          style={{
+            position: "absolute",
+            top: "16px",
+            right: "16px",
+            cursor: "pointer",
+          }}
+          onClick={buttonClose}
+        >
+          {icon}
+        </div>
         <div style={styles.message}>
           {status === "success" ? (
             <p style={{ color: "green" }}>Operation was successful!</p>
           ) : (
-            <p style={{ color: "red" }}>
-              Something went wrong, please try again.
-            </p>
+            <p style={{ color: "red" }}>Dữ liệu không thể khôi phục khi xoá!</p>
           )}
         </div>
 
         {/* Hiển thị button nếu có */}
         {buttonText && (
           <Button
-            className="btn-primary"
+            className="bg-white"
+            style={{
+              ...styles.button,
+              color: status === "success" ? "green" : "red",
+            }}
             onClick={onButtonClick}
-            style={styles.button}
           >
             {buttonText}
           </Button>

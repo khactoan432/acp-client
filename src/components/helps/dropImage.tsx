@@ -3,12 +3,11 @@ import { useDropzone } from "react-dropzone";
 import { TiDelete } from "react-icons/ti";
 import { Button } from "antd";
 
-// Định nghĩa interface
-
 interface ImageUploaderProps {
   titleBtn?: string;
   onImagesChange?: (files: File[]) => void;
-  urls?: string[];
+  onUrlsReset?: () => void; // Callback để reset URL
+  urls?: string; // URL của ảnh hoặc video
   typefile: string;
   reset?: boolean;
 }
@@ -16,6 +15,7 @@ interface ImageUploaderProps {
 const ImageUploader: React.FC<ImageUploaderProps> = ({
   titleBtn = "Chọn ảnh/video",
   onImagesChange,
+  onUrlsReset,
   urls,
   typefile = "image/*,video/*",
   reset = false,
@@ -23,19 +23,23 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
   const [files, setFiles] = useState<File[]>([]);
 
   const onDrop = (acceptedFiles: File[]) => {
-    const uploadedImages = acceptedFiles.map((file) => file);
-    setFiles((prev) => {
-      const newImages = [...prev, ...uploadedImages];
-      onImagesChange?.(newImages); // Callback truyền danh sách ảnh mới
-      return newImages;
-    });
+    const uploadedFile = acceptedFiles[0]; // Chỉ lấy 1 file
+    setFiles([uploadedFile]); // Cập nhật state với file mới
+    onImagesChange?.([uploadedFile]); // Callback với file mới
+    if (urls) {
+      onUrlsReset?.(); // Reset URL nếu có
+    }
   };
+
   useEffect(() => {
     if (reset) {
-      setFiles([]); // Reset lại mảng files
+      setFiles([]); // Reset files
       onImagesChange?.([]); // Callback với mảng trống
+      if (urls) {
+        onUrlsReset?.(); // Reset URL nếu cần
+      }
     }
-  }, [reset]);
+  }, [reset, onImagesChange, onUrlsReset, urls]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -45,7 +49,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
           return acc;
         }, {})
       : undefined,
-    multiple: true,
+    multiple: false, // Chỉ nhận một file
   });
 
   return (
@@ -59,68 +63,66 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
         <input {...getInputProps()} />
         <Button>{titleBtn}</Button>
         {isDragActive ? (
-          <p className="text-blue-500">Thả ảnh vào đây...</p>
+          <p className="text-blue-500">Thả file vào đây...</p>
         ) : (
-          <p>Kéo thả ảnh vào đây, hoặc bấm để chọn ảnh</p>
+          <p>Kéo thả file vào đây, hoặc bấm để chọn file</p>
         )}
       </div>
 
       <div className="grid gap-2 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 mt-4">
-        {/* grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 */}
-        {files.map((file, index) => (
+        {/* Hiển thị file đã chọn */}
+        {files.length > 0 && (
           <div
-            key={index}
+            key="uploaded-file"
             className="relative w-full h-32 overflow-hidden rounded-lg border"
           >
-            {file.type.startsWith("image/") && (
+            {files[0].type.startsWith("image/") && (
               <img
-                src={URL.createObjectURL(file)}
-                alt={file.name}
+                src={URL.createObjectURL(files[0])}
+                alt={files[0].name}
                 className="object-cover w-full h-full"
               />
             )}
-            {file.type.startsWith("video/") && (
+            {files[0].type.startsWith("video/") && (
               <video
-                src={URL.createObjectURL(file)}
+                src={URL.createObjectURL(files[0])}
                 controls
                 className="h-24 w-full object-cover rounded"
               />
             )}
             <button
-              onClick={() =>
-                setFiles((prev) => {
-                  const newImages = prev.filter((_, i) => i !== index);
-                  onImagesChange?.(newImages); // Gọi callback khi xóa ảnh
-                  return newImages;
-                })
-              }
+              onClick={() => {
+                setFiles([]); // Xóa file
+                onImagesChange?.([]); // Callback với mảng trống
+              }}
               className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1"
             >
               <TiDelete className="text-base" />
             </button>
           </div>
-        ))}
-        {urls &&
-          urls.map((url, index) => (
-            <div
-              key={index}
-              className="relative w-full h-32 overflow-hidden rounded-lg border"
+        )}
+
+        {/* Hiển thị URL nếu có */}
+        {urls && (
+          <div
+            key="uploaded-url"
+            className="relative w-full h-32 overflow-hidden rounded-lg border"
+          >
+            <img
+              src={urls}
+              alt="uploaded-url"
+              className="object-cover w-full h-full"
+            />
+            <button
+              onClick={() => {
+                onUrlsReset?.(); // Reset URL
+              }}
+              className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1"
             >
-              <img src={url} alt={url} className="object-cover w-full h-full" />
-              <button
-                onClick={() =>
-                  setFiles((prev) => {
-                    const newImages = prev.filter((_, i) => i !== index);
-                    onImagesChange?.(newImages); // Gọi callback khi xóa ảnh
-                    return newImages;
-                  })
-                }
-                className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1"
-              >
-                <TiDelete className="text-base" />
-              </button>
-            </div>
-          ))}
+              <TiDelete className="text-base" />
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

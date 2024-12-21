@@ -1,10 +1,14 @@
 import React from "react";
+import { FaRegEdit } from "react-icons/fa";
+import { MdOutlineDeleteOutline } from "react-icons/md";
+import { MdContentPaste } from "react-icons/md";
+import { MdAttractions } from "react-icons/md";
 
 interface TableProps<T> {
   columns: string[];
   data: T[];
-  onRowEdit: (row: T) => void;
-  onRowDelete: (row: T) => void;
+  onRowEdit?: (type: string, row: T) => void;
+  onRowDelete?: (row: T) => void;
 }
 
 const Table = <T extends Record<string, any>>({
@@ -77,6 +81,18 @@ const Table = <T extends Record<string, any>>({
                         }}
                       />
                     </div>
+                  ) : row[col] === "" ? (
+                    "None"
+                  ) : col === "video" ? (
+                    <video
+                      src={row[col]}
+                      controls
+                      style={{
+                        width: "30px",
+                        height: "30px",
+                        marginRight: "8px",
+                      }}
+                    />
                   ) : (
                     row[col]
                   )}
@@ -84,6 +100,7 @@ const Table = <T extends Record<string, any>>({
               ))}
               <td style={{ padding: "8px", textAlign: "center" }}>
                 <button
+                  title="Sửa nội dung"
                   style={{
                     marginRight: "8px",
                     padding: "4px 8px",
@@ -93,11 +110,43 @@ const Table = <T extends Record<string, any>>({
                     borderRadius: "4px",
                     cursor: "pointer",
                   }}
-                  onClick={() => onRowEdit(row)}
+                  onClick={() => onRowEdit("CONTENT", row)}
                 >
-                  Edit
+                  <MdContentPaste />
+                </button>
+
+                <button
+                  title="Sửa giới thiệu"
+                  style={{
+                    marginRight: "8px",
+                    padding: "4px 8px",
+                    backgroundColor: "#4CAF50",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "4px",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => onRowEdit("INTRODUCE", row)}
+                >
+                  <MdAttractions />
                 </button>
                 <button
+                  title="Sửa khoá học"
+                  style={{
+                    marginRight: "8px",
+                    padding: "4px 8px",
+                    backgroundColor: "#4CAF50",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "4px",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => onRowEdit("COURSE", row)}
+                >
+                  <FaRegEdit />
+                </button>
+                <button
+                  title="Xoá khoá học"
                   style={{
                     padding: "4px 8px",
                     backgroundColor: "#f44336",
@@ -108,7 +157,7 @@ const Table = <T extends Record<string, any>>({
                   }}
                   onClick={() => onRowDelete(row)}
                 >
-                  Delete
+                  <MdOutlineDeleteOutline />
                 </button>
               </td>
             </tr>
