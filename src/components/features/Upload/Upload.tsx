@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import { postData } from "../../../axios";
+import { postFile } from "../../../axios";
 import { toast } from "react-toastify";
 
 const MultiFileUpload: React.FC = () => {
   const [files, setFiles] = useState<File[]>([]); // Lưu danh sách file đã chọn
+  const [folderPath, setFolderPath] = useState<string>(""); // Đường dẫn folder
   const [isUploading, setIsUploading] = useState(false); // Trạng thái đang upload
 
   // Xử lý khi chọn nhiều file
@@ -27,23 +28,27 @@ const MultiFileUpload: React.FC = () => {
       return;
     }
 
+    if (!folderPath.trim()) {
+      toast.error("Vui lòng nhập đường dẫn folder!");
+      return;
+    }
+
     const formData = new FormData();
     files.forEach((file) => formData.append("files", file)); // Thêm tất cả file vào FormData
+    formData.append("folderPath", folderPath); // Thêm folderPath vào FormData
 
     try {
       setIsUploading(true); // Bật trạng thái upload
-      const response = await postData("/api/upload/upload", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      console.log(formData);
+      const response = await postFile("/api/upload/upload", formData);
 
       // Hiển thị kết quả
       toast.success("Upload thành công!");
       console.log("Uploaded Files:", response);
 
-      // Reset danh sách file
+      // Reset danh sách file và folderPath
       setFiles([]);
+      setFolderPath("");
     } catch (error: any) {
       toast.error("Upload thất bại!");
       console.error(error.message);
@@ -55,6 +60,19 @@ const MultiFileUpload: React.FC = () => {
   return (
     <div className="max-w-[1228px] mx-auto bg-white p-6 rounded-lg shadow-md">
       <h2 className="text-xl font-bold mb-4">Upload nhiều file (Ảnh/Video)</h2>
+      <div className="mb-4">
+        <label className="block font-semibold mb-2" htmlFor="folderPath">
+          Nhập đường dẫn folder:
+        </label>
+        <input
+          type="text"
+          id="folderPath"
+          value={folderPath}
+          onChange={(e) => setFolderPath(e.target.value)}
+          placeholder="Ví dụ: uploads/my-folder"
+          className="block w-full border p-2 rounded"
+        />
+      </div>
       <input
         type="file"
         multiple
