@@ -18,7 +18,7 @@ import PopupNotification from "../../components/popup/notify";
 import { CiCirclePlus } from "react-icons/ci";
 
 //axios
-import { postData, getData, deleteData, updateData } from "../../axios";
+import { postData, getData, deleteData, putData } from "../../axios";
 
 const AdminCourse: React.FC = () => {
   const header = localStorage.getItem("access_token");
@@ -243,7 +243,7 @@ const AdminCourse: React.FC = () => {
       formData.append("price", oldPrice.current?.value || "");
       formData.append("discount", newPrice.current?.value || "");
 
-      const resCourse = await updateData(
+      const resCourse = await putData(
         `/api/admin/course/${idCourse}`,
         formData,
         {

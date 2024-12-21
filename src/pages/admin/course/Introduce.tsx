@@ -19,7 +19,7 @@ import { CiCirclePlus } from "react-icons/ci";
 import { FaCheck } from "react-icons/fa";
 
 // import axios
-import { postData, getData, deleteData, updateData } from "../../../axios";
+import { postData, getData, deleteData, putData } from "../../../axios";
 
 // interface
 interface Desc {
@@ -198,7 +198,7 @@ const Introduce: React.FC = () => {
     }));
 
     try {
-      const resDescribe = await updateData(
+      const resDescribe = await putData(
         `/api/admin/describe/${idIntro}`,
         {
           desc: introTitle,
@@ -213,7 +213,7 @@ const Introduce: React.FC = () => {
         console.log("data", data);
         if (data.id && data.desc) {
           try {
-            const update = await updateData(
+            const update = await putData(
               `/api/admin/overview/${data.id}`,
               {
                 desc: data.desc,
