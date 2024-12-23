@@ -26,7 +26,7 @@ const AdminCourse: React.FC = () => {
   // state boolen
   const [isUpdate, setIsUpdate] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [isCreateCourses, setIsCreateCourses] = useState(false);
+  const [isFetchData, setIsFetchData] = useState(false);
 
   // get data
   useEffect(() => {
@@ -49,7 +49,7 @@ const AdminCourse: React.FC = () => {
       }
     };
     fetchDataCourse();
-  }, [isCreateCourses]);
+  }, [isFetchData]);
 
   // state string
   const [idCourseDeleted, setIdCourseDeleted] = useState<string>("");
@@ -134,7 +134,7 @@ const AdminCourse: React.FC = () => {
       // 1. Upload course information
       const formData = new FormData();
       imageIntroCourse.forEach((file) => formData.append("fileImage", file));
-      uploadeVideoIntro.forEach((file) => formData.append("fileImage", file));
+      uploadeVideoIntro.forEach((file) => formData.append("fileVideo", file));
 
       formData.append("name", courseTitleRef.current?.value || "");
       formData.append("price", oldPrice.current?.value || "");
@@ -159,7 +159,7 @@ const AdminCourse: React.FC = () => {
       console.error("Error saving course:", err);
     } finally {
       setIsLoading(false);
-      setIsCreateCourses(!isCreateCourses);
+      setIsFetchData(!isFetchData);
     }
   };
   // handle edit
@@ -208,6 +208,7 @@ const AdminCourse: React.FC = () => {
       setIsLoading(false);
       setIdModalVisible(false);
       setIdCourseDeleted("");
+      setIsFetchData(!isFetchData);
     }
   };
 
@@ -233,7 +234,7 @@ const AdminCourse: React.FC = () => {
       }
 
       if (uploadeVideoIntro && uploadeVideoIntro.length > 0) {
-        uploadeVideoIntro.forEach((file) => formData.append("fileImage", file));
+        uploadeVideoIntro.forEach((file) => formData.append("fileVideo", file));
       } else {
         video = dataEditCourse.video;
         formData.append("video", video);
@@ -333,7 +334,7 @@ const AdminCourse: React.FC = () => {
                       </h4>
                       <ImageUploader
                         titleBtn="Chọn video"
-                        typefile="image/*"
+                        typefile="video/*"
                         onImagesChange={handleVideoIntroChange}
                         urls={dataEditCourse?.video ? dataEditCourse.video : ""}
                         onUrlsReset={hanleResetUrlsVideo}

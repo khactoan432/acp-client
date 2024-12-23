@@ -11,29 +11,37 @@ import { Button } from "antd";
 import ButtonPlus from "../../../components/button/plus";
 import ImageUploader from "../../../components/helps/dropImage";
 import Loading from "../../../components/loading";
+import PopupNotification from "../../../components/popup/notify";
 
 // import icon react
 import { MdDeleteOutline } from "react-icons/md";
 import { MdEditSquare } from "react-icons/md";
 import { CiCirclePlus } from "react-icons/ci";
 import { FaRegCirclePlay } from "react-icons/fa6";
+import { FaChevronLeft } from "react-icons/fa6";
 
 // import axios
-import { postData, getData, deleteData } from "../../../axios";
+import { postData, getData, deleteData, putData } from "../../../axios";
 
 // interface
-interface ListLesson {
-  id: number;
-  name: string;
-  video: File[];
-  exercies: dataExercise[];
+interface Lesson {
+  id?: number;
+  _id?: string;
+  exercise?: Exercise[];
+  id_topic?: string;
+  name?: string;
+  status?: string;
+  video?: File[];
 }
-interface DataTopics {
+interface Topic {
+  id_course?: string;
   name: string;
-  lessons: ListLesson[];
+  lessons: Lesson[];
+  _id?: string;
 }
-interface dataExercise {
+interface Exercise {
   id: number;
+  _id: string;
   link: string;
   name: string;
 }
@@ -42,25 +50,39 @@ const Content: React.FC = () => {
   const navigate = useNavigate();
   const { idCourse } = useParams();
 
+  // state number
+  const [indexDeleted, setIndexDeleted] = useState<number>(0);
+
   //state boolean
   const [isLoading, setIsLoading] = useState(false);
+  const [isFetchData, setIsFetchData] = useState(false);
+  const [isUpdate, setIsUpdate] = useState(false);
+  const [isAddLesson, setIsAddLesson] = useState(true);
+  const [isOnlyTopicTitle, setIsOnlyTopicTitle] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isUpdateTitleTopic, setIsUpdateTitleTopic] = useState(false);
   const [addCourseContent, setAddCourseContent] = useState(false);
   const [resetUploaderLesson, setResetUploaderLesson] = useState(false);
   const [showLesson, setShowLesson] = useState<{ [key: string]: boolean }>({});
 
+  // state string
+  const [idDeleted, setIdDeleted] = useState("");
+  const [nameDeleted, setNameDeleted] = useState("");
+  const [editNameTopic, setEditNameTopic] = useState<string>();
+
   //state file []
-  const [uploadeVideoLesson, setUploadeVideoLesson] = useState<File[]>([]);
+  const [uploadeVideoLesson, setUploadeVideoLesson] = useState<File[]>();
 
   //state array (store)
-  const [lessons, setLessons] = useState<ListLesson[]>([]);
-  const [dataLinkCodeFource, setDataLinkCodeFource] = useState<dataExercise[]>(
-    []
-  );
-  const [dataTopic, setDataTopic] = useState<DataTopics[]>([]);
+  const [lessons, setLessons] = useState<Lesson[]>([]);
+  const [dataLinkCodeFource, setDataLinkCodeFource] = useState<Exercise[]>([]);
+  const [dataTopic, setDataTopic] = useState<Topic[]>([]);
+  const [editLesson, setEditLesson] = useState<Lesson>();
+  const [editTopic, setEditTopic] = useState<Topic>();
 
   //useRef
   const topicTitleRef = useRef<HTMLInputElement>(null);
-  const lessonTitleRef = useRef<HTMLInputElement>(null);
+  const lessonTitleRef = useRef<HTMLInputElement | null>(null);
   const nameExerciseRef = useRef<(HTMLInputElement | null)[]>([]);
   const linkExerciseRef = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -74,8 +96,8 @@ const Content: React.FC = () => {
             Authorization: `Bearer ${header}`,
           },
         });
+        console.log("res: ", res);
         const topics = res.data.course.topics;
-        console.log(topics);
         setDataTopic(topics);
       } catch (error) {
         console.error("Error fetching data: ", error);
@@ -84,7 +106,7 @@ const Content: React.FC = () => {
       }
     };
     fetchDataIntroduce();
-  }, []);
+  }, [isFetchData]);
 
   // reset input refs
   const resetInputRefs = (
@@ -118,143 +140,407 @@ const Content: React.FC = () => {
     });
   };
 
+  const hanleResetUrlsImage = () => {
+    setEditLesson((prev) => ({
+      ...prev,
+      video: [],
+    }));
+  };
+
   //   handle upfile
   const handleVideoLessonChange = (files: File[]) => {
     setUploadeVideoLesson(files);
   };
 
   // handle add
-  const hanleAddLesson = (idCur: number): void => {};
+  // const hanleAddLesson = (): void => {
+  //   const addLesson: Lesson = {
+  //     id: lessons.length + 1,
+  //     name: "",
+  //   };
+  //   setLessons([...lessons, addLesson]);
+  // };
   const hanleAddLinkCodeFource = (idCur: number): void => {
-    const addLinkCodeFource: dataExercise = {
+    const addLinkCodeFource: Exercise = {
       id: idCur + 1,
+      _id: "",
       link: "",
       name: "",
     };
     setDataLinkCodeFource([...dataLinkCodeFource, addLinkCodeFource]);
   };
   // handle save
-  const handleSaveLessons = () => {
-    const allDataExercise: dataExercise[] = dataLinkCodeFource.map(
+
+  const handleSaveLessonsStore = async () => {
+    const allDataExercise: Exercise[] = dataLinkCodeFource.map(
       (dataExercise, id) => ({
         id: dataExercise.id,
+        _id: dataExercise._id,
         link: linkExerciseRef.current[id]?.value || "",
         name: nameExerciseRef.current[id]?.value || "",
       })
     );
-    const lessonTitle = lessonTitleRef.current?.value || "";
-    setLessons((prev) => [
-      ...prev,
-      {
-        id: prev.length + 1,
-        name: lessonTitle,
-        exercies: allDataExercise || [],
-        video: uploadeVideoLesson,
-      },
-    ]);
-    setResetUploaderLesson(true);
-    setTimeout(() => setResetUploaderLesson(false), 0);
 
-    resetInputRefs([
-      { ref: lessonTitleRef },
-      { ref: linkExerciseRef },
-      { ref: nameExerciseRef },
-      { state: dataLinkCodeFource, setState: setDataLinkCodeFource },
-      { state: uploadeVideoLesson, setState: setUploadeVideoLesson },
-    ]);
+    const lessonTitle = lessonTitleRef.current?.value || "";
+    const video = uploadeVideoLesson;
+    if (lessonTitle && uploadeVideoLesson) {
+      setLessons((prev) => [
+        ...prev,
+        {
+          id: prev.length + 1,
+          name: lessonTitle,
+          exercies: allDataExercise || [],
+          video: video,
+        },
+      ]);
+
+      setResetUploaderLesson(true);
+      setTimeout(() => setResetUploaderLesson(false), 0);
+      resetInputRefs([
+        { ref: lessonTitleRef },
+        { ref: linkExerciseRef },
+        { ref: nameExerciseRef },
+        { state: dataLinkCodeFource, setState: setDataLinkCodeFource },
+        { state: isUpdate, setState: setIsUpdate },
+        { state: uploadeVideoLesson, setState: setUploadeVideoLesson },
+      ]);
+    } else {
+      console.log("Missing data, cannot save lesson to store");
+    }
   };
-  const hanleSaveTopics = async () => {
+  const createTopics = async () => {
     const topicTitle = topicTitleRef.current?.value || "";
 
-    // Tạo danh sách topics mới
-    const updatedTopics = [
-      ...dataTopic,
-      { name: topicTitle, lessons: lessons },
-    ];
-
-    // Cập nhật state (dùng biến tạm để tránh lỗi bất đồng bộ)
-    setDataTopic(updatedTopics);
-
     // Hàm lưu topics và lessons
-    const saveTopicsAndLessons = async (topics: any) => {
+    const createTopicsAndLessons = async () => {
       setIsLoading(true);
-      console.log("Topics to save: ", topics);
-
       try {
-        const topicPromises = topics.map(async (topic: any) => {
+        // Gửi topic lên server
+        const resTopic = await postData(
+          "/api/admin/topic",
+          { id_course: idCourse, name: topicTitle },
+          {
+            headers: { Authorization: `Bearer ${header}` },
+          }
+        );
+
+        const id_topic = resTopic.data._id;
+
+        // Gửi lessons liên quan tới topic
+        const lessonPromises = lessons.map(async (lesson: any) => {
           try {
-            // Gửi topic lên server
-            const resTopic = await postData(
-              "/api/admin/topic",
-              { id_course: idCourse, name: topic.name },
+            const formDataLesson = new FormData();
+            lesson.video.forEach(
+              (file: any) => formDataLesson.append("fileVideo", file)
+              //test image repalece video when internet low
+              // formDataLesson.append("fileImage", file)
+            );
+
+            formDataLesson.append("id_topic", id_topic);
+            formDataLesson.append("name", lesson.name);
+            formDataLesson.append("status", "PRIVATE");
+
+            const resLesson = await postData(
+              "/api/admin/lesson",
+              formDataLesson,
               {
-                headers: { Authorization: `Bearer ${header}` },
+                headers: {
+                  "Content-Type": "multipart/form-data",
+                  Authorization: `Bearer ${header}`,
+                },
               }
             );
 
-            const id_topic = resTopic.data._id;
+            const id_lesson = resLesson.data._id;
 
-            // Gửi lessons liên quan tới topic
-            const lessonPromises = topic.lessons.map(async (lesson: any) => {
-              try {
-                const formDataLesson = new FormData();
-                lesson.video.forEach((file: any) =>
-                  formDataLesson.append("fileImage", file)
-                );
-
-                formDataLesson.append("id_topic", id_topic);
-                formDataLesson.append("name", lesson.name);
-                formDataLesson.append("status", "PRIVATE");
-
-                const resLesson = await postData(
-                  "/api/admin/lesson",
-                  formDataLesson,
-                  {
-                    headers: {
-                      "Content-Type": "multipart/form-data",
-                      Authorization: `Bearer ${header}`,
-                    },
-                  }
-                );
-
-                const id_lesson = resLesson.data._id;
-
-                // Gửi exercises liên quan tới lesson
-                await postData(
-                  "/api/admin/exercise",
-                  { id_lesson: id_lesson, dataExercise: lesson.dataExercise },
-                  {
-                    headers: { Authorization: `Bearer ${header}` },
-                  }
-                );
-              } catch (error) {
-                console.error(`Error saving lesson: ${lesson.name}`, error);
-              }
-            });
-
-            await Promise.all(lessonPromises);
+            // Gửi exercises liên quan tới lesson
+            const exercises = lesson.exercise;
+            console.log("exercises", exercises);
+            if (exercises) {
+              await postData(
+                "/api/admin/exercise",
+                { id_lesson: id_lesson, dataExercise: lesson.exercise },
+                {
+                  headers: { Authorization: `Bearer ${header}` },
+                }
+              );
+            }
           } catch (error) {
-            console.error(`Error saving topic: ${topic.topicTitle}`, error);
+            console.error(`Error saving lesson: ${lesson.name}`, error);
           }
         });
-
-        await Promise.all(topicPromises);
+        await Promise.all(lessonPromises);
       } catch (error) {
         console.error("Error saving topics and lessons:", error);
       } finally {
+        setIsFetchData(!isFetchData);
         setIsLoading(false);
       }
     };
 
     // Gọi hàm với `updatedTopics`
-    await saveTopicsAndLessons(updatedTopics);
+    await createTopicsAndLessons();
 
     // Reset input và data
     resetInputRefs([{ state: lessons, setState: setLessons }]);
     setAddCourseContent(false);
   };
 
-  // handle edit
+  // handle edit(update)
+  const updateTopic = async () => {
+    // update only title topic
+    if (isOnlyTopicTitle) {
+      console.log("only");
+
+      const title =
+        topicTitleRef.current && topicTitleRef.current.value
+          ? topicTitleRef.current.value
+          : "";
+      if (title) {
+        setIsLoading(true);
+        const _id = editTopic?._id;
+        try {
+          const res = await putData(
+            `/api/admin/topic/${_id}`,
+            { name: title },
+            {
+              headers: { Authorization: `Bearer ${header}` },
+            }
+          );
+          console.log("res: ", res);
+        } catch (error) {
+          console.error("Error updating topic:", error);
+        } finally {
+          setIsLoading(false);
+          setIsUpdateTitleTopic(false);
+          setIsAddLesson(true);
+          setIsOnlyTopicTitle(false);
+          setIsUpdate(false);
+          setAddCourseContent(false);
+          setIsFetchData(!isFetchData);
+        }
+      }
+    } else {
+      const title =
+        topicTitleRef.current && topicTitleRef.current.value
+          ? topicTitleRef.current.value
+          : "";
+      if (title) {
+        setIsLoading(true);
+
+        const id = editLesson?.id_topic;
+        try {
+          const res = await putData(
+            `/api/admin/topic/${id}`,
+            { name: title },
+            {
+              headers: { Authorization: `Bearer ${header}` },
+            }
+          );
+          await updateLesson("calledTopic");
+        } catch (error) {
+          console.error("Error updating topic:", error);
+        }
+      }
+    }
+  };
+
+  const updateLesson = async (type: string) => {
+    const idLessonUpdate =
+      editLesson && editLesson._id ? editLesson._id : undefined;
+
+    const video = editLesson && editLesson.video ? editLesson.video : undefined;
+
+    const allDataExercise: Exercise[] = dataLinkCodeFource.map(
+      (dataExercise, id) => ({
+        id: dataExercise.id,
+        _id: dataExercise._id,
+        link: linkExerciseRef.current[id]?.value || "",
+        name: nameExerciseRef.current[id]?.value || "",
+      })
+    );
+    const lessonTitle = lessonTitleRef.current?.value || "";
+    console.log("lessonTitle", lessonTitle);
+    const formData = new FormData();
+    if (uploadeVideoLesson && uploadeVideoLesson[0]) {
+      // formData.append("fileVideo", uploadeVideoLesson[0]); test for internet low
+      formData.append("fileVideo", uploadeVideoLesson[0]);
+    } else {
+      formData.append("video", video);
+    }
+
+    formData.append("exercises", JSON.stringify(allDataExercise));
+    formData.append("name", lessonTitle);
+
+    setIsLoading(true);
+    try {
+      const resUpdate = await putData(
+        `/api/admin/lesson/${idLessonUpdate}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${header}`,
+          },
+        }
+      );
+      console.log("resUpdate: ", resUpdate);
+    } catch (err) {
+      console.log(err);
+    } finally {
+      resetInputRefs([
+        { state: uploadeVideoLesson, setState: setUploadeVideoLesson },
+        { state: addCourseContent, setState: setAddCourseContent },
+        { state: dataLinkCodeFource, setState: setDataLinkCodeFource },
+        { state: isUpdate, setState: setIsUpdate },
+        { ref: lessonTitleRef },
+        { ref: linkExerciseRef },
+        { ref: nameExerciseRef },
+      ]);
+      setIsFetchData(!isFetchData);
+      setIsLoading(false);
+    }
+    if (type === "calledTopic") {
+      setIsUpdateTitleTopic(false);
+      setIsAddLesson(true);
+      setIsOnlyTopicTitle(false);
+    }
+  };
+
+  const handleEdit = (dataEdit: any, nameTopic: string, type: string) => {
+    setAddCourseContent(true);
+    setEditNameTopic(nameTopic);
+    if (type === "topic") {
+      console.log("edit topic: ", dataEdit);
+      setIsAddLesson(false);
+      setIsUpdateTitleTopic(true);
+      setIsOnlyTopicTitle(true);
+      setEditTopic(dataEdit);
+    } else {
+      console.log("edit lesson: ", dataEdit);
+
+      const exercises = dataEdit.exercise;
+      const newEntries =
+        exercises?.map((exercise: any) => ({
+          id: exercise.id,
+          link: exercise.link,
+          name: exercise.name,
+          _id: exercise._id,
+        })) || [];
+
+      setDataLinkCodeFource((prev) => [...prev, ...newEntries]);
+      setEditLesson(dataEdit);
+    }
+
+    setIsUpdate(true);
+  };
+  // handle delete
+  const deleteExercise = async () => {
+    setIsLoading(true);
+
+    try {
+      const id_Deleted = idDeleted;
+      const res = await deleteData(`/api/admin/exercise/${id_Deleted}`, {
+        headers: {
+          Authorization: `Bearer ${header}`,
+        },
+      });
+      console.log("res: ", res);
+    } catch (err) {
+      console.log("error: ", err);
+    } finally {
+      const idDeletedExercise = idDeleted;
+      setDataLinkCodeFource(
+        dataLinkCodeFource.filter((_, idx) => idx !== indexDeleted)
+      );
+      setEditLesson({
+        ...editLesson,
+        exercise:
+          editLesson?.exercise?.filter(
+            (exercise) => exercise._id !== idDeletedExercise
+          ) || [],
+      });
+      // setDataLinkCodeFource(
+      //   dataLinkCodeFource.filter((_, idx) => idx !== exer?.id)
+      // );
+      setIsModalVisible(false);
+      setIsFetchData(!isFetchData);
+      resetInputRefs([{ state: idDeleted, setState: setIdDeleted }]);
+      setIndexDeleted(0);
+    }
+  };
+
+  const deleteLesson = async () => {
+    setIsLoading(true);
+    try {
+      const id_Deleted = idDeleted;
+      const res = await deleteData(`/api/admin/lesson/${id_Deleted}`, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${header}`,
+        },
+      });
+      console.log("res: ", res);
+    } catch (err) {
+      console.log("error: ", err);
+    } finally {
+      resetInputRefs([{ state: idDeleted, setState: setIdDeleted }]);
+      setIsFetchData(!isFetchData);
+      setIsModalVisible(false);
+    }
+  };
+
+  const deleteTopic = async () => {
+    setIsLoading(true);
+    try {
+      const id_Deleted = idDeleted;
+      const res = await deleteData(`/api/admin/topic/${id_Deleted}`, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${header}`,
+        },
+      });
+      console.log("res: ", res);
+    } catch (err) {
+      console.log("error: ", err);
+    } finally {
+      resetInputRefs([{ state: idDeleted, setState: setIdDeleted }]);
+      setIsFetchData(!isFetchData);
+      setIsModalVisible(false);
+    }
+  };
+
+  // func other
+
+  const deleteFunc = () => {
+    if (nameDeleted === "lesson") {
+      console.log("ID deleted lesson: ", idDeleted);
+      deleteLesson();
+    } else if (nameDeleted === "topic") {
+      console.log("ID deleted topic: ", idDeleted);
+      deleteTopic();
+    } else if (nameDeleted === "exercise") {
+      console.log("ID deleted exercise: ", idDeleted);
+      deleteExercise();
+    }
+  };
+
+  const notifyDelete = (id: string, name: string, index: number) => {
+    if (index !== 0) {
+      setIndexDeleted(index);
+    }
+    const idDeleted = id;
+    console.log("ID deleted: ", idDeleted);
+    const nameDeleted = name;
+    setIdDeleted(idDeleted);
+    setNameDeleted(nameDeleted);
+    setIsModalVisible(true);
+  };
+
+  const handleClosePopup = () => {
+    setIsModalVisible(false);
+    setIdDeleted("");
+  };
 
   if (isLoading) {
     return <Loading message="Đang tải dữ liệu..." size="large" />;
@@ -264,9 +550,22 @@ const Content: React.FC = () => {
       <AdminHeader />
       <div className="flex flex-1">
         <Nav />
-        <div className="w-full h-full overflow-y-auto bg-[rgba(255,246,244,1)]">
-          <div className="mb-2 mt-2">
-            <h4 className="font-semibold primary-color-text">
+        <div className="w-full h-full bg-white">
+          <div className="mx-2 my-2 pt-8 pb-[10px] pl-8 bg-[rgba(255,246,244,1)] rounded-lg h-full">
+            <Button
+              className="mr-4 button-cancel mb-6"
+              style={{
+                backgroundColor: "white",
+                color: "#1e2753",
+                borderColor: "#1e2753",
+              }}
+              ghost
+              onClick={() => navigate(`/admin/courses`)}
+            >
+              <FaChevronLeft />
+              Back
+            </Button>
+            <h4 className="font-semibold primary-color-text uppercase pb-2">
               Nội dung khoá học
             </h4>
             <ButtonPlus
@@ -278,21 +577,35 @@ const Content: React.FC = () => {
               width="w-[36%]"
               paddingLeft="pl-7"
               paddingRight="pr-4"
-              onClick={() => setAddCourseContent(!addCourseContent)}
+              onClick={() => {
+                setAddCourseContent(!addCourseContent);
+                setIsUpdateTitleTopic(true);
+              }}
             />
             {addCourseContent && (
-              <div>
-                <div className="flex flex-col mb-2">
+              <div className="pr-8">
+                <div className="flex flex-col mb-2 relative">
                   <label className="text-[12px] text-[#5a607f]">
                     Tiêu đề chương học
                   </label>
+                  {isUpdate && (
+                    <MdEditSquare
+                      onClick={() => setIsUpdateTitleTopic(true)}
+                      className="absolute cursor-pointer top-[4px] right-8 text-red-500 hover:text-red-700"
+                      title="Chỉnh sửa bài học"
+                    />
+                  )}
                   <input
                     ref={topicTitleRef}
+                    defaultValue={editNameTopic ? editNameTopic : ""}
+                    disabled={!isUpdateTitleTopic}
                     placeholder="Kiểu dữ liệu, biến, vòng lặp"
-                    className="border border-[#f3f3f3] rounded-[4px] p-1 mt-1 focus:border-[#1e2753] focus:outline-none"
+                    className={`border border-[#f3f3f3] rounded-[4px] p-1 mt-1 focus:border-[#1e2753] focus:outline-none ${
+                      !isUpdateTitleTopic ? "blurred-input" : ""
+                    }`}
                   />
                 </div>
-                <div className="mb-2 pl-6 relative">
+                <div className="mb-2 pl-6 relative ml-6">
                   <div className="absolute left-4 top-1/2 transform -translate-y-1/2 h-[100%] w-[0.2px] bg-[#1e2753]"></div>{" "}
                   <ButtonPlus
                     content="Thêm bài học"
@@ -303,107 +616,146 @@ const Content: React.FC = () => {
                     width="w-[36%]"
                     paddingLeft="pl-7"
                     paddingRight="pr-4"
-                    onClick={() => hanleAddLesson(lessons.length)}
+                    disabled={true}
                   />
-                  <div className="flex flex-col mb-2  pl-6 relative">
-                    <div className="absolute left-4 top-1/2 transform -translate-y-1/2 h-[100%] w-[0.2px] bg-[#1e2753]"></div>{" "}
-                    <label className="text-[12px] text-[#5a607f]">
-                      Tiêu đề bài học
-                    </label>
-                    <input
-                      ref={lessonTitleRef}
-                      placeholder="Hướng dẫn cài đặt vsCode"
-                      className="border border-[#f3f3f3] rounded-[4px] p-1 mt-1 focus:border-[#1e2753] focus:outline-none"
-                    />
-                    {/* add video */}
-                    {/* <ButtonPlus
-                                content="Thêm video"
-                                icon={CiCirclePlus}
-                                iconSize="text-[24px]"
-                                textSize="text-[12px]"
-                                height="h-[24px]"
-                                width="w-[36%]"
-                                paddingLeft="pl-7"
-                                paddingRight="pr-4"
-                                disabled={true}
-                              /> */}
+                  {isAddLesson && (
                     <div>
-                      <ImageUploader
-                        titleBtn="Chọn video"
-                        typefile="image/*"
-                        reset={resetUploaderLesson}
-                        onImagesChange={handleVideoLessonChange}
-                      />
-                    </div>
-                    {/* add link bài tập */}
-                    <ButtonPlus
-                      content="Thêm bài tập"
-                      icon={CiCirclePlus}
-                      iconSize="text-[24px]"
-                      textSize="text-[12px]"
-                      height="h-[24px]"
-                      width="w-[36%]"
-                      paddingLeft="pl-7"
-                      paddingRight="pr-4"
-                      onClick={() =>
-                        hanleAddLinkCodeFource(dataLinkCodeFource.length)
-                      }
-                    />
-                    {dataLinkCodeFource.length >= 1 &&
-                      dataLinkCodeFource.map((link, id) => (
-                        <div key={id} className="flex flex-col mb-2 relative">
-                          <MdDeleteOutline
-                            onClick={() =>
-                              setDataLinkCodeFource(
-                                dataLinkCodeFource.filter(
-                                  (_, idx) => idx !== id
+                      <div className="flex flex-col mb-2  pl-6 relative ml-6">
+                        <div className="absolute left-4 top-1/2 transform -translate-y-1/2 h-[100%] w-[0.2px] bg-[#1e2753]"></div>{" "}
+                        {/* <MdDeleteOutline
+                          onClick={() =>
+                            isUpdate && lesson.name
+                              ? notifyDelete(
+                                  lesson._id ? lesson._id : "undifined"
                                 )
-                              )
-                            }
-                            className="absolute cursor-pointer top-1 right-2 text-red-500 hover:text-red-700"
-                            title="Xoá mô tả"
-                          />
-                          <label className="text-[12px] text-[#5a607f]">
-                            Bài {link.id}: Tên và link bài tập
-                          </label>
-                          <input
-                            ref={(el) => (nameExerciseRef.current[id] = el)}
-                            placeholder="Nhập tên bài tập"
-                            className="border border-[#f3f3f3] rounded-[4px] p-1 mt-1 focus:border-[#1e2753] focus:outline-none"
-                          />
-                          <input
-                            ref={(el) => (linkExerciseRef.current[id] = el)}
-                            placeholder="Nhập link bài tập"
-                            className="border border-[#f3f3f3] rounded-[4px] p-1 mt-1 focus:border-[#1e2753] focus:outline-none"
+                              : setLessons(
+                                  lessons.filter((_, idx) => idx !== id)
+                                )
+                          }
+                          className="absolute cursor-pointer top-1 right-2 text-red-500 hover:text-red-700"
+                          title="Xoá mô tả"
+                        /> */}
+                        <label className="text-[12px] text-[#5a607f]">
+                          Tiêu đề bài học
+                        </label>
+                        <input
+                          ref={lessonTitleRef}
+                          defaultValue={
+                            editLesson && editLesson.name ? editLesson.name : ""
+                          }
+                          placeholder="Hướng dẫn cài đặt vsCode"
+                          className="border border-[#f3f3f3] rounded-[4px] p-1 mt-1 focus:border-[#1e2753] focus:outline-none"
+                        />
+                        <div>
+                          <ImageUploader
+                            titleBtn="Chọn video"
+                            typefile="video/*"
+                            reset={resetUploaderLesson}
+                            urls={editLesson?.video ? editLesson.video : ""}
+                            onImagesChange={handleVideoLessonChange}
+                            onUrlsReset={hanleResetUrlsImage}
                           />
                         </div>
-                      ))}
-                  </div>
-                  {/* button save */}
-                  <div className="mt-2 pl-6">
-                    <Button
-                      className="mr-4 button-cancel"
-                      style={{
-                        backgroundColor: "white",
-                        color: "#1e2753",
-                        borderColor: "#1e2753",
-                      }}
-                      ghost
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      className="button-save"
-                      style={{
-                        backgroundColor: "#00095b",
-                        color: "white",
-                        borderColor: "#00095b",
-                      }}
-                      onClick={handleSaveLessons}
-                    >
-                      Save Lesson
-                    </Button>
-                  </div>
+                        {/* add link bài tập */}
+                        <ButtonPlus
+                          content="Thêm bài tập"
+                          icon={CiCirclePlus}
+                          iconSize="text-[24px]"
+                          textSize="text-[12px]"
+                          height="h-[24px]"
+                          width="w-[36%]"
+                          paddingLeft="pl-7"
+                          paddingRight="pr-4"
+                          onClick={() =>
+                            hanleAddLinkCodeFource(dataLinkCodeFource.length)
+                          }
+                        />
+                        {dataLinkCodeFource.length >= 1 &&
+                          dataLinkCodeFource.map((link, id) => (
+                            <div
+                              key={id}
+                              className="flex flex-col mb-2 relative"
+                            >
+                              <MdDeleteOutline
+                                onClick={() => {
+                                  if (isUpdate && link.link) {
+                                    notifyDelete(
+                                      link?._id || "",
+                                      "exercise",
+                                      id
+                                    );
+                                  } else {
+                                    setDataLinkCodeFource(
+                                      dataLinkCodeFource.filter(
+                                        (_, idx) => idx !== id
+                                      )
+                                    );
+                                  }
+                                }}
+                                className="absolute cursor-pointer top-1 right-2 text-red-500 hover:text-red-700"
+                                title="Xoá mô tả"
+                              />
+                              <label className="text-[12px] text-[#5a607f]">
+                                Bài {link.id}: Tên và link bài tập
+                              </label>
+                              <input
+                                ref={(el) => (nameExerciseRef.current[id] = el)}
+                                defaultValue={
+                                  editLesson?.exercise &&
+                                  editLesson.exercise[id]?.name
+                                    ? editLesson.exercise[id].name
+                                    : ""
+                                }
+                                placeholder="Nhập tên bài tập"
+                                className="border border-[#f3f3f3] rounded-[4px] p-1 mt-1 focus:border-[#1e2753] focus:outline-none"
+                              />
+                              <input
+                                ref={(el) => (linkExerciseRef.current[id] = el)}
+                                defaultValue={
+                                  editLesson?.exercise &&
+                                  editLesson.exercise[id]?.link
+                                    ? editLesson.exercise[id].link
+                                    : ""
+                                }
+                                placeholder="Nhập link bài tập"
+                                className="border border-[#f3f3f3] rounded-[4px] p-1 mt-1 focus:border-[#1e2753] focus:outline-none"
+                              />
+                            </div>
+                          ))}
+                      </div>
+                      {/* button save */}
+                      {isUpdate && !isUpdateTitleTopic && (
+                        <div className="mt-8 pl-6">
+                          <Button
+                            className="mr-4 button-cancel"
+                            style={{
+                              backgroundColor: "white",
+                              color: "#1e2753",
+                              borderColor: "#1e2753",
+                            }}
+                            ghost
+                          >
+                            Cancel
+                          </Button>
+                          <Button
+                            className="button-save"
+                            style={{
+                              backgroundColor: "#00095b",
+                              color: "white",
+                              borderColor: "#00095b",
+                            }}
+                            onClick={() =>
+                              isUpdate
+                                ? updateLesson("")
+                                : handleSaveLessonsStore()
+                            }
+                          >
+                            {isUpdate ? "Update Lesson" : "Create Lesson"}
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  )}
                   {lessons &&
                     lessons.length > 0 &&
                     lessons.map((lesson, id) => (
@@ -449,33 +801,45 @@ const Content: React.FC = () => {
                           </h4>
                         </div>
                         {showLesson[id] && (
-                          <div>
+                          <div key={id}>
                             <div className="grid gap-2 grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 mt-4">
-                              {Array.isArray(lesson.video)
-                                ? lesson.video.map((video, index) => (
-                                    <div
-                                      key={index}
-                                      className="relative w-full h-32 overflow-hidden rounded-lg border"
-                                    >
-                                      <img
-                                        src={URL.createObjectURL(video)}
-                                        alt={`video-${index}`}
-                                        className="object-cover w-full h-full"
-                                      />
-                                    </div>
-                                  ))
-                                : lesson.video && (
-                                    <div className="relative w-full h-32 overflow-hidden rounded-lg border">
-                                      <img
-                                        src={URL.createObjectURL(lesson.video)}
-                                        alt="video"
-                                        className="object-cover w-full h-full"
-                                      />
-                                    </div>
-                                  )}
+                              <div className="relative w-full h-32 overflow-hidden rounded-lg border">
+                                {lesson.video && !isUpdate ? (
+                                  <video
+                                    src={URL.createObjectURL(lesson.video[0])}
+                                    controls
+                                    className="object-cover w-full h-full"
+                                  />
+                                ) : (
+                                  // cmt for test image when internet low
+                                  // <img
+                                  //   src={URL.createObjectURL(lesson.video[0])}
+                                  //   alt="test image"
+                                  //   className="object-cover w-full h-full"
+                                  // />
+                                  // <img
+                                  //   src={
+                                  //     editLesson && editLesson[0].video
+                                  //       ? editLesson.video
+                                  //       : ""
+                                  //   }
+                                  //   alt="test image"
+                                  //   className="object-cover w-full h-full"
+                                  // />
+                                  <video
+                                    src={
+                                      editLesson && editLesson[0].video
+                                        ? editLesson.video
+                                        : ""
+                                    }
+                                    controls
+                                    className="object-cover w-full h-full"
+                                  />
+                                )}
+                              </div>
                             </div>
-                            {lesson.exercies &&
-                              lesson.exercies.map((data) => (
+                            {lesson.exercise &&
+                              lesson.exercise.map((data) => (
                                 <div>
                                   <div className="mb-2 secondary-color-bg px-4 py-1 rounded-lg inline-block">
                                     <h4 className="text-white">{data.name}</h4>
@@ -498,132 +862,195 @@ const Content: React.FC = () => {
               </div>
             )}
             {/* button save */}
-            <div className="mt-2">
-              <Button
-                className="mr-4 button-cancel"
-                style={{
-                  backgroundColor: "white",
-                  color: "#1e2753",
-                  borderColor: "#1e2753",
-                }}
-                ghost
-              >
-                Cancel
-              </Button>
-              <Button
-                className="button-save"
-                style={{
-                  backgroundColor: "#00095b",
-                  color: "white",
-                  borderColor: "#00095b",
-                }}
-                onClick={hanleSaveTopics}
-              >
-                Save Topics
-              </Button>
-            </div>
-            {dataTopic &&
-              dataTopic.length > 0 &&
-              dataTopic.map((topic, topicId) => (
-                <div key={topicId} className="my-6">
-                  {/* Hiển thị tiêu đề topic */}
-                  <div className="mb-2 secondary-color-bg px-4 py-2 rounded-lg inline-block">
-                    <h4 className="text-white">{topic.name}</h4>
-                  </div>
+            {((addCourseContent === true && isUpdateTitleTopic === true) ||
+              (isUpdate === true && isUpdateTitleTopic === true)) && (
+              <div className="mt-8">
+                <Button
+                  className="mr-4 button-cancel"
+                  style={{
+                    backgroundColor: "white",
+                    color: "#1e2753",
+                    borderColor: "#1e2753",
+                  }}
+                  ghost
+                >
+                  Cancel
+                </Button>
+                <Button
+                  className="button-save"
+                  style={{
+                    backgroundColor: "#00095b",
+                    color: "white",
+                    borderColor: "#00095b",
+                  }}
+                  onClick={
+                    isUpdate === true && isUpdateTitleTopic === true
+                      ? updateTopic
+                      : createTopics
+                  }
+                >
+                  {isUpdate === true && isUpdateTitleTopic === true
+                    ? "Update Topic"
+                    : "Create Topic"}
+                </Button>
+              </div>
+            )}
+            <div className="py-2 my-8 px-4 mx-12 bg-white rounded-lg">
+              {dataTopic && dataTopic.length > 0 ? (
+                dataTopic.map((topic, topicId) => (
+                  <div
+                    key={topicId}
+                    className="my-6 px-4 pb-2 pt-6 pr-2 border-[0.4px] border-black rounded-lg max-h-[400px] overflow-y-auto relative"
+                    // style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+                  >
+                    <MdDeleteOutline
+                      className="absolute cursor-pointer top-[4px] left-[24px] text-red-500 hover:text-red-700"
+                      onClick={() =>
+                        notifyDelete(
+                          topic && topic._id ? topic._id : "",
+                          "topic",
+                          0
+                        )
+                      }
+                      title="Xoá chương học"
+                    />
+                    <MdEditSquare
+                      onClick={() => handleEdit(topic, topic.name, "topic")}
+                      className="absolute cursor-pointer top-[4px] left-[42px] text-red-500 hover:text-red-700"
+                      title="Chỉnh sửa chương học"
+                    />
+                    {/* Hiển thị tiêu đề topic */}
+                    <div className="mb-2 secondary-color-bg px-4 py-2 rounded-lg inline-block">
+                      <h4 className="text-white">{topic.name}</h4>
+                    </div>
 
-                  {/* Hiển thị danh sách các lesson trong topic */}
-                  {topic.lessons &&
-                    topic.lessons.length > 0 &&
-                    topic.lessons.map((lesson, lessonId) => (
-                      <div
-                        key={lessonId}
-                        className="pl-6 my-6 py-2 pr-2 ml-6 relative"
-                        style={{ borderTop: "0.4px solid #1e2753" }}
-                      >
-                        <MdDeleteOutline
-                          onClick={() => {
-                            const updatedTopics = [...dataTopic];
-                            updatedTopics[topicId].lessons = updatedTopics[
-                              topicId
-                            ].lessons.filter((_, idx) => idx !== lessonId);
-                            setDataTopic(updatedTopics);
-                          }}
-                          className="absolute cursor-pointer -top-5 right-2 text-red-500 hover:text-red-700"
-                          title="Xoá bài học"
-                        />
-                        <MdEditSquare
-                          onClick={() => {
-                            // Xử lý chỉnh sửa mô tả bài học tại đây
-                          }}
-                          className="absolute cursor-pointer -top-5 right-8 text-red-500 hover:text-red-700"
-                          title="Chỉnh sửa bài học"
-                        />
+                    {/* Hiển thị danh sách các lesson trong topic */}
+                    {topic.lessons &&
+                      topic.lessons.length > 0 &&
+                      topic.lessons.map((lesson, lessonId) => (
                         <div
-                          className="flex items-center primary-color-text inline-block cursor-pointer border border-transparent hover:border-[#1e2753] hover:rounded-lg transition-all duration-300 p-1"
-                          onClick={() =>
-                            setShowLesson((prev) => ({
-                              ...prev,
-                              [`${topicId}-${lessonId}`]:
-                                !prev[`${topicId}-${lessonId}`],
-                            }))
-                          }
+                          key={lessonId}
+                          className="pl-6 my-6 py-2 pr-2 ml-6 relative"
+                          style={{ borderTop: "0.4px solid #1e2753" }}
                         >
-                          <FaRegCirclePlay className="mr-4" />
-                          <h4>
-                            Bài {lesson.id}: {lesson.name}
-                          </h4>
-                        </div>
-                        {showLesson[`${topicId}-${lessonId}`] && (
-                          <div>
-                            <div className="grid gap-2 grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 mt-4">
-                              {Array.isArray(lesson?.video)
-                                ? lesson.video.map((video, index) => (
-                                    <div
-                                      key={index}
-                                      className="relative w-full h-32 overflow-hidden rounded-lg border"
-                                    >
-                                      <img
-                                        src={video}
-                                        alt={`video-${index}`}
-                                        className="object-cover w-full h-full"
-                                      />
-                                    </div>
-                                  ))
-                                : lesson?.video && (
-                                    <div className="relative w-full h-32 overflow-hidden rounded-lg border">
-                                      <img
-                                        src={lesson.video}
-                                        alt="video"
-                                        className="object-cover w-full h-full"
-                                      />
-                                    </div>
-                                  )}
-                            </div>
-                            {lesson.exercies &&
-                              lesson.exercies.map((data) => (
-                                <div>
-                                  <div className="mb-2 secondary-color-bg px-4 py-1 rounded-lg inline-block">
-                                    <h4 className="text-white">{data.name}</h4>
-                                  </div>
-                                  <p>
-                                    <a
-                                      href={data.link}
-                                      className="primary-color-text"
-                                    >
-                                      Link bài tập: {data.link}
-                                    </a>
-                                  </p>
-                                </div>
-                              ))}
+                          <MdDeleteOutline
+                            className="absolute cursor-pointer -top-5 right-2 text-red-500 hover:text-red-700"
+                            onClick={() =>
+                              notifyDelete(
+                                lesson && lesson._id ? lesson._id : "",
+                                "lesson",
+                                0
+                              )
+                            }
+                            title="Xoá bài học"
+                          />
+                          <MdEditSquare
+                            onClick={() => {
+                              handleEdit(lesson, topic.name, "");
+                              setIsUpdateTitleTopic(false);
+                            }}
+                            className="absolute cursor-pointer -top-5 right-8 text-red-500 hover:text-red-700"
+                            title="Chỉnh sửa bài học"
+                          />
+                          <div
+                            className="flex items-center primary-color-text inline-block cursor-pointer border border-transparent hover:border-[#1e2753] hover:rounded-lg transition-all duration-300 p-1"
+                            onClick={() =>
+                              setShowLesson((prev) => ({
+                                ...prev,
+                                [`${topicId}-${lessonId}`]:
+                                  !prev[`${topicId}-${lessonId}`],
+                              }))
+                            }
+                          >
+                            <FaRegCirclePlay className="mr-4" />
+                            <h4>
+                              Bài {lesson.id}: {lesson.name}
+                            </h4>
                           </div>
-                        )}
-                      </div>
-                    ))}
-                </div>
-              ))}
+                          {showLesson[`${topicId}-${lessonId}`] && (
+                            <div>
+                              <div className="grid gap-2 grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 mt-4">
+                                {Array.isArray(lesson?.video)
+                                  ? lesson.video.map((video, index) => (
+                                      <div
+                                        key={index}
+                                        className="relative w-full h-32 overflow-hidden rounded-lg border"
+                                      >
+                                        <video
+                                          src={video}
+                                          controls
+                                          className="object-cover w-full h-full"
+                                        />
+                                        {/* <img
+                                          src={video}
+                                          alt="test image"
+                                          className="object-cover w-full h-full"
+                                        /> */}
+                                      </div>
+                                    ))
+                                  : lesson?.video && (
+                                      // <div className="relative w-full h-32 overflow-hidden rounded-lg border">
+                                      //   <video
+                                      //     src={lesson.video}
+                                      //     controls
+                                      //     className="object-cover w-full h-full"
+                                      //   />
+                                      // </div>
+                                      // cmt for tes internet low
+                                      <div className="relative w-full h-32 overflow-hidden rounded-lg border">
+                                        {/* <img
+                                          src={lesson.video}
+                                          alt="test image"
+                                          className="object-cover w-full h-full"
+                                        /> */}
+                                        <video
+                                          src={lesson.video}
+                                          controls
+                                          className="object-cover w-full h-full"
+                                        />
+                                      </div>
+                                    )}
+                              </div>
+                              {lesson.exercise &&
+                                lesson.exercise.map((data) => (
+                                  <div>
+                                    <div className="mb-2 secondary-color-bg px-4 py-1 rounded-lg inline-block">
+                                      <h4 className="text-white">
+                                        {data.name}
+                                      </h4>
+                                    </div>
+                                    <p>
+                                      <a
+                                        href={data.link}
+                                        className="primary-color-text"
+                                      >
+                                        Link bài tập: {data.link}
+                                      </a>
+                                    </p>
+                                  </div>
+                                ))}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                  </div>
+                ))
+              ) : (
+                <div>No Data</div>
+              )}
+            </div>
           </div>
         </div>
       </div>
+      {isModalVisible && (
+        <PopupNotification
+          title="Bạn có chắc chắn muốn xoá?"
+          status="error"
+          buttonText="Xoá ngay"
+          onButtonClick={deleteFunc}
+          buttonClose={handleClosePopup}
+        />
+      )}
     </div>
   );
 };

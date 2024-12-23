@@ -17,6 +17,7 @@ import { MdDeleteOutline } from "react-icons/md";
 import { MdEditSquare } from "react-icons/md";
 import { CiCirclePlus } from "react-icons/ci";
 import { FaCheck } from "react-icons/fa";
+import { FaChevronLeft } from "react-icons/fa6";
 
 // import axios
 import { postData, getData, deleteData, putData } from "../../../axios";
@@ -25,7 +26,22 @@ import { postData, getData, deleteData, putData } from "../../../axios";
 interface Desc {
   id: number;
   _id: string;
-  content: string;
+  desc: string;
+}
+
+interface DataDesc {
+  _id?: string;
+  desc?: string;
+  id_material?: string;
+  overviews?: Overview[];
+  type?: string;
+}
+
+interface Overview {
+  _id: string;
+  desc: string;
+  id_material: string;
+  type: string;
 }
 
 const Introduce: React.FC = () => {
@@ -33,10 +49,11 @@ const Introduce: React.FC = () => {
   const navigate = useNavigate();
   const { idCourse } = useParams();
   // state string
-  const [idOverviewDeleted, setIdOverviewDeleted] = useState("");
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [idDeleted, setIdDeleted] = useState<string>("");
+  const [nameDeleted, setNameDeleted] = useState<string>("");
 
   //state boolean
+  const [isModalVisible, setIsModalVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false);
   const [addIntroduce, setAddIntroduce] = useState(false);
@@ -45,8 +62,8 @@ const Introduce: React.FC = () => {
 
   //state array (store)
   const [listDesc, setListDesc] = useState<Desc[]>([]);
-  const [dataDesc, setDataDesc] = useState([]);
-  const [dataEditDesc, setDataEditDesc] = useState();
+  const [dataDesc, setDataDesc] = useState<DataDesc[]>([]);
+  const [dataEditDesc, setDataEditDesc] = useState<DataDesc>();
 
   //useRef
   const introTitleRef = useRef<HTMLInputElement>(null);
@@ -127,13 +144,13 @@ const Introduce: React.FC = () => {
     const addDesc: Desc = {
       id: listDesc.length + 1,
       _id: "",
-      content: "",
+      desc: "",
     };
     setListDesc([...listDesc, addDesc]);
   };
 
   //handle save
-  const handleSaveIntroduce = async () => {
+  const createSaveIntroduce = async () => {
     setIsLoading(true);
     const introTitle = introTitleRef.current?.value || "";
     const dataList = descInputRefs.current.map((cur) => cur?.value);
@@ -183,17 +200,20 @@ const Introduce: React.FC = () => {
         { ref: descInputRefs },
       ]);
       setAddIntroduce(false);
+      setIsFetchData(!isFetchData);
     }
   };
   const handleUpdate = async () => {
-    console.log("dataUpdate: ", dataEditDesc.overviews._id);
     const dataUpdate = dataEditDesc;
     const idIntro = dataUpdate?._id;
 
     setIsLoading(true);
     const introTitle = introTitleRef.current?.value || "";
     const dataList = descInputRefs.current.map((cur, id) => ({
-      id: dataUpdate?.overviews[id]?._id,
+      id:
+        dataUpdate && dataUpdate.overviews
+          ? dataUpdate?.overviews[id]?._id
+          : null,
       desc: cur?.value,
     }));
 
@@ -282,30 +302,60 @@ const Introduce: React.FC = () => {
     const descsIntro: Desc[] = dataOverview.map((item: any, index: number) => ({
       id: listDesc.length + index + 1,
       _id: item?._id || "",
-      content: item?.desc || "",
+      desc: item?.desc || "",
     }));
 
     setListDesc([...listDesc, ...descsIntro]);
   };
 
   // hanle delete
-  const notifyDelete = (id: string) => {
+
+  const deleteFunc = () => {
+    if (nameDeleted === "overview") {
+      console.log("ID deleted overview: ", idDeleted);
+      handleDeleteOverview();
+    } else if (nameDeleted === "describe") {
+      console.log("ID deleted describe: ", idDeleted);
+      deleteIntro();
+    }
+  };
+
+  const notifyDelete = (id: string, name: string) => {
     const idDeleted = id;
-    setIdOverviewDeleted(idDeleted);
+    const nameDeleted = name;
+
+    setNameDeleted(nameDeleted);
+    setIdDeleted(idDeleted);
     setIsModalVisible(true);
   };
   const handleClosePopup = () => {
     setIsModalVisible(false);
-    setIdOverviewDeleted("");
+    setIdDeleted("");
   };
 
-  const handleDeleteIntro = async (id: string) => {
-    console.log(id);
+  const deleteIntro = async () => {
+    setIsLoading(true);
+    const id = idDeleted;
+    try {
+      const res = await deleteData(`/api/admin/describe/${id}`, {
+        headers: {
+          Authorization: `Bearer ${header}`,
+        },
+      });
+      console.log("res: ", res);
+    } catch (err) {
+      console.error(`Error deleting describe`, err);
+    } finally {
+      setIdDeleted("");
+      setIsLoading(false);
+      setIsFetchData(!isFetchData);
+      setIsModalVisible(false);
+    }
   };
   const handleDeleteOverview = async () => {
-    const idDeleted = idOverviewDeleted;
-    if (!idDeleted) {
-      console.error("idOverviewDeleted is undefined");
+    const id_Deleted = idDeleted;
+    if (!id_Deleted) {
+      console.error("idDeleted is undefined");
       return;
     }
 
@@ -357,9 +407,22 @@ const Introduce: React.FC = () => {
       <AdminHeader />
       <div className="flex flex-1">
         <Nav />
-        <div className="w-full h-full overflow-y-auto bg-[rgba(255,246,244,1)]">
-          <div className="mb-2">
-            <h4 className="font-semibold primary-color-text">
+        <div className="w-full h-full bg-white">
+          <div className="mx-2 my-2 pt-8 pb-[10px] pl-8 bg-[rgba(255,246,244,1)] rounded-lg h-full">
+            <Button
+              className="mr-4 button-cancel mb-6"
+              style={{
+                backgroundColor: "white",
+                color: "#1e2753",
+                borderColor: "#1e2753",
+              }}
+              ghost
+              onClick={() => navigate(`/admin/courses`)}
+            >
+              <FaChevronLeft />
+              Back
+            </Button>
+            <h4 className="font-semibold primary-color-text uppercase pb-2">
               Giới thiệu khoá học
             </h4>
             <ButtonPlus
@@ -374,12 +437,14 @@ const Introduce: React.FC = () => {
               onClick={() => setAddIntroduce(!addIntroduce)}
             />
             {addIntroduce && (
-              <div>
-                <div className="flex flex-col mb-2">
+              <div className="pr-8">
+                <div className="flex flex-col mb-2 relative">
                   <label className="text-[12px] text-[#5a607f]">Tiêu đề</label>
                   <input
                     ref={introTitleRef}
-                    defaultValue={dataEditDesc ? dataEditDesc.desc : ""}
+                    defaultValue={
+                      dataEditDesc && dataEditDesc.desc ? dataEditDesc.desc : ""
+                    }
                     placeholder="Bạn sẽ học được gì khi tham gia khoá học"
                     className="border border-[#f3f3f3] rounded-[4px] p-1 mt-1 focus:border-[#1e2753] focus:outline-none"
                   />
@@ -407,7 +472,7 @@ const Introduce: React.FC = () => {
                         <MdDeleteOutline
                           onClick={() =>
                             isUpdate && desc.desc
-                              ? notifyDelete(desc?._id)
+                              ? notifyDelete(desc?._id, "overview")
                               : setListDesc(
                                   listDesc.filter((_, idx) => idx !== id)
                                 )
@@ -465,7 +530,7 @@ const Introduce: React.FC = () => {
                         color: "white",
                         borderColor: "#00095b",
                       }}
-                      onClick={handleSaveIntroduce}
+                      onClick={createSaveIntroduce}
                     >
                       Save describe
                     </Button>
@@ -473,38 +538,48 @@ const Introduce: React.FC = () => {
                 </div>
               </div>
             )}
-          </div>
-          {/* show list desc */}
-          {dataDesc &&
-            dataDesc.length > 0 &&
-            dataDesc.map((descs, id) => (
-              <div
-                key={id}
-                className="pl-6 my-6 py-2 pr-2 rounded-lg border-[0.4px] border-[#1e2753] relative"
-              >
-                <MdDeleteOutline
-                  onClick={() => handleDeleteIntro(descs._id)}
-                  className="absolute cursor-pointer -top-5 right-2 text-red-500 hover:text-red-700"
-                  title="Xoá mô tả"
-                />
-                <MdEditSquare
-                  onClick={() => handleEditIntroduce(descs)}
-                  className="absolute cursor-pointer -top-5 right-8 text-red-500 hover:text-red-700"
-                  title="Chỉnh sửa mô tả"
-                />
-                <div className="mb-2 secondary-color-bg px-4 py-2 rounded-lg inline-block">
-                  <h4 className="text-white">{descs?.desc}</h4>
-                </div>
-                <div className="mb-2">
-                  {descs?.overviews.map((desc, index) => (
-                    <div key={index} className="flex items-center">
-                      <FaCheck className="primary-color-text mr-2" />
-                      <p>{desc.desc}</p>
+            {/* show list desc */}
+            <div className="py-2 my-8 px-4 mx-12 bg-white rounded-lg">
+              {dataDesc && dataDesc.length > 0 ? (
+                dataDesc.map((descs, id) => (
+                  <div
+                    key={id}
+                    className="pl-6 my-6 pb-2 pt-6 pr-2 rounded-lg border-[0.4px] border-[#1e2753] relative"
+                  >
+                    <MdDeleteOutline
+                      onClick={() =>
+                        notifyDelete(
+                          descs._id ? descs._id : "undefined",
+                          "describe"
+                        )
+                      }
+                      className="absolute cursor-pointer top-[4px] left-[24px] text-red-500 hover:text-red-700"
+                      title="Xoá mô tả"
+                    />
+                    <MdEditSquare
+                      onClick={() => handleEditIntroduce(descs)}
+                      className="absolute cursor-pointer top-[4px] left-[42px] text-red-500 hover:text-red-700"
+                      title="Chỉnh sửa mô tả"
+                    />
+                    <div className="mb-2 secondary-color-bg px-4 py-2 rounded-lg inline-block">
+                      <h4 className="text-white">{descs?.desc}</h4>
                     </div>
-                  ))}
-                </div>
-              </div>
-            ))}
+                    <div className="mb-2">
+                      {descs.overviews &&
+                        descs?.overviews.map((desc, index) => (
+                          <div key={index} className="flex items-center">
+                            <FaCheck className="primary-color-text mr-2" />
+                            <p>{desc.desc}</p>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div>No data</div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
       {isModalVisible && (
@@ -512,7 +587,7 @@ const Introduce: React.FC = () => {
           title="Bạn có chắc chắn muốn xoá?"
           status="error"
           buttonText="Xoá ngay"
-          onButtonClick={handleDeleteOverview}
+          onButtonClick={deleteFunc}
           buttonClose={handleClosePopup}
         />
       )}

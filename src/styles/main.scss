@@ -73,3 +73,9 @@ body {
 .disable-bg {
   background-color: #00095b70;
 }
+
+.blurred-input {
+  color: #0000004a;
+  background: white;
+  pointer-events: none; /* Ngăn người dùng tương tác */
+}

@@ -20,14 +20,15 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
   typefile = "image/*,video/*",
   reset = false,
 }) => {
+  console.log("url video: ", urls);
   const [files, setFiles] = useState<File[]>([]);
 
   const onDrop = (acceptedFiles: File[]) => {
-    const uploadedFile = acceptedFiles[0]; // Chỉ lấy 1 file
-    setFiles([uploadedFile]); // Cập nhật state với file mới
-    onImagesChange?.([uploadedFile]); // Callback với file mới
+    const uploadedFile = acceptedFiles[0];
+    setFiles([uploadedFile]);
+    onImagesChange?.([uploadedFile]);
     if (urls) {
-      onUrlsReset?.(); // Reset URL nếu có
+      onUrlsReset?.();
     }
   };
 
@@ -49,7 +50,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
           return acc;
         }, {})
       : undefined,
-    multiple: false, // Chỉ nhận một file
+    multiple: false,
   });
 
   return (
@@ -103,16 +104,24 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
         )}
 
         {/* Hiển thị URL nếu có */}
-        {urls && (
+        {urls && urls.length > 0 && (
           <div
             key="uploaded-url"
             className="relative w-full h-32 overflow-hidden rounded-lg border"
           >
-            <img
-              src={urls}
-              alt="uploaded-url"
-              className="object-cover w-full h-full"
-            />
+            {typefile === "image/*" ? (
+              <img
+                src={urls}
+                alt="uploaded-url"
+                className="object-cover w-full h-full"
+              />
+            ) : (
+              <video
+                src={urls}
+                controls
+                className="object-cover w-full h-full"
+              />
+            )}
             <button
               onClick={() => {
                 onUrlsReset?.(); // Reset URL
