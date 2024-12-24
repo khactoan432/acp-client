@@ -19,6 +19,7 @@ import { MdEditSquare } from "react-icons/md";
 import { CiCirclePlus } from "react-icons/ci";
 import { FaRegCirclePlay } from "react-icons/fa6";
 import { FaChevronLeft } from "react-icons/fa6";
+import { MdCreateNewFolder } from "react-icons/md";
 
 // import axios
 import { postData, getData, deleteData, putData } from "../../../axios";
@@ -35,8 +36,8 @@ interface Lesson {
 }
 interface Topic {
   id_course?: string;
-  name: string;
-  lessons: Lesson[];
+  name?: string;
+  lessons?: Lesson[];
   _id?: string;
 }
 interface Exercise {
@@ -56,8 +57,12 @@ const Content: React.FC = () => {
   //state boolean
   const [isLoading, setIsLoading] = useState(false);
   const [isFetchData, setIsFetchData] = useState(false);
-  const [isUpdate, setIsUpdate] = useState(false);
-  const [isAddLesson, setIsAddLesson] = useState(true);
+
+  const [isUpdateLesson, setIsUpdateLesson] = useState(false);
+  const [isOpenLesson, setIsOpenLesson] = useState(true);
+  const [addLesson, setAddLesson] = useState(false);
+  const [isCreateLesson, setIsCreateLesson] = useState(false);
+
   const [isOnlyTopicTitle, setIsOnlyTopicTitle] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isUpdateTitleTopic, setIsUpdateTitleTopic] = useState(false);
@@ -68,7 +73,7 @@ const Content: React.FC = () => {
   // state string
   const [idDeleted, setIdDeleted] = useState("");
   const [nameDeleted, setNameDeleted] = useState("");
-  const [editNameTopic, setEditNameTopic] = useState<string>();
+  const [editNameTopic, setEditNameTopic] = useState<string>("");
 
   //state file []
   const [uploadeVideoLesson, setUploadeVideoLesson] = useState<File[]>();
@@ -149,17 +154,9 @@ const Content: React.FC = () => {
 
   //   handle upfile
   const handleVideoLessonChange = (files: File[]) => {
+    console.log("file: ", files);
     setUploadeVideoLesson(files);
   };
-
-  // handle add
-  // const hanleAddLesson = (): void => {
-  //   const addLesson: Lesson = {
-  //     id: lessons.length + 1,
-  //     name: "",
-  //   };
-  //   setLessons([...lessons, addLesson]);
-  // };
   const hanleAddLinkCodeFource = (idCur: number): void => {
     const addLinkCodeFource: Exercise = {
       id: idCur + 1,
@@ -167,11 +164,13 @@ const Content: React.FC = () => {
       link: "",
       name: "",
     };
-    setDataLinkCodeFource([...dataLinkCodeFource, addLinkCodeFource]);
+    setDataLinkCodeFource((prev) => [...(prev || []), addLinkCodeFource]);
+    console.log("check link code");
   };
-  // handle save
+  // handle create
 
   const handleSaveLessonsStore = async () => {
+    // console.log("data link: ", dataLinkCodeFource);
     const allDataExercise: Exercise[] = dataLinkCodeFource.map(
       (dataExercise, id) => ({
         id: dataExercise.id,
@@ -181,6 +180,8 @@ const Content: React.FC = () => {
       })
     );
 
+    console.log("dataLink:", allDataExercise);
+
     const lessonTitle = lessonTitleRef.current?.value || "";
     const video = uploadeVideoLesson;
     if (lessonTitle && uploadeVideoLesson) {
@@ -189,7 +190,7 @@ const Content: React.FC = () => {
         {
           id: prev.length + 1,
           name: lessonTitle,
-          exercies: allDataExercise || [],
+          exercise: allDataExercise || [],
           video: video,
         },
       ]);
@@ -201,7 +202,7 @@ const Content: React.FC = () => {
         { ref: linkExerciseRef },
         { ref: nameExerciseRef },
         { state: dataLinkCodeFource, setState: setDataLinkCodeFource },
-        { state: isUpdate, setState: setIsUpdate },
+        { state: isUpdateLesson, setState: setIsUpdateLesson },
         { state: uploadeVideoLesson, setState: setUploadeVideoLesson },
       ]);
     } else {
@@ -223,11 +224,14 @@ const Content: React.FC = () => {
             headers: { Authorization: `Bearer ${header}` },
           }
         );
+        console.log("topic create");
 
         const id_topic = resTopic.data._id;
 
         // Gửi lessons liên quan tới topic
         const lessonPromises = lessons.map(async (lesson: any) => {
+          console.log("lesson create");
+
           try {
             const formDataLesson = new FormData();
             lesson.video.forEach(
@@ -255,7 +259,6 @@ const Content: React.FC = () => {
 
             // Gửi exercises liên quan tới lesson
             const exercises = lesson.exercise;
-            console.log("exercises", exercises);
             if (exercises) {
               await postData(
                 "/api/admin/exercise",
@@ -286,12 +289,41 @@ const Content: React.FC = () => {
     setAddCourseContent(false);
   };
 
+  const handleShowAddLesson = () => {
+    //resetState
+    setAddCourseContent(true);
+    setIsOnlyTopicTitle(false);
+    setIsUpdateTitleTopic(false);
+    setIsUpdateLesson(false);
+    setIsOpenLesson(true);
+    setIsCreateLesson(true);
+
+    resetInputRefs([
+      { ref: lessonTitleRef },
+      { ref: linkExerciseRef },
+      { ref: nameExerciseRef },
+      { state: dataLinkCodeFource, setState: setDataLinkCodeFource },
+      { state: uploadeVideoLesson, setState: setUploadeVideoLesson },
+      { state: editLesson, setState: setEditLesson },
+    ]);
+  };
+  const createLesson = () => {
+    console.log("create lesson");
+    // setUploadeVideoLesson(lesson.video)
+  };
+
   // handle edit(update)
+  const fillEditLesson = (lesson: Lesson) => {
+    console.log("lesson edit: ", lesson);
+    handleVideoLessonChange(lesson.video || []);
+    if (lessonTitleRef.current) {
+      lessonTitleRef.current.value = lesson.name || "";
+    }
+    setDataLinkCodeFource(lesson.exercise);
+  };
   const updateTopic = async () => {
     // update only title topic
     if (isOnlyTopicTitle) {
-      console.log("only");
-
       const title =
         topicTitleRef.current && topicTitleRef.current.value
           ? topicTitleRef.current.value
@@ -313,9 +345,9 @@ const Content: React.FC = () => {
         } finally {
           setIsLoading(false);
           setIsUpdateTitleTopic(false);
-          setIsAddLesson(true);
+          setIsOpenLesson(true);
           setIsOnlyTopicTitle(false);
-          setIsUpdate(false);
+          setIsUpdateLesson(false);
           setAddCourseContent(false);
           setIsFetchData(!isFetchData);
         }
@@ -392,7 +424,7 @@ const Content: React.FC = () => {
         { state: uploadeVideoLesson, setState: setUploadeVideoLesson },
         { state: addCourseContent, setState: setAddCourseContent },
         { state: dataLinkCodeFource, setState: setDataLinkCodeFource },
-        { state: isUpdate, setState: setIsUpdate },
+        { state: isUpdateLesson, setState: setIsUpdateLesson },
         { ref: lessonTitleRef },
         { ref: linkExerciseRef },
         { ref: nameExerciseRef },
@@ -402,7 +434,7 @@ const Content: React.FC = () => {
     }
     if (type === "calledTopic") {
       setIsUpdateTitleTopic(false);
-      setIsAddLesson(true);
+      setIsOpenLesson(true);
       setIsOnlyTopicTitle(false);
     }
   };
@@ -412,12 +444,19 @@ const Content: React.FC = () => {
     setEditNameTopic(nameTopic);
     if (type === "topic") {
       console.log("edit topic: ", dataEdit);
-      setIsAddLesson(false);
+      setIsOpenLesson(false);
       setIsUpdateTitleTopic(true);
       setIsOnlyTopicTitle(true);
-      setEditTopic(dataEdit);
+      setAddLesson(false);
+      setEditTopic((prev) => ({
+        ...prev,
+        _id: dataEdit._id,
+      }));
+      resetInputRefs([
+        { state: setDataLinkCodeFource, setState: setDataLinkCodeFource },
+      ]);
     } else {
-      console.log("edit lesson: ", dataEdit);
+      const data = dataEdit;
 
       const exercises = dataEdit.exercise;
       const newEntries =
@@ -428,11 +467,14 @@ const Content: React.FC = () => {
           _id: exercise._id,
         })) || [];
 
-      setDataLinkCodeFource((prev) => [...prev, ...newEntries]);
-      setEditLesson(dataEdit);
+      setDataLinkCodeFource(() => [...newEntries]);
+      if (lessonTitleRef.current) {
+        lessonTitleRef.current.value = data.name;
+      }
+      setEditLesson(data);
     }
 
-    setIsUpdate(true);
+    setIsUpdateLesson(true);
   };
   // handle delete
   const deleteExercise = async () => {
@@ -542,6 +584,39 @@ const Content: React.FC = () => {
     setIdDeleted("");
   };
 
+  // handle cancel
+
+  const cancel = () => {
+    setAddCourseContent(false);
+    setIsUpdateLesson(false);
+    setIsUpdateTitleTopic(false);
+    setIsOnlyTopicTitle(false);
+    setIsOpenLesson(false);
+    setAddLesson(false);
+    setIsModalVisible(false);
+    setResetUploaderLesson(false);
+    setShowLesson({});
+    setIndexDeleted(0);
+
+    setIdDeleted("");
+    setNameDeleted("");
+    setEditNameTopic("");
+
+    resetInputRefs([
+      { state: uploadeVideoLesson, setState: setUploadeVideoLesson },
+      { state: dataLinkCodeFource, setState: setDataLinkCodeFource },
+      { state: lessons, setState: setLessons },
+      { state: editLesson, setState: setEditLesson },
+      { state: editTopic, setState: setEditTopic },
+      { ref: topicTitleRef },
+      { ref: lessonTitleRef },
+      { ref: linkExerciseRef },
+      { ref: nameExerciseRef },
+    ]);
+  };
+
+  console.log("editdata: ", editLesson);
+
   if (isLoading) {
     return <Loading message="Đang tải dữ liệu..." size="large" />;
   }
@@ -580,6 +655,8 @@ const Content: React.FC = () => {
               onClick={() => {
                 setAddCourseContent(!addCourseContent);
                 setIsUpdateTitleTopic(true);
+                setAddLesson(true);
+                setIsOpenLesson(true);
               }}
             />
             {addCourseContent && (
@@ -588,13 +665,17 @@ const Content: React.FC = () => {
                   <label className="text-[12px] text-[#5a607f]">
                     Tiêu đề chương học
                   </label>
-                  {isUpdate && (
+                  {/* {isUpdateLesson && !isOnlyTopicTitle && (
                     <MdEditSquare
-                      onClick={() => setIsUpdateTitleTopic(true)}
+                      onClick={() => {
+                        setIsUpdateTitleTopic(true);
+                        setAddLesson(false);
+                        setIsUpdateLesson(false);
+                      }}
                       className="absolute cursor-pointer top-[4px] right-8 text-red-500 hover:text-red-700"
-                      title="Chỉnh sửa bài học"
+                      title="Chỉnh sửa chương học"
                     />
-                  )}
+                  )} */}
                   <input
                     ref={topicTitleRef}
                     defaultValue={editNameTopic ? editNameTopic : ""}
@@ -616,15 +697,22 @@ const Content: React.FC = () => {
                     width="w-[36%]"
                     paddingLeft="pl-7"
                     paddingRight="pr-4"
-                    disabled={true}
+                    disabled={
+                      (isUpdateTitleTopic === true &&
+                        (!addLesson || isCreateLesson)) ||
+                      isUpdateLesson === true
+                    }
+                    onClick={() => {
+                      setIsOpenLesson(!isOpenLesson);
+                    }}
                   />
-                  {isAddLesson && (
+                  {isOpenLesson && (
                     <div>
                       <div className="flex flex-col mb-2  pl-6 relative ml-6">
                         <div className="absolute left-4 top-1/2 transform -translate-y-1/2 h-[100%] w-[0.2px] bg-[#1e2753]"></div>{" "}
                         {/* <MdDeleteOutline
                           onClick={() =>
-                            isUpdate && lesson.name
+                            isUpdateLesson && lesson.name
                               ? notifyDelete(
                                   lesson._id ? lesson._id : "undifined"
                                 )
@@ -640,9 +728,7 @@ const Content: React.FC = () => {
                         </label>
                         <input
                           ref={lessonTitleRef}
-                          defaultValue={
-                            editLesson && editLesson.name ? editLesson.name : ""
-                          }
+                          defaultValue={editLesson?.name ? editLesson.name : ""}
                           placeholder="Hướng dẫn cài đặt vsCode"
                           className="border border-[#f3f3f3] rounded-[4px] p-1 mt-1 focus:border-[#1e2753] focus:outline-none"
                         />
@@ -652,6 +738,7 @@ const Content: React.FC = () => {
                             typefile="video/*"
                             reset={resetUploaderLesson}
                             urls={editLesson?.video ? editLesson.video : ""}
+                            filesParent={uploadeVideoLesson}
                             onImagesChange={handleVideoLessonChange}
                             onUrlsReset={hanleResetUrlsImage}
                           />
@@ -667,10 +754,17 @@ const Content: React.FC = () => {
                           paddingLeft="pl-7"
                           paddingRight="pr-4"
                           onClick={() =>
-                            hanleAddLinkCodeFource(dataLinkCodeFource.length)
+                            hanleAddLinkCodeFource(
+                              dataLinkCodeFource
+                                ? dataLinkCodeFource.length > 0
+                                  ? dataLinkCodeFource.length
+                                  : 0
+                                : 0
+                            )
                           }
                         />
-                        {dataLinkCodeFource.length >= 1 &&
+                        {dataLinkCodeFource &&
+                          dataLinkCodeFource.length >= 1 &&
                           dataLinkCodeFource.map((link, id) => (
                             <div
                               key={id}
@@ -678,7 +772,7 @@ const Content: React.FC = () => {
                             >
                               <MdDeleteOutline
                                 onClick={() => {
-                                  if (isUpdate && link.link) {
+                                  if (isUpdateLesson && link.link) {
                                     notifyDelete(
                                       link?._id || "",
                                       "exercise",
@@ -696,14 +790,17 @@ const Content: React.FC = () => {
                                 title="Xoá mô tả"
                               />
                               <label className="text-[12px] text-[#5a607f]">
-                                Bài {link.id}: Tên và link bài tập
+                                Bài {id + 1}: Tên và link bài tập
                               </label>
                               <input
                                 ref={(el) => (nameExerciseRef.current[id] = el)}
                                 defaultValue={
-                                  editLesson?.exercise &&
-                                  editLesson.exercise[id]?.name
-                                    ? editLesson.exercise[id].name
+                                  editLesson?.exercise
+                                    ? editLesson.exercise[id]?.name
+                                      ? editLesson.exercise[id].name
+                                      : ""
+                                    : dataLinkCodeFource[id]?.name
+                                    ? dataLinkCodeFource[id].name
                                     : ""
                                 }
                                 placeholder="Nhập tên bài tập"
@@ -712,9 +809,12 @@ const Content: React.FC = () => {
                               <input
                                 ref={(el) => (linkExerciseRef.current[id] = el)}
                                 defaultValue={
-                                  editLesson?.exercise &&
-                                  editLesson.exercise[id]?.link
-                                    ? editLesson.exercise[id].link
+                                  editLesson?.exercise
+                                    ? editLesson.exercise[id]?.link
+                                      ? editLesson.exercise[id].link
+                                      : ""
+                                    : dataLinkCodeFource[id]?.link
+                                    ? dataLinkCodeFource[id].link
                                     : ""
                                 }
                                 placeholder="Nhập link bài tập"
@@ -724,19 +824,28 @@ const Content: React.FC = () => {
                           ))}
                       </div>
                       {/* button save */}
-                      {isUpdate && !isUpdateTitleTopic && (
+
+                      {/* setIsUpdateTitleTopic(true);
+                        setAddLesson(false);
+                        setIsUpdateLesson(false); */}
+                      {(isUpdateTitleTopic === false ||
+                        addLesson === true ||
+                        isUpdateLesson === true) && (
                         <div className="mt-8 pl-6">
-                          <Button
-                            className="mr-4 button-cancel"
-                            style={{
-                              backgroundColor: "white",
-                              color: "#1e2753",
-                              borderColor: "#1e2753",
-                            }}
-                            ghost
-                          >
-                            Cancel
-                          </Button>
+                          {!addLesson && (
+                            <Button
+                              className="mr-4 button-cancel"
+                              style={{
+                                backgroundColor: "white",
+                                color: "#1e2753",
+                                borderColor: "#1e2753",
+                              }}
+                              ghost
+                              onClick={() => cancel()}
+                            >
+                              Cancel
+                            </Button>
+                          )}
                           <Button
                             className="button-save"
                             style={{
@@ -745,12 +854,22 @@ const Content: React.FC = () => {
                               borderColor: "#00095b",
                             }}
                             onClick={() =>
-                              isUpdate
+                              isUpdateLesson
                                 ? updateLesson("")
-                                : handleSaveLessonsStore()
+                                : addLesson
+                                ? handleSaveLessonsStore()
+                                : isCreateLesson
+                                ? createLesson()
+                                : console.log("No thing")
                             }
                           >
-                            {isUpdate ? "Update Lesson" : "Create Lesson"}
+                            {isUpdateLesson
+                              ? "Update Lesson"
+                              : addLesson
+                              ? "Save Lesson"
+                              : isCreateLesson
+                              ? "Create Lesson"
+                              : "No thing"}
                           </Button>
                         </div>
                       )}
@@ -764,28 +883,20 @@ const Content: React.FC = () => {
                         className="pl-6 my-6 py-2 pr-2 ml-6 relative"
                         style={{ borderTop: "0.4px solid #1e2753" }}
                       >
-                        {/* <MdDeleteOutline
-                                    onClick={() =>
-                                      setDataListDesc(
-                                        dataListDesc.filter(
-                                          (_, idx) => idx !== id
-                                        )
-                                      )
-                                    }
-                                    className="absolute cursor-pointer -top-5 right-2 text-red-500 hover:text-red-700"
-                                    title="Xoá mô tả"
-                                  />
-                                  <MdEditSquare
-                                    onClick={() =>
-                                      setDataListDesc(
-                                        dataListDesc.filter(
-                                          (_, idx) => idx !== id
-                                        )
-                                      )
-                                    }
-                                    className="absolute cursor-pointer -top-5 right-8 text-red-500 hover:text-red-700"
-                                    title="Chỉnh sửa mô tả"
-                                  /> */}
+                        <MdDeleteOutline
+                          className="absolute cursor-pointer -top-5 right-2 text-red-500 hover:text-red-700"
+                          onClick={() =>
+                            setLessons((prev) =>
+                              prev.filter((e) => e.id !== lesson.id)
+                            )
+                          }
+                          title="Xoá lesson"
+                        />
+                        <MdEditSquare
+                          className="absolute cursor-pointer -top-5 right-8 text-red-500 hover:text-red-700"
+                          onClick={() => fillEditLesson(lesson)}
+                          title="Chỉnh sửa lesson"
+                        />
                         <div
                           className="flex items-center primary-color-text inline-block cursor-pointer border border-transparent hover:border-[#1e2753] hover:rounded-lg transition-all duration-300 p-1"
                           onClick={() =>
@@ -804,7 +915,7 @@ const Content: React.FC = () => {
                           <div key={id}>
                             <div className="grid gap-2 grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 mt-4">
                               <div className="relative w-full h-32 overflow-hidden rounded-lg border">
-                                {lesson.video && !isUpdate ? (
+                                {lesson.video && !isUpdateLesson ? (
                                   <video
                                     src={URL.createObjectURL(lesson.video[0])}
                                     controls
@@ -863,7 +974,7 @@ const Content: React.FC = () => {
             )}
             {/* button save */}
             {((addCourseContent === true && isUpdateTitleTopic === true) ||
-              (isUpdate === true && isUpdateTitleTopic === true)) && (
+              (isUpdateLesson === true && isUpdateTitleTopic === true)) && (
               <div className="mt-8">
                 <Button
                   className="mr-4 button-cancel"
@@ -873,6 +984,7 @@ const Content: React.FC = () => {
                     borderColor: "#1e2753",
                   }}
                   ghost
+                  onClick={() => cancel()}
                 >
                   Cancel
                 </Button>
@@ -884,12 +996,12 @@ const Content: React.FC = () => {
                     borderColor: "#00095b",
                   }}
                   onClick={
-                    isUpdate === true && isUpdateTitleTopic === true
+                    isUpdateLesson === true && isUpdateTitleTopic === true
                       ? updateTopic
                       : createTopics
                   }
                 >
-                  {isUpdate === true && isUpdateTitleTopic === true
+                  {isUpdateTitleTopic === true
                     ? "Update Topic"
                     : "Create Topic"}
                 </Button>
@@ -918,6 +1030,11 @@ const Content: React.FC = () => {
                       onClick={() => handleEdit(topic, topic.name, "topic")}
                       className="absolute cursor-pointer top-[4px] left-[42px] text-red-500 hover:text-red-700"
                       title="Chỉnh sửa chương học"
+                    />
+                    <MdCreateNewFolder
+                      className="absolute cursor-pointer top-[4px] left-[62px] text-red-500 hover:text-red-700"
+                      title="Tạo mới bài học"
+                      onClick={() => handleShowAddLesson()}
                     />
                     {/* Hiển thị tiêu đề topic */}
                     <div className="mb-2 secondary-color-bg px-4 py-2 rounded-lg inline-block">
@@ -948,6 +1065,9 @@ const Content: React.FC = () => {
                             onClick={() => {
                               handleEdit(lesson, topic.name, "");
                               setIsUpdateTitleTopic(false);
+                              setIsOnlyTopicTitle(false);
+                              setIsOpenLesson(true);
+                              setIsUpdateLesson(true);
                             }}
                             className="absolute cursor-pointer -top-5 right-8 text-red-500 hover:text-red-700"
                             title="Chỉnh sửa bài học"

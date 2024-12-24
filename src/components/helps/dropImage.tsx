@@ -8,6 +8,7 @@ interface ImageUploaderProps {
   onImagesChange?: (files: File[]) => void;
   onUrlsReset?: () => void; // Callback để reset URL
   urls?: string; // URL của ảnh hoặc video
+  filesParent?: File[];
   typefile: string;
   reset?: boolean;
 }
@@ -17,10 +18,10 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
   onImagesChange,
   onUrlsReset,
   urls,
+  filesParent,
   typefile = "image/*,video/*",
   reset = false,
 }) => {
-  console.log("url video: ", urls);
   const [files, setFiles] = useState<File[]>([]);
 
   const onDrop = (acceptedFiles: File[]) => {
@@ -72,7 +73,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
 
       <div className="grid gap-2 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 mt-4">
         {/* Hiển thị file đã chọn */}
-        {files.length > 0 && (
+        {files.length > 0 ? (
           <div
             key="uploaded-file"
             className="relative w-full h-32 overflow-hidden rounded-lg border"
@@ -101,10 +102,20 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
               <TiDelete className="text-base" />
             </button>
           </div>
-        )}
-
-        {/* Hiển thị URL nếu có */}
-        {urls && urls.length > 0 && (
+        ) : filesParent && filesParent.length > 0 ? (
+          <div
+            key="uploaded-file"
+            className="relative w-full h-32 overflow-hidden rounded-lg border"
+          >
+            {filesParent[0].type.startsWith("video/") && (
+              <video
+                src={URL.createObjectURL(filesParent[0])}
+                controls
+                className="h-24 w-full object-cover rounded"
+              />
+            )}
+          </div>
+        ) : urls && urls.length > 0 ? (
           <div
             key="uploaded-url"
             className="relative w-full h-32 overflow-hidden rounded-lg border"
@@ -131,7 +142,11 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
               <TiDelete className="text-base" />
             </button>
           </div>
+        ) : (
+          <div>Chưa có ảnh/video</div>
         )}
+
+        {/* Hiển thị URL nếu có */}
       </div>
     </div>
   );
