@@ -50,6 +50,7 @@ const Content: React.FC = () => {
   const header = localStorage.getItem("access_token");
   const navigate = useNavigate();
   const { idCourse } = useParams();
+  const [idTopicCreated, setIdTopicCreated] = useState("");
 
   // state number
   const [indexDeleted, setIndexDeleted] = useState<number>(0);
@@ -86,7 +87,7 @@ const Content: React.FC = () => {
   const [editTopic, setEditTopic] = useState<Topic>();
 
   //useRef
-  const topicTitleRef = useRef<HTMLInputElement>(null);
+  const topicTitleRef = useRef<HTMLInputElement | null>(null);
   const lessonTitleRef = useRef<HTMLInputElement | null>(null);
   const nameExerciseRef = useRef<(HTMLInputElement | null)[]>([]);
   const linkExerciseRef = useRef<(HTMLInputElement | null)[]>([]);
@@ -262,7 +263,7 @@ const Content: React.FC = () => {
             if (exercises) {
               await postData(
                 "/api/admin/exercise",
-                { id_lesson: id_lesson, dataExercise: lesson.exercise },
+                { id_lesson: id_lesson, dataExercise: exercises },
                 {
                   headers: { Authorization: `Bearer ${header}` },
                 }
@@ -289,8 +290,12 @@ const Content: React.FC = () => {
     setAddCourseContent(false);
   };
 
-  const handleShowAddLesson = () => {
+  const handleShowAddLesson = (topic: Topic) => {
     //resetState
+    const titleTopic = topic.name;
+    const idTopic = topic._id;
+
+    //reset state
     setAddCourseContent(true);
     setIsOnlyTopicTitle(false);
     setIsUpdateTitleTopic(false);
@@ -306,16 +311,73 @@ const Content: React.FC = () => {
       { state: uploadeVideoLesson, setState: setUploadeVideoLesson },
       { state: editLesson, setState: setEditLesson },
     ]);
+
+    setIdTopicCreated(idTopic);
+    setEditNameTopic(titleTopic);
   };
-  const createLesson = () => {
-    console.log("create lesson");
+
+  const createLesson = async () => {
+    console.log("idTopicCreated: ", idTopicCreated);
+
+    const allDataExercise: Exercise[] = dataLinkCodeFource.map(
+      (dataExercise, id) => ({
+        id: dataExercise.id,
+        _id: dataExercise._id,
+        link: linkExerciseRef.current[id]?.value || "",
+        name: nameExerciseRef.current[id]?.value || "",
+      })
+    );
+    const formData = new FormData();
+
+    const idTopic = idTopicCreated;
+    const nameLesson = lessonTitleRef.current.value || "";
+    const fileVideo = uploadeVideoLesson;
+
+    if (fileVideo && nameLesson && allDataExercise && idTopic) {
+      try {
+        setIsLoading(true);
+        fileVideo.forEach((file) => formData.append("fileVideo", file));
+        formData.append("id_topic", idTopic);
+        formData.append("name", nameLesson);
+        formData.append("status", "PRIVATE");
+
+        const resLesson = await postData("/api/admin/lesson", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${header}`,
+          },
+        });
+        console.log("resLesson: ", resLesson);
+
+        const id_lesson = resLesson.data._id;
+
+        // Gửi exercises liên quan tới lesson
+        const resExercise = await postData(
+          "/api/admin/exercise",
+          { id_lesson: id_lesson, dataExercise: allDataExercise },
+          {
+            headers: { Authorization: `Bearer ${header}` },
+          }
+        );
+        console.log("resExercise: ", resExercise);
+      } catch (err) {
+        console.error("Error saving lesson: ", err);
+      } finally {
+        setIsFetchData(!isFetchData);
+        setIsLoading(false);
+        cancel();
+      }
+    } else {
+      console.log("Video not found");
+    }
+
     // setUploadeVideoLesson(lesson.video)
   };
 
   // handle edit(update)
   const fillEditLesson = (lesson: Lesson) => {
-    console.log("lesson edit: ", lesson);
     handleVideoLessonChange(lesson.video || []);
+    console.log("check null lessref: ", lessonTitleRef);
     if (lessonTitleRef.current) {
       lessonTitleRef.current.value = lesson.name || "";
     }
@@ -614,8 +676,6 @@ const Content: React.FC = () => {
       { ref: nameExerciseRef },
     ]);
   };
-
-  console.log("editdata: ", editLesson);
 
   if (isLoading) {
     return <Loading message="Đang tải dữ liệu..." size="large" />;
@@ -1034,7 +1094,7 @@ const Content: React.FC = () => {
                     <MdCreateNewFolder
                       className="absolute cursor-pointer top-[4px] left-[62px] text-red-500 hover:text-red-700"
                       title="Tạo mới bài học"
-                      onClick={() => handleShowAddLesson()}
+                      onClick={() => handleShowAddLesson(topic)}
                     />
                     {/* Hiển thị tiêu đề topic */}
                     <div className="mb-2 secondary-color-bg px-4 py-2 rounded-lg inline-block">
