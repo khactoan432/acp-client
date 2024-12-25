@@ -1,7 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import banner from "../../../assets/banner1.jpg";
 import Button from '../../common/Button';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '../../../redux/store';
+import { fetchUserCourses } from '../../../redux/slices/courseSlice';
 
 interface Course {
   id: string;
@@ -54,7 +58,17 @@ const sampleExamResults: ExamResult[] = [
 ];
 
 const ProfileTabs: React.FC = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'courses' | 'results'>('courses');
+
+  const dispatch = useDispatch<AppDispatch>();
+    const { userCourses, loading, error } = useSelector(
+      (state: RootState) => state.courses
+    );
+  
+    useEffect(() => {
+      dispatch(fetchUserCourses({ page: 1, limit: 100 }));
+    }, [dispatch]);
 
   return (
     <div className="">
@@ -81,11 +95,11 @@ const ProfileTabs: React.FC = () => {
       {/* Tabs Content */}
       <div className="py-8">
         {activeTab === 'courses' ? (
-          sampleCourses.length > 0 ? (
+          userCourses.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-              {sampleCourses.map((course) => (
+              {userCourses.map((course) => (
                 <div
-                  key={course.id}
+                  key={course._id}
                   className="bg-white shadow-md rounded-lg flex flex-col items-center"
                 >
                   <img
@@ -100,15 +114,15 @@ const ProfileTabs: React.FC = () => {
                     <div className="w-full bg-gray-200 rounded-full h-[10px] mb-2">
                       <div
                         className="bg-blue-600 rounded-full h-[10px]"
-                        style={{ width: `${course.progress}%` }}
+                        style={{ width: `${10}%` }}
                       ></div>
                     </div>
                     <p className="text-sm font-semibold text-gray-600 pb-3">
-                      Tiến độ: {course.progress}%
+                      Tiến độ: {10}%
                     </p>
 
                     <Button
-                    onClick={() => alert(`Added ${name} to cart!`)}
+                    onClick={() => navigate("/learning/"+course._id)}
                     className='w-full'
                   >
                     {"Tiếp tục"}
