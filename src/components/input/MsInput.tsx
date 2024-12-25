@@ -1,4 +1,10 @@
-import React, { forwardRef, useImperativeHandle, useRef } from "react";
+import { current } from "@reduxjs/toolkit";
+import React, {
+  forwardRef,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
 import { IconType } from "react-icons";
 
 // Định nghĩa interface cho các phương thức của ref
@@ -19,6 +25,7 @@ interface MSInputProps {
   rightIcon?: IconType; // Icon bên phải
   errorMessage?: string; // Thông báo lỗi tùy chỉnh
   className?: string; // Thêm style tùy chỉnh
+  defaultValue?: string;
 }
 
 const MSInput = forwardRef<MSInputHandle, MSInputProps>(
@@ -33,28 +40,65 @@ const MSInput = forwardRef<MSInputHandle, MSInputProps>(
       rightIcon: RightIcon,
       errorMessage,
       className = "",
+      defaultValue = "",
     },
     ref
   ) => {
     const inputRef = useRef<HTMLInputElement>(null);
+    const [value, setValue] = useState<string>(defaultValue);
+    const [error, setError] = useState<string>("");
 
     // Expose các phương thức tùy chỉnh ra ngoài thông qua ref
     useImperativeHandle(ref, () => ({
       focus: () => {
         inputRef.current?.focus();
       },
-      getValue: () => inputRef.current?.value || "",
-      setValue: (value: string) => {
-        if (inputRef.current) {
-          inputRef.current.value = value;
-        }
+      getValue: () => value,
+      setValue: (newValue: string) => {
+        setValue(newValue);
+        validateInput(newValue); // Validate khi set giá trị
       },
       clear: () => {
-        if (inputRef.current) {
-          inputRef.current.value = "";
-        }
+        setValue("");
+        setError(""); // Xóa lỗi
       },
     }));
+
+    // Hàm xử lý validation
+    const validateInput = (inputValue: string) => {
+      let validationError = "";
+
+      if (required && !inputValue.trim()) {
+        validationError = "This field is required.";
+      } else if (validate === "email") {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(inputValue)) {
+          validationError = "Please enter a valid email.";
+        }
+      } else if (validate === "phone") {
+        const phoneRegex = /^[0-9]{10,15}$/; // Số điện thoại có 10-15 chữ số
+        if (!phoneRegex.test(inputValue)) {
+          validationError = "Please enter a valid phone number.";
+        }
+      } else if (validate === "number") {
+        if (isNaN(Number(inputValue))) {
+          validationError = "Please enter a valid number.";
+        }
+      }
+
+      setError(validationError);
+      return validationError === "";
+    };
+
+    // Xử lý khi giá trị thay đổi
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const newValue = e.target.value;
+      setValue(newValue);
+      validateInput(newValue); // Kiểm tra giá trị mới
+    };
+    const handleBlur = () => {
+      validateInput(value);
+    };
 
     return (
       <div className={`w-full ${className}`}>
@@ -73,9 +117,14 @@ const MSInput = forwardRef<MSInputHandle, MSInputProps>(
             ref={inputRef}
             type={type}
             placeholder={placeholder}
+            onBlur={handleBlur}
+            value={value}
+            onChange={handleChange}
             className={`w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none ${
               LeftIcon ? "pl-10" : ""
-            } ${RightIcon ? "pr-10" : ""}`}
+            } ${RightIcon ? "pr-10" : ""} ${
+              error ? "border-red-500" : "border-gray-300"
+            }`}
           />
           {RightIcon && (
             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-500">
@@ -83,6 +132,9 @@ const MSInput = forwardRef<MSInputHandle, MSInputProps>(
             </div>
           )}
         </div>
+        {error && (
+          <p className="mt-1 text-sm text-red-500">{errorMessage || error}</p>
+        )}
       </div>
     );
   }

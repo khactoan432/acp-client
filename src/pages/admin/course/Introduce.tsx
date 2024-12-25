@@ -8,8 +8,9 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "antd";
 
 // import components
-import PopupNotification from "../../../components/popup/notify";
 import ButtonPlus from "../../../components/button/plus";
+import MSInput from "../../../components/input/MsInput";
+import PopupNotification from "../../../components/popup/notify";
 import Loading from "../../../components/loading";
 
 //icon react
@@ -66,8 +67,23 @@ const Introduce: React.FC = () => {
   const [dataEditDesc, setDataEditDesc] = useState<DataDesc>();
 
   //useRef
-  const introTitleRef = useRef<HTMLInputElement>(null);
-  const descInputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  // const introTitleRef = useRef<HTMLInputElement>(null);
+  // const descInputRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+  const introTitleRef = useRef<{
+    focus: () => void;
+    getValue: () => string;
+    setValue: (value: string) => void;
+    clear: () => void;
+  }>(null);
+  const descInputRefs = useRef<
+    {
+      focus: () => void;
+      getValue: () => string;
+      setValue: (value: string) => void;
+      clear: () => void;
+    }[]
+  >([]);
 
   // get data
   useEffect(() => {
@@ -152,8 +168,8 @@ const Introduce: React.FC = () => {
   //handle save
   const createSaveIntroduce = async () => {
     setIsLoading(true);
-    const introTitle = introTitleRef.current?.value || "";
-    const dataList = descInputRefs.current.map((cur) => cur?.value);
+    const introTitle = introTitleRef.current?.getValue() || "";
+    const dataList = descInputRefs.current.map((cur) => cur?.getValue());
     try {
       const resDescribe = await postData(
         "/api/admin/describe",
@@ -208,13 +224,13 @@ const Introduce: React.FC = () => {
     const idIntro = dataUpdate?._id;
 
     setIsLoading(true);
-    const introTitle = introTitleRef.current?.value || "";
+    const introTitle = introTitleRef.current?.getValue() || "";
     const dataList = descInputRefs.current.map((cur, id) => ({
       id:
         dataUpdate && dataUpdate.overviews
           ? dataUpdate?.overviews[id]?._id
           : null,
-      desc: cur?.value,
+      desc: cur?.getValue(),
     }));
 
     try {
@@ -294,6 +310,7 @@ const Introduce: React.FC = () => {
   };
   // hanle edit
   const handleEditIntroduce = async (descs: any) => {
+    console.log("describe", descs);
     setIsUpdate(true);
     setAddIntroduce(true);
     setDataEditDesc(descs);
@@ -439,7 +456,7 @@ const Introduce: React.FC = () => {
             {addIntroduce && (
               <div className="pr-8">
                 <div className="flex flex-col mb-2 relative">
-                  <label className="text-[12px] text-[#5a607f]">Tiêu đề</label>
+                  {/* <label className="text-[12px] text-[#5a607f]">Tiêu đề</label>
                   <input
                     ref={introTitleRef}
                     defaultValue={
@@ -447,6 +464,16 @@ const Introduce: React.FC = () => {
                     }
                     placeholder="Bạn sẽ học được gì khi tham gia khoá học"
                     className="border border-[#f3f3f3] rounded-[4px] p-1 mt-1 focus:border-[#1e2753] focus:outline-none"
+                  /> */}
+                  <MSInput
+                    ref={introTitleRef}
+                    label="Tiêu đề"
+                    placeholder="Bạn sẽ học được gì khi tham gia khoá học"
+                    type="text"
+                    required
+                    defaultValue={
+                      dataEditDesc && dataEditDesc.desc ? dataEditDesc.desc : ""
+                    }
                   />
                 </div>
                 <div className="mb-2 pl-6 relative">
@@ -480,7 +507,7 @@ const Introduce: React.FC = () => {
                           className="absolute cursor-pointer top-1 right-2 text-red-500 hover:text-red-700"
                           title="Xoá mô tả"
                         />
-                        <label className="text-[12px] text-[#5a607f]">
+                        {/* <label className="text-[12px] text-[#5a607f]">
                           Mô tả {desc.id}
                         </label>
                         <input
@@ -492,6 +519,20 @@ const Introduce: React.FC = () => {
                           }
                           placeholder="Thành thạo ngôn ngữ lập trình c#"
                           className="border border-[#f3f3f3] rounded-[4px] p-1 mt-1 focus:border-[#1e2753] focus:outline-none"
+                        /> */}
+                        <MSInput
+                          ref={(el) => {
+                            descInputRefs.current[id] = el!;
+                          }}
+                          label={`Mô tả ${id + 1}`}
+                          placeholder="Thành thạo ngôn ngữ lập trình c#"
+                          type="text"
+                          required
+                          defaultValue={
+                            dataEditDesc?.overviews
+                              ? dataEditDesc?.overviews[id]?.desc
+                              : ""
+                          }
                         />
                       </div>
                     ))}

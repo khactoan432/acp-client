@@ -1,5 +1,4 @@
 import AdminHeader from "../../components/layout/Admin/header";
-import { FaEnvelope, FaCheckCircle } from "react-icons/fa";
 import Nav from "../../components/layout/Admin/nav";
 
 import React, { useState, useRef, useEffect } from "react";
@@ -48,35 +47,41 @@ const AdminExam: React.FC = () => {
   const [dataEditExam, setDataEditExam] = useState<any>(null);
 
   // useRef input
-  const ExamTitleRef = useRef<HTMLInputElement>(null);
-  const linkExam = useRef<HTMLInputElement>(null);
-  const oldPrice = useRef<HTMLInputElement>(null);
-  const newPrice = useRef<HTMLInputElement>(null);
+  //   const ExamTitleRef = useRef<HTMLInputElement>(null);
+  //   const linkExam = useRef<HTMLInputElement>(null);
+  //   const oldPrice = useRef<HTMLInputElement>(null);
+  //   const newPrice = useRef<HTMLInputElement>(null);
   //   test ----------------------
-  const inputRef = useRef<{
+  const ExamTitleRef = useRef<{
+    focus: () => void;
+    getValue: () => string;
+    setValue: (value: string) => void;
+    clear: () => void;
+  }>(null);
+  const linkExam = useRef<{
+    focus: () => void;
+    getValue: () => string;
+    setValue: (value: string) => void;
+    clear: () => void;
+  }>(null);
+  const oldPrice = useRef<{
+    focus: () => void;
+    getValue: () => string;
+    setValue: (value: string) => void;
+    clear: () => void;
+  }>(null);
+  const newPrice = useRef<{
     focus: () => void;
     getValue: () => string;
     setValue: (value: string) => void;
     clear: () => void;
   }>(null);
 
-  const handleGetValue = () => {
-    if (inputRef.current) {
-      alert("Input value: " + inputRef.current.getValue());
-    }
-  };
-
-  const handleSetValue = () => {
-    if (inputRef.current) {
-      inputRef.current.setValue("Hello World");
-    }
-  };
-
-  const handleClear = () => {
-    if (inputRef.current) {
-      inputRef.current.clear();
-    }
-  };
+  //   const handleCheckValue = () => {
+  //     if (ExamTitleRef.current) {
+  //       alert("Value: " + ExamTitleRef.current.getValue());
+  //     }
+  //   };
 
   //   test ----------------------
 
@@ -174,11 +179,16 @@ const AdminExam: React.FC = () => {
         if (Array.isArray(currentRef)) {
           // Reset mỗi phần tử trong mảng ref
           currentRef.forEach((ref) => {
-            if (ref && ref.value !== undefined) ref.value = "";
+            if (ref && ref.clear) {
+              ref.clear(); // Gọi phương thức clear nếu tồn tại
+            } else if (ref && ref.value !== undefined) {
+              ref.value = ""; // Reset giá trị của ref
+            }
           });
-        } else if (currentRef && currentRef.value !== undefined) {
-          // Reset giá trị của input ref
-          currentRef.value = "";
+        } else if (currentRef.clear) {
+          currentRef.clear(); // Gọi phương thức clear nếu tồn tại
+        } else if (currentRef.value !== undefined) {
+          currentRef.value = ""; // Reset giá trị trực tiếp
         }
       }
     });
@@ -186,8 +196,8 @@ const AdminExam: React.FC = () => {
 
   // hanle save
 
-  const handleSaveAll = async () => {
-    setIsLoading(true);
+  const createExam = async () => {
+    // setIsLoading(true);
 
     try {
       // 1. Upload exam information
@@ -195,10 +205,14 @@ const AdminExam: React.FC = () => {
       imageExam.forEach((file) => formData.append("fileImage", file));
       uploadVideo.forEach((file) => formData.append("fileVideo", file));
 
-      const name = ExamTitleRef.current?.value || "";
-      const price = oldPrice.current?.value || "";
-      const discount = newPrice.current?.value || "";
-      const link = linkExam.current?.value || "";
+      const name = ExamTitleRef.current?.getValue() || "";
+      const price = oldPrice.current?.getValue() || "";
+      const discount = newPrice.current?.getValue() || "";
+      const link = linkExam.current?.getValue() || "";
+      //   console.log("name: ", name);
+      //   console.log("price: ", price);
+      //   console.log("discount: ", discount);
+      //   console.log("link: ", link);
 
       formData.append("name", name);
       formData.append("price", price);
@@ -270,7 +284,7 @@ const AdminExam: React.FC = () => {
   };
 
   // hanle update
-  const handleUpdate = async () => {
+  const updateExam = async () => {
     setIsLoading(true);
     const idExam = dataEditExam._id;
     try {
@@ -370,7 +384,7 @@ const AdminExam: React.FC = () => {
                       </h4>
                     </div>
                     <div className="flex flex-col mb-2">
-                      <label className="text-[12px] text-[#5a607f]">
+                      {/* <label className="text-[12px] text-[#5a607f]">
                         Tên đề thi
                       </label>
                       <input
@@ -378,10 +392,18 @@ const AdminExam: React.FC = () => {
                         defaultValue={dataEditExam ? dataEditExam.name : ""}
                         placeholder="Nhập tên đề thi"
                         className="border border-[#f3f3f3] rounded-[4px] p-1 mt-1 focus:border-[#1e2753] focus:outline-none"
+                      /> */}
+                      <MSInput
+                        ref={ExamTitleRef}
+                        label="Tên đề thi"
+                        placeholder="Nhập tên đề thi"
+                        type="text"
+                        required
+                        defaultValue={dataEditExam ? dataEditExam.name : ""}
                       />
                     </div>
                     <div className="flex flex-col mb-2">
-                      <label className="text-[12px] text-[#5a607f]">
+                      {/* <label className="text-[12px] text-[#5a607f]">
                         Link đề thi
                       </label>
                       <input
@@ -389,6 +411,14 @@ const AdminExam: React.FC = () => {
                         defaultValue={dataEditExam ? dataEditExam.link : ""}
                         placeholder="Nhập đường dẫn đề thi"
                         className="border border-[#f3f3f3] rounded-[4px] p-1 mt-1 focus:border-[#1e2753] focus:outline-none"
+                      /> */}
+                      <MSInput
+                        ref={linkExam}
+                        label="Đường dẫn đề thi"
+                        placeholder="Nhập đường dẫn đề thi"
+                        type="text"
+                        required
+                        defaultValue={dataEditExam ? dataEditExam.link : ""}
                       />
                     </div>
                     <ImageUploader
@@ -417,7 +447,7 @@ const AdminExam: React.FC = () => {
                       </h4>
                       <div className="flex justify-around">
                         <div className="flex flex-col">
-                          <label className="text-[12px] text-[#5a607f]">
+                          {/* <label className="text-[12px] text-[#5a607f]">
                             Giá gốc
                           </label>
                           <input
@@ -427,10 +457,21 @@ const AdminExam: React.FC = () => {
                             }
                             placeholder="Nhập giá trước giảm"
                             className="border border-[#f3f3f3] rounded-[4px] p-1 mt-1 focus:border-[#1e2753] focus:outline-none"
+                          /> */}
+                          <MSInput
+                            ref={oldPrice}
+                            label="Giá đề thi"
+                            placeholder="Nhập giá"
+                            type="number"
+                            validate="number"
+                            required
+                            defaultValue={
+                              dataEditExam ? dataEditExam.price : ""
+                            }
                           />
                         </div>
                         <div className="flex flex-col">
-                          <label className="text-[12px] text-[#5a607f]">
+                          {/* <label className="text-[12px] text-[#5a607f]">
                             Giá đã giảm
                           </label>
                           <input
@@ -440,36 +481,37 @@ const AdminExam: React.FC = () => {
                             }
                             placeholder="Nhập giá đã giảm"
                             className="border border-[#f3f3f3] rounded-[4px] p-1 mt-1 focus:border-[#1e2753] focus:outline-none"
+                          /> */}
+                          <MSInput
+                            ref={newPrice}
+                            label="Giá ưu đãi"
+                            placeholder="Nhập giá"
+                            type="number"
+                            validate="number"
+                            required
+                            defaultValue={
+                              dataEditExam ? dataEditExam.discount : ""
+                            }
                           />
                         </div>
                       </div>
                       {/* ---------------- test ----------------- */}
-                      <div>
+                      {/* <div>
                         <MSInput
                           ref={inputRef}
-                          label="Sample Input"
-                          placeholder="Enter something"
+                          label="Email Address"
+                          placeholder="Enter your email"
                           type="text"
+                          required
+                          validate="email"
                         />
                         <button
                           className="mt-4 px-4 py-2 bg-blue-500 text-white rounded"
-                          onClick={handleGetValue}
+                          onClick={handleCheckValue}
                         >
                           Get Value
                         </button>
-                        <button
-                          className="mt-4 ml-2 px-4 py-2 bg-green-500 text-white rounded"
-                          onClick={handleSetValue}
-                        >
-                          Set Value
-                        </button>
-                        <button
-                          className="mt-4 ml-2 px-4 py-2 bg-red-500 text-white rounded"
-                          onClick={handleClear}
-                        >
-                          Clear Input
-                        </button>
-                      </div>
+                      </div> */}
                       {/* test-------------------------- */}
                     </div>
                     {/* button save */}
@@ -493,7 +535,7 @@ const AdminExam: React.FC = () => {
                             color: "white",
                             borderColor: "#00095b",
                           }}
-                          onClick={handleUpdate}
+                          onClick={updateExam}
                         >
                           Cập nhật
                         </Button>
@@ -505,7 +547,7 @@ const AdminExam: React.FC = () => {
                             color: "white",
                             borderColor: "#00095b",
                           }}
-                          onClick={handleSaveAll}
+                          onClick={createExam}
                         >
                           Tạo mới
                         </Button>

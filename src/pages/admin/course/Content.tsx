@@ -9,6 +9,7 @@ import { Button } from "antd";
 
 // import components
 import ButtonPlus from "../../../components/button/plus";
+import MSInput from "../../../components/input/MsInput";
 import ImageUploader from "../../../components/helps/dropImage";
 import Loading from "../../../components/loading";
 import PopupNotification from "../../../components/popup/notify";
@@ -87,10 +88,39 @@ const Content: React.FC = () => {
   const [editTopic, setEditTopic] = useState<Topic>();
 
   //useRef
-  const topicTitleRef = useRef<HTMLInputElement | null>(null);
-  const lessonTitleRef = useRef<HTMLInputElement | null>(null);
-  const nameExerciseRef = useRef<(HTMLInputElement | null)[]>([]);
-  const linkExerciseRef = useRef<(HTMLInputElement | null)[]>([]);
+  // const topicTitleRef = useRef<HTMLInputElement | null>(null);
+  // const lessonTitleRef = useRef<HTMLInputElement | null>(null);
+  // const nameExerciseRef = useRef<(HTMLInputElement | null)[]>([]);
+  // const linkExerciseRef = useRef<(HTMLInputElement | null)[]>([]);
+
+  const topicTitleRef = useRef<{
+    focus: () => void;
+    getValue: () => string;
+    setValue: (value: string) => void;
+    clear: () => void;
+  }>(null);
+  const lessonTitleRef = useRef<{
+    focus: () => void;
+    getValue: () => string;
+    setValue: (value: string) => void;
+    clear: () => void;
+  }>(null);
+  const nameExerciseRef = useRef<
+    {
+      focus: () => void;
+      getValue: () => string;
+      setValue: (value: string) => void;
+      clear: () => void;
+    }[]
+  >([]);
+  const linkExerciseRef = useRef<
+    {
+      focus: () => void;
+      getValue: () => string;
+      setValue: (value: string) => void;
+      clear: () => void;
+    }[]
+  >([]);
 
   //   get data
   useEffect(() => {
@@ -136,11 +166,16 @@ const Content: React.FC = () => {
         if (Array.isArray(currentRef)) {
           // Reset mỗi phần tử trong mảng ref
           currentRef.forEach((ref) => {
-            if (ref && ref.value !== undefined) ref.value = "";
+            if (ref && ref.clear) {
+              ref.clear(); // Gọi phương thức clear nếu tồn tại
+            } else if (ref && ref.value !== undefined) {
+              ref.value = ""; // Reset giá trị của ref
+            }
           });
-        } else if (currentRef && currentRef.value !== undefined) {
-          // Reset giá trị của input ref
-          currentRef.value = "";
+        } else if (currentRef.clear) {
+          currentRef.clear(); // Gọi phương thức clear nếu tồn tại
+        } else if (currentRef.value !== undefined) {
+          currentRef.value = ""; // Reset giá trị trực tiếp
         }
       }
     });
@@ -176,14 +211,14 @@ const Content: React.FC = () => {
       (dataExercise, id) => ({
         id: dataExercise.id,
         _id: dataExercise._id,
-        link: linkExerciseRef.current[id]?.value || "",
-        name: nameExerciseRef.current[id]?.value || "",
+        link: linkExerciseRef.current[id]?.getValue() || "",
+        name: nameExerciseRef.current[id]?.getValue() || "",
       })
     );
 
     console.log("dataLink:", allDataExercise);
 
-    const lessonTitle = lessonTitleRef.current?.value || "";
+    const lessonTitle = lessonTitleRef.current?.getValue() || "";
     const video = uploadeVideoLesson;
     if (lessonTitle && uploadeVideoLesson) {
       setLessons((prev) => [
@@ -211,7 +246,7 @@ const Content: React.FC = () => {
     }
   };
   const createTopics = async () => {
-    const topicTitle = topicTitleRef.current?.value || "";
+    const topicTitle = topicTitleRef.current?.getValue() || "";
 
     // Hàm lưu topics và lessons
     const createTopicsAndLessons = async () => {
@@ -323,14 +358,14 @@ const Content: React.FC = () => {
       (dataExercise, id) => ({
         id: dataExercise.id,
         _id: dataExercise._id,
-        link: linkExerciseRef.current[id]?.value || "",
-        name: nameExerciseRef.current[id]?.value || "",
+        link: linkExerciseRef.current[id]?.getValue() || "",
+        name: nameExerciseRef.current[id]?.getValue() || "",
       })
     );
     const formData = new FormData();
 
     const idTopic = idTopicCreated;
-    const nameLesson = lessonTitleRef.current.value || "";
+    const nameLesson = lessonTitleRef.current?.getValue() || "";
     const fileVideo = uploadeVideoLesson;
 
     if (fileVideo && nameLesson && allDataExercise && idTopic) {
@@ -379,7 +414,7 @@ const Content: React.FC = () => {
     handleVideoLessonChange(lesson.video || []);
     console.log("check null lessref: ", lessonTitleRef);
     if (lessonTitleRef.current) {
-      lessonTitleRef.current.value = lesson.name || "";
+      lessonTitleRef.current.setValue(lesson.name || "");
     }
     setDataLinkCodeFource(lesson.exercise);
   };
@@ -387,8 +422,8 @@ const Content: React.FC = () => {
     // update only title topic
     if (isOnlyTopicTitle) {
       const title =
-        topicTitleRef.current && topicTitleRef.current.value
-          ? topicTitleRef.current.value
+        topicTitleRef.current && topicTitleRef.current.getValue()
+          ? topicTitleRef.current.getValue()
           : "";
       if (title) {
         setIsLoading(true);
@@ -416,8 +451,8 @@ const Content: React.FC = () => {
       }
     } else {
       const title =
-        topicTitleRef.current && topicTitleRef.current.value
-          ? topicTitleRef.current.value
+        topicTitleRef.current && topicTitleRef.current.getValue()
+          ? topicTitleRef.current.getValue()
           : "";
       if (title) {
         setIsLoading(true);
@@ -449,11 +484,11 @@ const Content: React.FC = () => {
       (dataExercise, id) => ({
         id: dataExercise.id,
         _id: dataExercise._id,
-        link: linkExerciseRef.current[id]?.value || "",
-        name: nameExerciseRef.current[id]?.value || "",
+        link: linkExerciseRef.current[id]?.getValue() || "",
+        name: nameExerciseRef.current[id]?.getValue() || "",
       })
     );
-    const lessonTitle = lessonTitleRef.current?.value || "";
+    const lessonTitle = lessonTitleRef.current?.getValue() || "";
     console.log("lessonTitle", lessonTitle);
     const formData = new FormData();
     if (uploadeVideoLesson && uploadeVideoLesson[0]) {
@@ -531,7 +566,7 @@ const Content: React.FC = () => {
 
       setDataLinkCodeFource(() => [...newEntries]);
       if (lessonTitleRef.current) {
-        lessonTitleRef.current.value = data.name;
+        lessonTitleRef.current.setValue(data.name);
       }
       setEditLesson(data);
     }
@@ -722,9 +757,9 @@ const Content: React.FC = () => {
             {addCourseContent && (
               <div className="pr-8">
                 <div className="flex flex-col mb-2 relative">
-                  <label className="text-[12px] text-[#5a607f]">
+                  {/* <label className="text-[12px] text-[#5a607f]">
                     Tiêu đề chương học
-                  </label>
+                  </label> */}
                   {/* {isUpdateLesson && !isOnlyTopicTitle && (
                     <MdEditSquare
                       onClick={() => {
@@ -736,7 +771,7 @@ const Content: React.FC = () => {
                       title="Chỉnh sửa chương học"
                     />
                   )} */}
-                  <input
+                  {/* <input
                     ref={topicTitleRef}
                     defaultValue={editNameTopic ? editNameTopic : ""}
                     disabled={!isUpdateTitleTopic}
@@ -744,6 +779,14 @@ const Content: React.FC = () => {
                     className={`border border-[#f3f3f3] rounded-[4px] p-1 mt-1 focus:border-[#1e2753] focus:outline-none ${
                       !isUpdateTitleTopic ? "blurred-input" : ""
                     }`}
+                  /> */}
+                  <MSInput
+                    ref={topicTitleRef}
+                    label="Tiêu đề chương học"
+                    placeholder="Kiểu dữ liệu, biến, vòng lặp"
+                    type="text"
+                    required
+                    defaultValue={editNameTopic ? editNameTopic : ""}
                   />
                 </div>
                 <div className="mb-2 pl-6 relative ml-6">
@@ -783,7 +826,7 @@ const Content: React.FC = () => {
                           className="absolute cursor-pointer top-1 right-2 text-red-500 hover:text-red-700"
                           title="Xoá mô tả"
                         /> */}
-                        <label className="text-[12px] text-[#5a607f]">
+                        {/* <label className="text-[12px] text-[#5a607f]">
                           Tiêu đề bài học
                         </label>
                         <input
@@ -791,6 +834,14 @@ const Content: React.FC = () => {
                           defaultValue={editLesson?.name ? editLesson.name : ""}
                           placeholder="Hướng dẫn cài đặt vsCode"
                           className="border border-[#f3f3f3] rounded-[4px] p-1 mt-1 focus:border-[#1e2753] focus:outline-none"
+                        /> */}
+                        <MSInput
+                          ref={lessonTitleRef}
+                          label="Tiêu đề bài học"
+                          placeholder="Hướng dẫn cài đặt vsCode"
+                          type="text"
+                          required
+                          defaultValue={editLesson?.name ? editLesson.name : ""}
                         />
                         <div>
                           <ImageUploader
@@ -849,7 +900,7 @@ const Content: React.FC = () => {
                                 className="absolute cursor-pointer top-1 right-2 text-red-500 hover:text-red-700"
                                 title="Xoá mô tả"
                               />
-                              <label className="text-[12px] text-[#5a607f]">
+                              {/* <label className="text-[12px] text-[#5a607f]">
                                 Bài {id + 1}: Tên và link bài tập
                               </label>
                               <input
@@ -865,8 +916,26 @@ const Content: React.FC = () => {
                                 }
                                 placeholder="Nhập tên bài tập"
                                 className="border border-[#f3f3f3] rounded-[4px] p-1 mt-1 focus:border-[#1e2753] focus:outline-none"
+                              /> */}
+                              <MSInput
+                                ref={(el) => {
+                                  linkExerciseRef.current[id] = el!;
+                                }}
+                                label={`Bài tập ${id + 1}`}
+                                placeholder="Nhập tên bài tập"
+                                type="text"
+                                required
+                                defaultValue={
+                                  editLesson?.exercise
+                                    ? editLesson.exercise[id]?.name
+                                      ? editLesson.exercise[id].name
+                                      : ""
+                                    : dataLinkCodeFource[id]?.name
+                                    ? dataLinkCodeFource[id].name
+                                    : ""
+                                }
                               />
-                              <input
+                              {/* <input
                                 ref={(el) => (linkExerciseRef.current[id] = el)}
                                 defaultValue={
                                   editLesson?.exercise
@@ -879,6 +948,24 @@ const Content: React.FC = () => {
                                 }
                                 placeholder="Nhập link bài tập"
                                 className="border border-[#f3f3f3] rounded-[4px] p-1 mt-1 focus:border-[#1e2753] focus:outline-none"
+                              /> */}
+                              <MSInput
+                                ref={(el) => {
+                                  linkExerciseRef.current[id] = el!;
+                                }}
+                                label={`Đường dẫn bài tập ${id + 1}`}
+                                placeholder="Nhập đường dẫn bài tập"
+                                type="text"
+                                required
+                                defaultValue={
+                                  editLesson?.exercise
+                                    ? editLesson.exercise[id]?.link
+                                      ? editLesson.exercise[id].link
+                                      : ""
+                                    : dataLinkCodeFource[id]?.link
+                                    ? dataLinkCodeFource[id].link
+                                    : ""
+                                }
                               />
                             </div>
                           ))}
