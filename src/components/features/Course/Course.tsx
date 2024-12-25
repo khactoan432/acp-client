@@ -60,12 +60,13 @@ const Course: React.FC<CourseProps> = ({ id, name, image, price, discount, descr
         <p className="text-sm text-gray-600 mt-2">{description}</p>
 
         <div className="mt-2 flex justify-between items-center">
-          <div className='flex items-center gap-4'>
-            <Rating rating={rating} />
-            <span>(241)</span>
+          <div className='flex items-center gap-1.5'>
+            <span>{rating}</span>
+            <span className='text-yellow-500 text-2xl'> ★ </span>
+            <span>({234} đánh giá)</span>
           </div>
-          
-          <span>4279 Học viên</span>
+
+          <span>{2465} Học viên</span>
         </div>
 
         <div className="flex justify-between items-center my-3">

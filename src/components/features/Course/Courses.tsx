@@ -33,7 +33,7 @@ const Courses: React.FC = () => {
     dots: true,
     infinite: userCourses.length > 1,
     speed: 500,
-    slidesToShow: Math.min(userCourses.length, 3),
+    slidesToShow: Math.min(userCourses.length, 4),
     slidesToScroll: 1,
     nextArrow: <ArrowButton direction="right" />,
     prevArrow: <ArrowButton direction="left" />,

@@ -15,6 +15,17 @@ import { fetchCourseDetail } from "../../redux/slices/courseSlice";
 import Lesson from '../../components/features/Video/Lesson';
 import { postData } from '../../axios';
 
+interface User {
+  _id: string;
+  name: string;
+  image: string;
+  email: string;
+  phone_number: string;
+  codeforce_name: string;
+  role: string;
+}
+
+
 const UserCourseDetail = () => {
   const { id } = useParams<{ id: string }>();
   const dispatch = useDispatch<AppDispatch>();
@@ -95,9 +106,21 @@ const UserCourseDetail = () => {
     try {
       console.log("Payment initiated for:", id_material);
 
+      const userString = localStorage.getItem('user');
+      let user: User | null = null;
+
+      // Nếu có giá trị, phân tích JSON
+      if (userString) {
+        try {
+          user = JSON.parse(userString) as User; // Chuyển chuỗi thành đối tượng
+        } catch (error) {
+          console.error("Failed to parse user from localStorage:", error);
+        }
+      }
+
       // Gửi request thanh toán
       const pm = await postData("/api/payment/momo", {
-        id_user: "6756abc20424abb76abb1eb0", // ID người dùng
+        id_user: user?._id || "6756abc20424abb76abb1eb0", // ID người dùng
         id_material: id_material,          // ID khóa học
         type: "COURSE",                    // Loại thanh toán
       }, {});
