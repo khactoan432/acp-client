@@ -15,6 +15,7 @@ import { MdAttractions } from "react-icons/md";
 
 // import components
 import ButtonPlus from "../../components/button/plus";
+import MSInput from "../../components/input/MsInput";
 import ImageUploader from "../../components/helps/dropImage";
 import Loading from "../../components/loading";
 import Table from "../../components/table";
@@ -48,9 +49,29 @@ const AdminExam: React.FC = () => {
   const [dataEditCourse, setDataEditCourse] = useState<any>(null);
 
   // useRef input
-  const courseTitleRef = useRef<HTMLInputElement>(null);
-  const oldPrice = useRef<HTMLInputElement>(null);
-  const newPrice = useRef<HTMLInputElement>(null);
+  // const courseTitleRef = useRef<HTMLInputElement>(null);
+  // const oldPrice = useRef<HTMLInputElement>(null);
+  // const newPrice = useRef<HTMLInputElement>(null);
+
+  const courseTitleRef = useRef<{
+    focus: () => void;
+    getValue: () => string;
+    setValue: (value: string) => void;
+    clear: () => void;
+  }>(null);
+  const oldPrice = useRef<{
+    focus: () => void;
+    getValue: () => string;
+    setValue: (value: string) => void;
+    clear: () => void;
+  }>(null);
+  const newPrice = useRef<{
+    focus: () => void;
+    getValue: () => string;
+    setValue: (value: string) => void;
+    clear: () => void;
+  }>(null);
+
   // get data
   useEffect(() => {
     const fetchDataCourse = async () => {
@@ -95,7 +116,7 @@ const AdminExam: React.FC = () => {
     },
     {
       title: "Sửa nội dung",
-      name: "CONTENT",
+      action: "CONTENT",
       icon: <MdContentPaste />,
       style: styleAction,
     },
@@ -156,11 +177,16 @@ const AdminExam: React.FC = () => {
         if (Array.isArray(currentRef)) {
           // Reset mỗi phần tử trong mảng ref
           currentRef.forEach((ref) => {
-            if (ref && ref.value !== undefined) ref.value = "";
+            if (ref && ref.clear) {
+              ref.clear(); // Gọi phương thức clear nếu tồn tại
+            } else if (ref && ref.value !== undefined) {
+              ref.value = ""; // Reset giá trị của ref
+            }
           });
-        } else if (currentRef && currentRef.value !== undefined) {
-          // Reset giá trị của input ref
-          currentRef.value = "";
+        } else if (currentRef.clear) {
+          currentRef.clear(); // Gọi phương thức clear nếu tồn tại
+        } else if (currentRef.value !== undefined) {
+          currentRef.value = ""; // Reset giá trị trực tiếp
         }
       }
     });
@@ -206,6 +232,8 @@ const AdminExam: React.FC = () => {
   // handle edit
 
   const handleActions = (type: string, row: any) => {
+    console.log("type: ", type);
+    console.log("row: ", row);
     if (type === "EDIT") {
       setAddCourse(true);
       setIsUpdate(true);
@@ -222,10 +250,6 @@ const AdminExam: React.FC = () => {
     if (type === "CONTENT") {
       navigate(`/admin/course/${row._id}/content`);
     }
-    // fill out infor course
-
-    console.log("Edit row:", row);
-    // Implement logic to edit the row
   };
 
   // hanle delete
@@ -352,7 +376,7 @@ const AdminExam: React.FC = () => {
                       </h4>
                     </div>
                     <div className="flex flex-col mb-2">
-                      <label className="text-[12px] text-[#5a607f]">
+                      {/* <label className="text-[12px] text-[#5a607f]">
                         Tên khoá học
                       </label>
                       <input
@@ -360,6 +384,14 @@ const AdminExam: React.FC = () => {
                         defaultValue={dataEditCourse ? dataEditCourse.name : ""}
                         placeholder="Nhập tên khoá học"
                         className="border border-[#f3f3f3] rounded-[4px] p-1 mt-1 focus:border-[#1e2753] focus:outline-none"
+                      /> */}
+                      <MSInput
+                        ref={courseTitleRef}
+                        label="Tên khoá học"
+                        placeholder="Nhập tên khoá học"
+                        type="text"
+                        required
+                        defaultValue={dataEditCourse ? dataEditCourse.name : ""}
                       />
                     </div>
                     <ImageUploader
@@ -388,7 +420,7 @@ const AdminExam: React.FC = () => {
                       </h4>
                       <div className="flex justify-around">
                         <div className="flex flex-col">
-                          <label className="text-[12px] text-[#5a607f]">
+                          {/* <label className="text-[12px] text-[#5a607f]">
                             Giá gốc
                           </label>
                           <input
@@ -398,10 +430,21 @@ const AdminExam: React.FC = () => {
                             }
                             placeholder="Nhập giá trước giảm"
                             className="border border-[#f3f3f3] rounded-[4px] p-1 mt-1 focus:border-[#1e2753] focus:outline-none"
+                          /> */}
+                          <MSInput
+                            ref={oldPrice}
+                            label="Giá khoá học"
+                            placeholder="Nhập giá khoá học"
+                            type="number"
+                            validate="number"
+                            required
+                            defaultValue={
+                              dataEditCourse ? dataEditCourse.price : ""
+                            }
                           />
                         </div>
                         <div className="flex flex-col">
-                          <label className="text-[12px] text-[#5a607f]">
+                          {/* <label className="text-[12px] text-[#5a607f]">
                             Giá đã giảm
                           </label>
                           <input
@@ -411,6 +454,17 @@ const AdminExam: React.FC = () => {
                             }
                             placeholder="Nhập giá đã giảm"
                             className="border border-[#f3f3f3] rounded-[4px] p-1 mt-1 focus:border-[#1e2753] focus:outline-none"
+                          /> */}
+                          <MSInput
+                            ref={newPrice}
+                            label="Giá ưu đãi"
+                            placeholder="Nhập ưu đãi"
+                            type="number"
+                            validate="number"
+                            required
+                            defaultValue={
+                              dataEditCourse ? dataEditCourse.discount : ""
+                            }
                           />
                         </div>
                       </div>
