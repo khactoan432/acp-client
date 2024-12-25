@@ -41,7 +41,7 @@ const Courses: React.FC = () => {
       {
         breakpoint: 1024, // Tablet and below
         settings: {
-          slidesToShow: Math.min(userCourses.length, 2), // Show 2 courses at a time
+          slidesToShow: Math.min(userCourses.length, 3), // Show 2 courses at a time
         },
       },
       {

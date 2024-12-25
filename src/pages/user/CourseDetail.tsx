@@ -13,6 +13,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../redux/store";
 import { fetchCourseDetail } from "../../redux/slices/courseSlice";
 import Lesson from '../../components/features/Video/Lesson';
+import { postData } from '../../axios';
 
 const UserCourseDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -89,6 +90,32 @@ const UserCourseDetail = () => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
+
+  const payment = async (id_material: string) => {
+    try {
+      console.log("Payment initiated for:", id_material);
+
+      // Gửi request thanh toán
+      const pm = await postData("/api/payment/momo", {
+        id_user: "6756abc20424abb76abb1eb0", // ID người dùng
+        id_material: id_material,          // ID khóa học
+        type: "COURSE",                    // Loại thanh toán
+      }, {});
+
+      console.log("Payment response:", pm);
+
+      // Điều hướng đến URL thanh toán
+      if (pm.data?.payUrl) {
+        window.location.href = pm.data.payUrl; 
+      } else {
+        console.error("Payment URL not found in response.");
+        alert("Không thể thực hiện thanh toán, vui lòng thử lại sau.");
+      }
+    } catch (error) {
+      console.error("Error during payment process:", error);
+      alert("Đã xảy ra lỗi khi thực hiện thanh toán.");
+    }
+  };
 
   return (
     loading ? "Waiting for Loading" 
@@ -276,7 +303,9 @@ const UserCourseDetail = () => {
                   </div>
                 </div>
               </div>
-              <button className="w-full bg-blue-600 text-white font-semibold py-3 rounded-lg mt-4 hover:bg-blue-700">
+              <button className="w-full bg-blue-600 text-white font-semibold py-3 rounded-lg mt-4 hover:bg-blue-700"
+                onClick={() => payment(selectedCourse?._id)}
+              >
                 MUA KHÓA HỌC NGAY
               </button>
               <button className="w-full bg-gray-200 text-gray-800 font-semibold py-3 rounded-lg mt-3 hover:bg-gray-300">

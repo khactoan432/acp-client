@@ -1,4 +1,6 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 import VideoPlayer from "../../components/features/Lesson/VideoPlayer";
 import LessonList from "../../components/features/Lesson/LessonList";
 
@@ -9,10 +11,10 @@ import { AppDispatch, RootState } from "../../redux/store";
 import { fetchCourseDetail } from "../../redux/slices/courseSlice";
 
 interface Lesson {
-  id: number;
-  title: string;
-  duration: string;
-  locked: boolean;
+  _id: number;
+  name: string;
+  video: string;
+  // locked: boolean;
 }
 
 interface Section {
@@ -25,17 +27,57 @@ interface Section {
 }
 
 const UserLearning: React.FC = () => {
+  const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const dispatch = useDispatch<AppDispatch>();
   const { selectedCourse, loading, error } = useSelector(
     (state: RootState) => state.courses
   );
 
+  const [currentLesson, setCurrentLesson] = useState({
+    _id : "",
+    video: "",
+    name:""
+  });
+
   const courseId = id ?? "default-id";
 
   useEffect(() => {
     dispatch(fetchCourseDetail(courseId));
   }, [dispatch, courseId]);
+
+  // Xử lý cập nhật bài học hiện tại khi selectedCourse thay đổi
+  useEffect(() => {
+    if (
+      selectedCourse?.topics?.length > 0 &&
+      selectedCourse?.topics[0]?.lessons?.length > 0
+    ) {
+      setCurrentLesson(selectedCourse?.topics[0].lessons[0]);
+    }
+  }, [selectedCourse]);
+
+  const changeLesson = (topicId: string, lessonId: string) => {
+    // Tìm topic có id khớp với topicId
+    // console.log(selectedCourse);
+    const selectedTopic = selectedCourse?.topics.find(
+      (topic: { _id: string }) => topic._id === topicId
+    );
+
+  
+    // Tìm lesson trong topic vừa tìm được
+    const selectedLesson = selectedTopic?.lessons.find(
+      (lesson: { _id: string }) => lesson._id === lessonId
+    );
+
+    // console.log(topicId,lessonId,selectedTopic, selectedLesson);
+  
+    // Nếu tìm thấy bài học, cập nhật state
+    if (selectedLesson) {
+      setCurrentLesson(selectedLesson);
+    }
+  };
+
+  // console.log(currentLesson);
 
   // const sections: Section[] = [
   //     {
@@ -76,19 +118,13 @@ const UserLearning: React.FC = () => {
   //     },
   //   ];
 
-  const currentLesson = {
-    id: 1,
-    title: "Mô hình Client - Server là gì?",
-    videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
-  };
-
   return (
     <div className=" bg-white">
       {/* Thanh điều hướng */}
       <header className="bg-gray-800 sticky top-0 text-white px-4 flex items-center text-lg font-bold h-[54px]">
         <div className="pl-8">
           <div className="flex items-center">
-            <img className="w-[30px] h-[30px] rounded-lg mr-3" src={Logo} alt="alt" />
+            <img className="w-[30px] h-[30px] rounded-lg mr-3 cursor-pointer" src={Logo} alt="alt" onClick={()=>navigate("/")}/>
             <p>Kiến Thức Nhập Môn IT</p>
           </div>
         </div>
@@ -99,14 +135,13 @@ const UserLearning: React.FC = () => {
         {/* Video chính */}
         <div className="flex-1 w-[80%]">
           <VideoPlayer
-            videoUrl={currentLesson.videoUrl}
-            title={currentLesson.title}
+            currentLesson={currentLesson}
           />
         </div>
 
         {/* Danh sách bài học */}
         <div className="bg-gray-50  text-black w-[20%] border-l">
-          <LessonList sections ={selectedCourse?.topics} />
+          <LessonList sections ={selectedCourse?.topics} currentLesson={currentLesson} changeLesson={changeLesson} />
         </div>
       </div>
       

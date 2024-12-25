@@ -21,20 +21,20 @@ interface ExamResult {
   score: number; // Điểm thi (0-100)
 }
 
-const sampleCourses: Course[] = [
-  {
-    id: '1',
-    name: 'Khóa học lập trình cơ bản',
-    image: banner,
-    progress: 45, // Tiến độ 45%
-  },
-  {
-    id: '2',
-    name: 'Khóa học JavaScript nâng cao',
-    image: banner,
-    progress: 80, // Tiến độ 80%
-  },
-];
+// const sampleCourses: Course[] = [
+//   {
+//     id: '1',
+//     name: 'Khóa học lập trình cơ bản',
+//     image: banner,
+//     progress: 45, // Tiến độ 45%
+//   },
+//   {
+//     id: '2',
+//     name: 'Khóa học JavaScript nâng cao',
+//     image: banner,
+//     progress: 80, // Tiến độ 80%
+//   },
+// ];
 
 const sampleExamResults: ExamResult[] = [
   {

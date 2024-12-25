@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 
 interface Lesson {
-  _id: number;
-  title: string;
-  duration: string;
-  locked: boolean;
+  _id: string;
+  name: string;
+  video: string;
+  // locked: boolean;
 }
 
 interface Section {
-  _id: number;
+  _id: string;
   name: string;
   lessons: Lesson[];
   totalLessons: number;
@@ -18,14 +18,16 @@ interface Section {
 
 interface LessonListProps {
   sections: Section[];
+  currentLesson: Lesson;
+  changeLesson: (topicId:string, lessonId: string)=>void
 }
 
-const LessonList: React.FC<LessonListProps> = ({ sections }) => {
+const LessonList: React.FC<LessonListProps> = ({ sections, currentLesson, changeLesson }) => {
   
 
-  const [activeSection, setActiveSection] = useState<number | null>(null);
+  const [activeSection, setActiveSection] = useState<string | null>(null);
 
-  const toggleSection = (id: number) => {
+  const toggleSection = (id: string) => {
     setActiveSection(activeSection === id ? null : id);
   };
 
@@ -48,9 +50,10 @@ const LessonList: React.FC<LessonListProps> = ({ sections }) => {
               {section?.lessons?.map((lesson) => (
                 <li
                   key={lesson._id}
-                  className={`flex justify-between items-center px-4 py-3 rounded ${
-                    lesson.locked ?  "bg-blue-100 text-black":"bg-gray-50 text-gray-500 hover:bg-gray-200"
+                  className={`flex justify-between items-center px-4 py-3 rounded cursor-pointer ${
+                    lesson._id===currentLesson._id ?  "bg-blue-100 text-black":"bg-gray-50 text-gray-500 hover:bg-gray-200"
                   }`}
+                  onClick={()=>changeLesson(section._id, lesson._id)}
                 >
                   <span className="pr-2"> {lesson.name}</span>
                   <span>{"23:09"}</span>
