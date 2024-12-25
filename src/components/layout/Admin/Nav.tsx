@@ -7,10 +7,16 @@ import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   HomeOutlined,
-  UsergroupDeleteOutlined,
 } from "@ant-design/icons";
+import { GiTeacher } from "react-icons/gi";
+import { PiExamLight } from "react-icons/pi";
+import { GrSchedule } from "react-icons/gr";
 import type { MenuProps } from "antd";
 import { Button, Menu } from "antd";
+import { PiRankingThin } from "react-icons/pi";
+import { PiShoppingBagOpenLight } from "react-icons/pi";
+import { TbSettingsCode } from "react-icons/tb";
+import { VscSettings } from "react-icons/vsc";
 import "./nav.scss";
 
 type MenuItem = Required<MenuProps>["items"][number];
@@ -28,14 +34,15 @@ const items: MenuItem[] = [
   },
   { key: "2", icon: <TagOutlined />, label: "Banner" },
   { key: "3", icon: <FolderOutlined />, label: "Học sinh xuất sắc" },
-  { key: "4", icon: <UsergroupDeleteOutlined />, label: "Đội ngũ giảng viên" },
+  { key: "4", icon: <GiTeacher />, label: "Đội ngũ giảng viên" },
+  { key: "5", icon: <PiExamLight />, label: "Đề thi" },
   {
     type: "group",
     label: "Other Information",
     children: [
-      { key: "5", icon: <UsergroupDeleteOutlined />, label: "Lịch hẹn tư vấn" },
-      { key: "6", icon: <UsergroupDeleteOutlined />, label: "Thông tin rank" },
-      { key: "7", icon: <UsergroupDeleteOutlined />, label: "Orders" },
+      { key: "6", icon: <GrSchedule />, label: "Lịch hẹn tư vấn" },
+      { key: "7", icon: <PiRankingThin />, label: "Thông tin rank" },
+      { key: "8", icon: <PiShoppingBagOpenLight />, label: "Orders" },
     ],
   },
   {
@@ -43,11 +50,15 @@ const items: MenuItem[] = [
     label: "Setting",
     children: [
       {
-        key: "8",
-        icon: <UsergroupDeleteOutlined />,
+        key: "9",
+        icon: <TbSettingsCode />,
         label: "Personal settings",
       },
-      { key: "9", icon: <UsergroupDeleteOutlined />, label: "Global settings" },
+      {
+        key: "10",
+        icon: <VscSettings />,
+        label: "Global settings",
+      },
     ],
   },
 ];
@@ -65,11 +76,12 @@ const Nav: React.FC = () => {
     "2": "/admin/banners",
     "3": "/admin/achievements",
     "4": "/admin/teachers",
-    "5": "/admin/schedules",
-    "6": "/admin/ranks",
-    "7": "/admin/orders",
-    "8": "/admin/personal-setting",
-    "9": "/admin/global-setting",
+    "5": "/admin/exam",
+    "6": "/admin/schedules",
+    "7": "/admin/ranks",
+    "8": "/admin/orders",
+    "9": "/admin/personal-setting",
+    "10": "/admin/global-setting",
   };
 
   useEffect(() => {

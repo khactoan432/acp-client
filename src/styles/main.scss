@@ -13,6 +13,13 @@ body {
   width: 100%;
 }
 
+.ant-menu-item-group-title {
+  color: white !important;
+}
+.ant-menu-submenu-title {
+  color: white !important;
+}
+
 .primary-color-text {
   color: #1e2753;
 }
@@ -78,4 +85,8 @@ body {
   color: #0000004a;
   background: #dedede;
   pointer-events: none; /* Ngăn người dùng tương tác */
+}
+// hover
+.hover-action:hover {
+  background-color: #dedede !important;
 }

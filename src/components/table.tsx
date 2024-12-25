@@ -1,21 +1,23 @@
 import React from "react";
-import { FaRegEdit } from "react-icons/fa";
-import { MdOutlineDeleteOutline } from "react-icons/md";
-import { MdContentPaste } from "react-icons/md";
-import { MdAttractions } from "react-icons/md";
 
+interface Action {
+  title: string;
+  action: string;
+  icon: JSX.Element; // Thay đổi kiểu `icon` từ `string` sang `JSX.Element`
+  style: React.CSSProperties; // Đảm bảo style là kiểu React hợp lệ
+}
 interface TableProps<T> {
   columns: string[];
   data: T[];
-  onRowEdit?: (type: string, row: T) => void;
-  onRowDelete?: (row: T) => void;
+  handleAction?: (type: string, row: T) => void;
+  actions: Action[];
 }
 
 const Table = <T extends Record<string, any>>({
   columns,
   data,
-  onRowEdit = () => {},
-  onRowDelete = () => {},
+  handleAction = () => {},
+  actions,
 }: TableProps<T>) => {
   return (
     <div style={{ padding: "20px", width: "100%" }}>
@@ -29,30 +31,45 @@ const Table = <T extends Record<string, any>>({
         <thead>
           <tr
             style={{
-              backgroundColor: "#fff",
-              borderBottom: "1px solid #f2f2f2",
+              backgroundColor: "#1e2753",
+              color: "white",
+              border: "1px solid #c9c9c9",
             }}
           >
             {columns.map((col, index) => (
               <th
                 key={index}
-                style={{ padding: "8px", textAlign: "center" }}
+                style={{
+                  padding: "8px",
+                  textAlign: "center",
+                  border: "1px solid  #c9c9c9",
+                }}
                 className="uppercase"
               >
                 {col}
               </th>
             ))}
-            <th style={{ padding: "8px", textAlign: "center" }}>Actions</th>
+            <th style={{ padding: "8px", textAlign: "center" }}>ACTIONS</th>
           </tr>
         </thead>
         {data && data.length > 0 ? (
-          <tbody>
+          <tbody style={{ backgroundColor: "white" }}>
             {data.map((row, rowIndex) => (
-              <tr key={rowIndex} style={{ borderBottom: "1px solid #f2f2f2" }}>
+              <tr
+                key={rowIndex}
+                style={{
+                  border: "1px solid #c9c9c9",
+                  color: "#1e2753",
+                }}
+              >
                 {columns.map((col, colIndex) => (
                   <td
                     key={colIndex}
-                    style={{ padding: "8px", textAlign: "center" }}
+                    style={{
+                      padding: "8px",
+                      textAlign: "center",
+                      border: "1px solid  #c9c9c9",
+                    }}
                   >
                     {col === "Name" && row[col]?.image ? (
                       <div
@@ -118,66 +135,18 @@ const Table = <T extends Record<string, any>>({
                   </td>
                 ))}
                 <td style={{ padding: "8px", textAlign: "center" }}>
-                  <button
-                    title="Sửa nội dung"
-                    style={{
-                      marginRight: "8px",
-                      padding: "4px 8px",
-                      backgroundColor: "#4CAF50",
-                      color: "white",
-                      border: "none",
-                      borderRadius: "4px",
-                      cursor: "pointer",
-                    }}
-                    onClick={() => onRowEdit("CONTENT", row)}
-                  >
-                    <MdContentPaste />
-                  </button>
-
-                  <button
-                    title="Sửa giới thiệu"
-                    style={{
-                      marginRight: "8px",
-                      padding: "4px 8px",
-                      backgroundColor: "#4CAF50",
-                      color: "white",
-                      border: "none",
-                      borderRadius: "4px",
-                      cursor: "pointer",
-                    }}
-                    onClick={() => onRowEdit("INTRODUCE", row)}
-                  >
-                    <MdAttractions />
-                  </button>
-                  <button
-                    title="Sửa khoá học"
-                    style={{
-                      marginRight: "8px",
-                      padding: "4px 8px",
-                      backgroundColor: "#4CAF50",
-                      color: "white",
-                      border: "none",
-                      borderRadius: "4px",
-                      cursor: "pointer",
-                    }}
-                    onClick={() => onRowEdit("COURSE", row)}
-                  >
-                    <FaRegEdit />
-                  </button>
-                  <button
-                    title="Xoá khoá học"
-                    style={{
-                      padding: "4px 8px",
-                      backgroundColor: "#f44336",
-                      color: "white",
-                      border: "none",
-                      borderRadius: "4px",
-                      cursor: "pointer",
-                    }}
-                    onClick={() => onRowDelete(row)}
-                  >
-                    <MdOutlineDeleteOutline />
-                  </button>
+                  {actions &&
+                    actions.length > 0 &&
+                    actions.map((action) => (
+                      <button
+                        className="hover-action"
+                        title={action.title}
+                        style={action.style}
+                        onClick={() => handleAction(action.action, row)}
+                      >
+                        {action.icon}
+                      </button>
+                    ))}
                 </td>
               </tr>
             ))}

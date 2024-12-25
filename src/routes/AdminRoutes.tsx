@@ -10,6 +10,7 @@ import Introduce from "../pages/admin/course/Introduce";
 import Banners from "../pages/admin/Banners";
 import Achievement from "../pages/admin/Achievement";
 import Teacher from "../pages/admin/Teacher";
+import Exam from "../pages/admin/Exam";
 import Schedules from "../pages/admin/Schedules";
 import Ranks from "../pages/admin/InforRank";
 import Orders from "../pages/admin/Orders";
@@ -84,6 +85,14 @@ const AdminRoutes: React.FC = () => {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/exam"
+        element={
+          <ProtectedRoute allowedRoles={["ADMIN"]}>
+            <Exam />
+          </ProtectedRoute>
+        }
+      ></Route>
       <Route
         path="/schedules"
         element={

@@ -10,8 +10,6 @@ import { Button } from "antd";
 // import icon
 import { FaRegEdit } from "react-icons/fa";
 import { MdOutlineDeleteOutline } from "react-icons/md";
-import { MdContentPaste } from "react-icons/md";
-import { MdAttractions } from "react-icons/md";
 
 // import components
 import ButtonPlus from "../../components/button/plus";
@@ -35,35 +33,38 @@ const AdminExam: React.FC = () => {
   const [isFetchData, setIsFetchData] = useState(false);
 
   // state string
-  const [idCourseDeleted, setIdCourseDeleted] = useState<string>("");
+  const [idExamDeleted, setIdExamDeleted] = useState<string>("");
   // state file
-  const [uploadVideo, setUploadVideoIntro] = useState<File[]>([]);
-  const [imageIntroCourse, setImageIntroCourse] = useState<File[]>([]);
+  const [uploadVideo, setUploadVideo] = useState<File[]>([]);
+  const [imageExam, setImageExam] = useState<File[]>([]);
   // state boolean
-  const [addCourse, setAddCourse] = useState(false);
+  const [addExam, setAddExam] = useState(false);
   const [isModalVisible, setIdModalVisible] = useState(false);
 
   // data store
-  const [allCourse, setAllCourse] = useState([]);
-  const [dataEditCourse, setDataEditCourse] = useState<any>(null);
+  const [allExam, setAllExam] = useState([]);
+  const [dataEditExam, setDataEditExam] = useState<any>(null);
 
   // useRef input
-  const courseTitleRef = useRef<HTMLInputElement>(null);
+  const ExamTitleRef = useRef<HTMLInputElement>(null);
+  const linkExam = useRef<HTMLInputElement>(null);
   const oldPrice = useRef<HTMLInputElement>(null);
   const newPrice = useRef<HTMLInputElement>(null);
+
   // get data
   useEffect(() => {
-    const fetchDataCourse = async () => {
+    const fetchDataExam = async () => {
       setIsLoading(true);
       try {
-        const res = await getData("/api/admin/courses", {
+        const res = await getData("/api/admin/exams", {
           headers: {
             Authorization: `Bearer ${header}`,
           },
         });
+        console.log("res: ", res);
         if (res) {
-          setAllCourse(res);
-          console.log("res exam: ", res);
+          setAllExam(res);
+          console.log("res exams: ", res);
         }
       } catch (err) {
         console.error(err);
@@ -71,11 +72,12 @@ const AdminExam: React.FC = () => {
         setIsLoading(false);
       }
     };
-    fetchDataCourse();
+    fetchDataExam();
   }, [isFetchData]);
-  // fake frame course
-  let columnsCourse = ["name", "image", "video", "price", "discount"];
-  let dataCourse = allCourse;
+  // fake frame exam
+  let columnsExam = ["name", "link", "price", "discount", "image", "video"];
+  let dataExam = allExam;
+  // action table
 
   const styleAction = {
     marginRight: "8px",
@@ -87,18 +89,6 @@ const AdminExam: React.FC = () => {
   };
 
   const actions = [
-    {
-      title: "Giới thiệu khoá học",
-      action: "INTRODUCE",
-      icon: <MdAttractions />,
-      style: styleAction,
-    },
-    {
-      title: "Sửa nội dung",
-      name: "CONTENT",
-      icon: <MdContentPaste />,
-      style: styleAction,
-    },
     {
       title: "Chỉnh sửa",
       action: "EDIT",
@@ -112,26 +102,25 @@ const AdminExam: React.FC = () => {
       style: { ...styleAction, color: "red" },
     },
   ];
-
   // handle
-  const handleVideoIntroChange = (files: File[]) => {
-    setUploadVideoIntro(files);
+  const handleVideoExam = (files: File[]) => {
+    setUploadVideo(files);
   };
   const hanleResetUrlsImage = () => {
-    setDataEditCourse((prev) => ({
+    setDataEditExam((prev) => ({
       ...prev,
       image: "",
     }));
   };
   const hanleResetUrlsVideo = () => {
-    // dataEditCourse.video = "";
-    setDataEditCourse((prev) => ({
+    // dataEditExam.video = "";
+    setDataEditExam((prev) => ({
       ...prev,
       video: "",
     }));
   };
-  const handleImageIntroCourse = (files: File[]) => {
-    setImageIntroCourse(files);
+  const handleImageExam = (files: File[]) => {
+    setImageExam(files);
   };
 
   // reset text inputRef
@@ -172,84 +161,81 @@ const AdminExam: React.FC = () => {
     setIsLoading(true);
 
     try {
-      // 1. Upload course information
+      // 1. Upload exam information
       const formData = new FormData();
-      imageIntroCourse.forEach((file) => formData.append("fileImage", file));
+      imageExam.forEach((file) => formData.append("fileImage", file));
       uploadVideo.forEach((file) => formData.append("fileVideo", file));
 
-      formData.append("name", courseTitleRef.current?.value || "");
-      formData.append("price", oldPrice.current?.value || "");
-      formData.append("discount", newPrice.current?.value || "");
+      const name = ExamTitleRef.current?.value || "";
+      const price = oldPrice.current?.value || "";
+      const discount = newPrice.current?.value || "";
+      const link = linkExam.current?.value || "";
 
-      const resCourse = await postData("/api/admin/course", formData, {
+      formData.append("name", name);
+      formData.append("price", price);
+      formData.append("discount", discount);
+      formData.append("link", link);
+
+      const resExam = await postData("/api/admin/exam", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${header}`,
         },
       });
 
-      console.log("Course saved successfully.", resCourse);
+      console.log("Exam saved successfully.", resExam);
       resetInputRefs([
-        { state: imageIntroCourse, setState: setImageIntroCourse },
-        { state: uploadVideo, setState: setUploadVideoIntro },
-        { ref: courseTitleRef },
+        { state: imageExam, setState: setImageExam },
+        { state: uploadVideo, setState: setUploadVideo },
+        { ref: ExamTitleRef },
         { ref: oldPrice },
         { ref: newPrice },
+        { ref: linkExam },
       ]);
     } catch (err) {
-      console.error("Error saving course:", err);
+      console.error("Error saving exam:", err);
     } finally {
       setIsLoading(false);
       setIsFetchData(!isFetchData);
     }
   };
   // handle edit
-
   const handleActions = (type: string, row: any) => {
     if (type === "EDIT") {
-      setAddCourse(true);
+      setAddExam(true);
       setIsUpdate(true);
-      setDataEditCourse(row);
+      setDataEditExam(row);
+      console.log("row edit: ", row);
     }
     if (type === "DELETE") {
       const id = row._id;
-      setIdCourseDeleted(id);
+      setIdExamDeleted(id);
       setIdModalVisible(true);
     }
-    if (type === "INTRODUCE") {
-      navigate(`/admin/course/${row._id}/introduce`);
-    }
-    if (type === "CONTENT") {
-      navigate(`/admin/course/${row._id}/content`);
-    }
-    // fill out infor course
 
     console.log("Edit row:", row);
     // Implement logic to edit the row
   };
-
-  // hanle delete
-
   const handleClosePopup = () => {
     setIdModalVisible(false);
-    setIdCourseDeleted("");
+    setIdExamDeleted("");
   };
-  const handleDeleteCourse = async () => {
+  const handleDeleteExam = async () => {
     try {
       setIsLoading(true);
-      const idDeleted = JSON.parse(JSON.stringify(idCourseDeleted));
-      const courseDeleted = await deleteData(`/api/admin/course/${idDeleted}`, {
+      const idDeleted = JSON.parse(JSON.stringify(idExamDeleted));
+      const examDeleted = await deleteData(`/api/admin/exam/${idDeleted}`, {
         headers: {
           Authorization: `Bearer ${header}`,
         },
       });
-      console.log(courseDeleted, "course deleted");
+      console.log(examDeleted, "Exam deleted");
     } catch (err) {
       console.log("Error deleting: ", err);
     } finally {
       setIsLoading(false);
       setIdModalVisible(false);
-      setIdCourseDeleted("");
+      setIdExamDeleted("");
       setIsFetchData(!isFetchData);
     }
   };
@@ -257,63 +243,66 @@ const AdminExam: React.FC = () => {
   // hanle update
   const handleUpdate = async () => {
     setIsLoading(true);
-    const idCourse = dataEditCourse._id;
+    const idExam = dataEditExam._id;
     try {
-      // 1. Upload course information
+      // 1. Upload exam information
       const formData = new FormData();
 
-      // imageIntroCourse || uploadVideo == [] thì lấy image và video cũ trong dataEditCourse
+      // imageExam || uploadVideo == [] thì lấy image và video cũ trong dataEditExam
       // nếu image và video cũ sẽ là chuỗi string, nếu không nó sẽ là file và be phải chuyển qua string url để lưu
       let image = "";
       let video = "";
+      const name = ExamTitleRef.current?.value || "";
+      const price = oldPrice.current?.value || "";
+      const discount = newPrice.current?.value || "";
+      const link = linkExam.current?.value || "";
 
-      if (imageIntroCourse && imageIntroCourse.length > 0) {
-        imageIntroCourse.forEach((file) => formData.append("fileImage", file));
+      if (imageExam && imageExam.length > 0) {
+        imageExam.forEach((file) => formData.append("fileImage", file));
       } else {
         console.log("check image here");
-        image = dataEditCourse.image;
+        image = dataEditExam.image;
         formData.append("image", image);
       }
 
       if (uploadVideo && uploadVideo.length > 0) {
         uploadVideo.forEach((file) => formData.append("fileVideo", file));
       } else {
-        video = dataEditCourse.video;
+        video = dataEditExam.video;
         formData.append("video", video);
       }
 
-      formData.append("name", courseTitleRef.current?.value || "");
-      formData.append("price", oldPrice.current?.value || "");
-      formData.append("discount", newPrice.current?.value || "");
+      formData.append("name", name);
+      formData.append("link", link);
+      formData.append("price", price);
+      formData.append("discount", discount);
 
-      const resCourse = await putData(
-        `/api/admin/course/${idCourse}`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${header}`,
-          },
-        }
-      );
+      const resExam = await putData(`/api/admin/exam/${idExam}`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${header}`,
+        },
+      });
 
-      console.log("Course update successfully.", resCourse);
+      console.log("Exam update successfully.", resExam);
       resetInputRefs([
-        { state: imageIntroCourse, setState: setImageIntroCourse },
-        { state: uploadVideo, setState: setUploadVideoIntro },
-        { state: dataEditCourse, setState: setDataEditCourse },
-        { ref: courseTitleRef },
+        { state: imageExam, setState: setImageExam },
+        { state: uploadVideo, setState: setUploadVideo },
+        { state: dataEditExam, setState: setDataEditExam },
+        { ref: ExamTitleRef },
         { ref: oldPrice },
         { ref: newPrice },
+        { ref: linkExam },
       ]);
       setIsUpdate(false);
-      setAddCourse(false);
+      setAddExam(false);
       hanleResetUrlsVideo();
       hanleResetUrlsImage();
     } catch (err) {
-      console.error("Error saving course:", err);
+      console.error("Error saving exam:", err);
     } finally {
       setIsLoading(false);
+      setIsFetchData(!isFetchData);
     }
   };
 
@@ -329,62 +318,73 @@ const AdminExam: React.FC = () => {
           <div className="my-3">
             <div className="px-3 md:px-5">
               <div className="w-[30%] rounded-lg secondary-color-bg flex justify-center">
-                <h4 className="text-white p-2 uppercase">Khoá học</h4>
+                <h4 className="text-white p-2 uppercase">Đề thi</h4>
               </div>
               {/* button them khoa hoc */}
               <ButtonPlus
-                content="Thêm khoá học mới"
+                content="Thêm đề thi mới"
                 icon={CiCirclePlus}
                 iconSize="text-[32px]"
                 textSize="text-[14px"
                 height="h-[32px]"
                 width="w-[22%]"
-                onClick={() => setAddCourse(!addCourse)}
+                onClick={() => setAddExam(!addExam)}
               />
               {/* add thong tin khoa hoc */}
-              {addCourse && (
+              {addExam && (
                 <div className="flex justify-around w-full">
                   {/* thong tin khoa hoc */}
                   <div className="bg-white rounded-lg w-[60%] p-4">
                     <div className="mb-2">
                       <h4 className="font-semibold primary-color-text">
-                        Thông tin khoá học
+                        Thông tin đề thi
                       </h4>
                     </div>
                     <div className="flex flex-col mb-2">
                       <label className="text-[12px] text-[#5a607f]">
-                        Tên khoá học
+                        Tên đề thi
                       </label>
                       <input
-                        ref={courseTitleRef}
-                        defaultValue={dataEditCourse ? dataEditCourse.name : ""}
-                        placeholder="Nhập tên khoá học"
+                        ref={ExamTitleRef}
+                        defaultValue={dataEditExam ? dataEditExam.name : ""}
+                        placeholder="Nhập tên đề thi"
+                        className="border border-[#f3f3f3] rounded-[4px] p-1 mt-1 focus:border-[#1e2753] focus:outline-none"
+                      />
+                    </div>
+                    <div className="flex flex-col mb-2">
+                      <label className="text-[12px] text-[#5a607f]">
+                        Link đề thi
+                      </label>
+                      <input
+                        ref={linkExam}
+                        defaultValue={dataEditExam ? dataEditExam.link : ""}
+                        placeholder="Nhập đường dẫn đề thi"
                         className="border border-[#f3f3f3] rounded-[4px] p-1 mt-1 focus:border-[#1e2753] focus:outline-none"
                       />
                     </div>
                     <ImageUploader
-                      titleBtn="Chọn ảnh đại diện khoá học"
+                      titleBtn="Chọn ảnh đại diện đề thi"
                       typefile="image/*"
-                      onImagesChange={handleImageIntroCourse}
-                      urls={dataEditCourse?.image ? dataEditCourse.image : ""}
+                      onImagesChange={handleImageExam}
+                      urls={dataEditExam?.image ? dataEditExam.image : ""}
                       onUrlsReset={hanleResetUrlsImage}
                     />
                     <div>
                       <h4 className="font-semibold primary-color-text">
-                        Video giới thiệu khoá học
+                        Video chữa đề thi
                       </h4>
                       <ImageUploader
                         titleBtn="Chọn video"
                         typefile="video/*"
-                        onImagesChange={handleVideoIntroChange}
-                        urls={dataEditCourse?.video ? dataEditCourse.video : ""}
+                        onImagesChange={handleVideoExam}
+                        urls={dataEditExam?.video ? dataEditExam.video : ""}
                         onUrlsReset={hanleResetUrlsVideo}
                       />
                     </div>
                     {/* chi phí khoá học */}
                     <div>
                       <h4 className="font-semibold primary-color-text">
-                        Giá khoá học
+                        Giá đề thi
                       </h4>
                       <div className="flex justify-around">
                         <div className="flex flex-col">
@@ -394,7 +394,7 @@ const AdminExam: React.FC = () => {
                           <input
                             ref={oldPrice}
                             defaultValue={
-                              dataEditCourse ? dataEditCourse.price : ""
+                              dataEditExam ? dataEditExam.price : ""
                             }
                             placeholder="Nhập giá trước giảm"
                             className="border border-[#f3f3f3] rounded-[4px] p-1 mt-1 focus:border-[#1e2753] focus:outline-none"
@@ -407,7 +407,7 @@ const AdminExam: React.FC = () => {
                           <input
                             ref={newPrice}
                             defaultValue={
-                              dataEditCourse ? dataEditCourse.discount : ""
+                              dataEditExam ? dataEditExam.discount : ""
                             }
                             placeholder="Nhập giá đã giảm"
                             className="border border-[#f3f3f3] rounded-[4px] p-1 mt-1 focus:border-[#1e2753] focus:outline-none"
@@ -462,11 +462,11 @@ const AdminExam: React.FC = () => {
               )}
             </div>
           </div>
-          {/* table course */}
-          {dataCourse && (
+          {/* table exam */}
+          {dataExam && (
             <Table
-              columns={columnsCourse}
-              data={dataCourse}
+              columns={columnsExam}
+              data={dataExam}
               handleAction={handleActions}
               actions={actions}
             />
@@ -478,7 +478,7 @@ const AdminExam: React.FC = () => {
           title="Bạn có chắc chắn muốn xoá?"
           status="error"
           buttonText="Xoá ngay"
-          onButtonClick={handleDeleteCourse}
+          onButtonClick={handleDeleteExam}
           buttonClose={handleClosePopup}
         />
       )}
