@@ -8,6 +8,7 @@ import ExamDetail from "../pages/user/ExamDetail";
 import About from "../pages/user/About";
 import Profile from "../pages/user/Profile";
 import Layout from "../components/layout/User/Layout";
+import Learning from "../pages/user/Learning";
 
 const UserRoutes: React.FC = () => {
   return (
@@ -25,6 +26,8 @@ const UserRoutes: React.FC = () => {
         {/* Chuyển hướng về trang chủ nếu không khớp route */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
+      
+      <Route path="/learning/:id" element={<Learning />} />
     </Routes>
   );
 };

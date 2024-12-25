@@ -38,44 +38,44 @@ const UserCourseDetail = () => {
     users: 79
   }
 
-  const topics = [
-    {
-      id: 1,
-      name: "JavaScript Basics",
-      lessons: [
-        { name: "Introduction to JavaScript" },
-        { name: "Variables and Constants" },
-        { name: "Functions and Scope" },
-        { name: "Conditionals and Loops" },
-        { name: "Arrays and Objects" },
-        { name: "Debugging and Error Handling" },
-      ],
-    },
-    {
-      id: 2,
-      name: "Web Development",
-      lessons: [
-        { name: "HTML Basics" },
-        { name: "CSS Fundamentals" },
-        { name: "JavaScript for the Web" },
-        { name: "Responsive Design" },
-        { name: "Introduction to Web APIs" },
-        { name: "Deploying a Website" },
-      ],
-    },
-    {
-      id: 3,
-      name: "React Framework",
-      lessons: [
-        { name: "Getting Started with React" },
-        { name: "JSX and Component Basics" },
-        { name: "State and Props" },
-        { name: "Handling Events in React" },
-        { name: "Lifecycle Methods and Hooks" },
-        { name: "Building a Todo App with React" },
-      ],
-    },
-  ];
+  // const topics = [
+  //   {
+  //     id: 1,
+  //     name: "JavaScript Basics",
+  //     lessons: [
+  //       { name: "Introduction to JavaScript" },
+  //       { name: "Variables and Constants" },
+  //       { name: "Functions and Scope" },
+  //       { name: "Conditionals and Loops" },
+  //       { name: "Arrays and Objects" },
+  //       { name: "Debugging and Error Handling" },
+  //     ],
+  //   },
+  //   {
+  //     id: 2,
+  //     name: "Web Development",
+  //     lessons: [
+  //       { name: "HTML Basics" },
+  //       { name: "CSS Fundamentals" },
+  //       { name: "JavaScript for the Web" },
+  //       { name: "Responsive Design" },
+  //       { name: "Introduction to Web APIs" },
+  //       { name: "Deploying a Website" },
+  //     ],
+  //   },
+  //   {
+  //     id: 3,
+  //     name: "React Framework",
+  //     lessons: [
+  //       { name: "Getting Started with React" },
+  //       { name: "JSX and Component Basics" },
+  //       { name: "State and Props" },
+  //       { name: "Handling Events in React" },
+  //       { name: "Lifecycle Methods and Hooks" },
+  //       { name: "Building a Todo App with React" },
+  //     ],
+  //   },
+  // ];
 
   const [isSticky, setIsSticky] = useState(false);
 
