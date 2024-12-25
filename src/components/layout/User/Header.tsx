@@ -106,7 +106,7 @@ const Header = () => {
                 <ul className="p-4 text-gray-700">
                   <li className="mb-2">
                     <a
-                      href="#"
+                      href="/profile"
                       className="hover:text-blue-500"
                     >
                       Lịch học của tôi
@@ -114,7 +114,7 @@ const Header = () => {
                   </li>
                   <li className="mb-2">
                     <a
-                      href="#"
+                      href="/profile"
                       className="hover:text-blue-500"
                     >
                       Trang cá nhân

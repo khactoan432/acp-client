@@ -6,6 +6,7 @@ import CourseDetail from "../pages/user/CourseDetail";
 import Exam from "../pages/user/Exam";
 import ExamDetail from "../pages/user/ExamDetail";
 import About from "../pages/user/About";
+import Profile from "../pages/user/Profile";
 import Layout from "../components/layout/User/Layout";
 
 const UserRoutes: React.FC = () => {
@@ -19,6 +20,7 @@ const UserRoutes: React.FC = () => {
         <Route path="/exam" element={<Exam />} />
         <Route path="/exam/:id" element={<ExamDetail />} />
         <Route path="/about" element={<About />} />
+        <Route path="/profile" element={<Profile />} />
 
         {/* Chuyển hướng về trang chủ nếu không khớp route */}
         <Route path="*" element={<Navigate to="/" replace />} />

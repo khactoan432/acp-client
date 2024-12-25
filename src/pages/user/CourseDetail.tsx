@@ -5,8 +5,28 @@ import banner from '../../assets/banner1.jpg';
 import play from '../../assets/play.png';
 import RatingPage from '../../components/features/Rating/Rating';
 import CommentPage from '../../components/features/Comment/Comment';
+import VideoPopup from '../../components/features/Video/Video';
 
-const UserCourseDetail: React.FC = () => {
+import { useParams } from "react-router-dom";
+
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../redux/store";
+import { fetchCourseDetail } from "../../redux/slices/courseSlice";
+import Lesson from '../../components/features/Video/Lesson';
+
+const UserCourseDetail = () => {
+  const { id } = useParams<{ id: string }>();
+  const dispatch = useDispatch<AppDispatch>();
+  const { selectedCourse, loading, error } = useSelector(
+    (state: RootState) => state.courses
+  );
+
+  const courseId = id ?? "default-id";
+
+  useEffect(() => {
+    dispatch(fetchCourseDetail(courseId));
+  }, [dispatch, courseId]);
+
   const course = {
     id: 1,
     name: 'React for Beginners 1',
@@ -71,7 +91,9 @@ const UserCourseDetail: React.FC = () => {
   }, []);
 
   return (
-    <div>
+    loading ? "Waiting for Loading" 
+    : error ? "Something have wrong"
+    : <div>
       <div className="relative flex items-center justify-center">
         {/* Background with opacity */}
         <div
@@ -83,7 +105,7 @@ const UserCourseDetail: React.FC = () => {
           <div className="relative max-w-[1228px] my-10 py-6 rounded-lg w-full">
             <div className='w-2/3 text-white px-3'>
               <h2 className="text-3xl font-bold mb-2">
-                [ACP General training] Class A: Bài Giảng - Chiến Lược Làm Bài - Chữa Bài Chi Tiết
+                {selectedCourse?.name}
               </h2>
 
               <div className="my-2 flex justify-between items-center">
@@ -98,8 +120,8 @@ const UserCourseDetail: React.FC = () => {
               </div>
 
               <div className='flex flex-col gap-2'>
-                <p>✅ Dành các bạn mới bắt đầu học code C++</p>
-                <p>✅ 18 giờ học video giảng bài và 54 bài tập lập trình từ chi tiết tới nâng cao</p>
+                <p>✅ Dành các bạn học code C++</p>
+                <p>✅ Nhiều giờ học video giảng bài và bài tập lập trình thực hành từ chi tiết tới nâng cao</p>
                 <p>✅ Làm bài chấm bài tự động với codeforce, các bài sẽ có lời giải chi tiết qua video</p>
               </div>
             </div>
@@ -150,22 +172,21 @@ const UserCourseDetail: React.FC = () => {
           <div className='w-2/3 px-3'>
             <div id="overview" className="text-[#00095B] my-6 bg-white p-4 rounded-[0.65rem] border border-solid border-[#e0e0e0] shadow-[0_4px_0_0_rgba(143,156,173,0.2)]">
               <div className="flex flex-col items-center justify-center w-full h-full">
-                <div className="relative rounded-lg w-full">
-                  <h2 className="text-2xl font-bold mb-6">
-                    Bạn sẽ học được gì?
-                  </h2>
+                {selectedCourse?.describes?.map((item) => (
+                  <div className="relative mb-6 rounded-lg w-full" key={item._id}>
+                    <h2 className="text-2xl font-bold mb-6">
+                      {item.desc}
+                    </h2>
 
-                  <div className='flex flex-col gap-2'>
-                    <p>✅ Dành các bạn mới bắt đầu học code C++</p>
-                    <p>✅ 18 giờ học video giảng bài và 54 bài tập lập trình từ chi tiết tới nâng cao</p>
-                    <p>✅ Làm bài chấm bài tự động với codeforce, các bài sẽ có lời giải chi tiết qua video</p>
-                    <p>✅ Dành các bạn mới bắt đầu học code C++</p>
-                    <p>✅ 18 giờ học video giảng bài và 54 bài tập lập trình từ chi tiết tới nâng cao</p>
-                    <p>✅ Làm bài chấm bài tự động với codeforce, các bài sẽ có lời giải chi tiết qua video</p>
+                    <div className='flex flex-col gap-2'>
+                      {item.overviews.map((overview) => (
+                        <p key={overview._id}>✅ {overview.desc})</p>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                ))}
 
-                <div className="relative mt-6 rounded-lg w-full">
+                {/* <div className="relative mt-6 rounded-lg w-full">
                   <h2 className="text-2xl font-bold mb-6">
                     Khoá học có gì đặc biệt?
                   </h2>
@@ -193,7 +214,7 @@ const UserCourseDetail: React.FC = () => {
                     <p>✅ 18 giờ học video giảng bài và 54 bài tập lập trình từ chi tiết tới nâng cao</p>
                     <p>✅ Làm bài chấm bài tự động với codeforce, các bài sẽ có lời giải chi tiết qua video</p>
                   </div>
-                </div>
+                </div> */}
               </div>
             </div>
 
@@ -204,15 +225,19 @@ const UserCourseDetail: React.FC = () => {
                     Nội dung khóa học
                   </h2>
 
-                  {topics.map(topic => (
-                    <div id='topic.id' className=''>
+                  {selectedCourse?.topics?.map(topic => (
+                    <div key={topic._id} className=''>
                       <p className='bg-sky-500 text-white font-semibold text-lg py-1 px-2'>{topic.name}</p>
 
                       <div className='flex flex-col divide-y divide-gray-200'>
-                        {topic.lessons.map(lesson => (
-                          <div className='flex items-center'>
-                            <img className='w-[25px] h-[25px]' src={play} alt="alt" />
-                            <p className='text-base py-2 px-2'>{lesson.name}</p>
+                        {topic?.lessons?.map(lesson => (
+                          <div className='flex items-center justify-between px-2' key={lesson._id}>
+                            <div className='flex items-center'>
+                              <img className='w-[25px] h-[25px]' src={play} alt="alt" />
+                              <p className='text-base py-2 px-2'>{lesson.name}</p>
+                            </div>
+
+                            {lesson.status==="PUBLIC"?<Lesson url={lesson.video} name={"dsd"} />:""}
                           </div>
                         ))}
                       </div>
@@ -237,28 +262,31 @@ const UserCourseDetail: React.FC = () => {
             <div className={`bg-white shadow-lg rounded-lg p-3 mx-auto mt-[-320px] z-40 ${
               isSticky ? "sticky top-[70px]" : "relative"
               }`}>
-              <img className='rounded-md w-full h-[180px]' src={banner} alt='alt' />
+              {/* <video className='rounded-md w-full h-[180px]' src={selectedCourse?.video} controls/> */}
+              <VideoPopup url={selectedCourse?.video} name={"dfds"}/>
               <div className="mt-6">
-                <p className="text-gray-700 text-lg font-semibold">Ưu đãi đặc biệt tháng 12/2024:</p>
+                <p className="text-gray-700 text-lg font-semibold">Ưu đãi đặc biệt trong tháng:</p>
                 <div className="flex gap-4 mt-2">
-                  <p className="text-green-600 text-2xl font-bold mt-2">689.000đ</p>
+                  <p className="text-green-600 text-2xl font-bold mt-2">{new Intl.NumberFormat('vi-VN').format((selectedCourse?.price ?? 0) - (selectedCourse?.discount ?? 0))}đ</p>
                   <div>
-                    <p className="text-gray-400 line-through text-sm">Giá gốc: 1.799.000đ</p>
-                    <p className="text-red-500 text-sm font-medium">Tiết kiệm: 810.000đ (-45%)</p>
+                    <p className="text-gray-400 line-through text-sm">Giá gốc: {new Intl.NumberFormat('vi-VN').format(selectedCourse?.price)}đ</p>
+                    <p className="text-red-500 text-sm font-medium">Tiết kiệm: {new Intl.NumberFormat('vi-VN').format(selectedCourse?.discount)}đ (
+                      -{Math.round((selectedCourse?.discount ?? 0) / (selectedCourse?.price ?? 1) * 100)}%)
+                    </p>
                   </div>
                 </div>
               </div>
               <button className="w-full bg-blue-600 text-white font-semibold py-3 rounded-lg mt-4 hover:bg-blue-700">
-                ĐĂNG KÝ HỌC NGAY
+                MUA KHÓA HỌC NGAY
               </button>
               <button className="w-full bg-gray-200 text-gray-800 font-semibold py-3 rounded-lg mt-3 hover:bg-gray-300">
                 Học thử miễn phí
               </button>
               <ul className="mt-6 text-sm text-gray-600 space-y-2">
-                <li>👥 63,042 học viên đã đăng ký</li>
-                <li>📚 83 chủ đề, 477 bài học</li>
-                <li>📝 1,391 bài tập thực hành</li>
-                <li>📦 Combo 2 khóa học có giá trị 12 tháng</li>
+                <li>👥 2,042 học viên đã đăng ký</li>
+                <li>📚 8 chủ đề, 48 bài học</li>
+                <li>📝 56 bài tập thực hành</li>
+                <li>📦 Khóa học có giá trị 6 tháng</li>
                 <li>💻 Có thể học trên điện thoại và máy tính</li>
               </ul>
               <p className="text-sm text-gray-500 mt-6">

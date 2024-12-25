@@ -1,84 +1,47 @@
-// Courses.tsx
-import React from 'react';
+import React, { useEffect } from 'react';
 import Slider from 'react-slick';
 import Course from './Course'; // Import the Course component
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
-import banner from "../../../assets/banner1.jpg";
+import { AppDispatch, RootState } from '../../../redux/store';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchUserCourses } from '../../../redux/slices/courseSlice';
 
-const NextArrow: React.FC<{ onClick?: () => void }> = ({ onClick }) => {
+const ArrowButton: React.FC<{ onClick?: () => void; direction: 'left' | 'right' }> = ({ onClick, direction }) => {
+  const isLeft = direction === 'left';
   return (
     <div
-      className="absolute top-1/2 right-4 transform -translate-y-1/2 bg-blue-500 text-white p-3 rounded-full cursor-pointer hover:bg-blue-600 z-10"
+      className={`absolute top-1/2 transform -translate-y-1/2 bg-blue-500 text-white p-3 rounded-full cursor-pointer hover:bg-blue-600 z-10 ${
+        isLeft ? 'left-4' : 'right-4'
+      }`}
       onClick={onClick}
     >
-      <FaChevronRight size={24} />
-    </div>
-  );
-};
-
-const PrevArrow: React.FC<{ onClick?: () => void }> = ({ onClick }) => {
-  return (
-    <div
-      className="absolute top-1/2 left-4 transform -translate-y-1/2 bg-blue-500 text-white p-3 rounded-full cursor-pointer hover:bg-blue-600 z-10"
-      onClick={onClick}
-    >
-      <FaChevronLeft size={24} />
+      {isLeft ? <FaChevronLeft size={24} /> : <FaChevronRight size={24} />}
     </div>
   );
 };
 
 const Courses: React.FC = () => {
-  const courses = [
-    {
-      id: 1,
-      name: 'React for Beginners 1',
-      description: '8 chủ đề - 47 bài học - 86 bài tập',
-      image: banner,
-      price: 299000,
-      rating: 4,
-    },
-    {
-      id: 2,
-      name: 'Advanced JavaScript 1',
-      description: '5 chủ đề - 32 bài học - 54 bài tập',
-      image: banner,
-      price: 399000,
-      rating: 5,
-    },
-    {
-      id: 3,
-      name: 'React for Beginners 2',
-      description: '7 chủ đề - 39 bài học - 67 bài tập',
-      image: banner,
-      price: 299000,
-      rating: 4,
-    },
-    {
-      id: 4,
-      name: 'Advanced JavaScript 2',
-      description: '5 chủ đề - 32 bài học - 54 bài tập',
-      image: banner,
-      price: 399000,
-      rating: 5,
-    },
-    // Add more courses as needed
-  ];
+  const dispatch = useDispatch<AppDispatch>();
+  const { userCourses, loading, error } = useSelector((state: RootState) => state.courses);
+
+  useEffect(() => {
+    dispatch(fetchUserCourses({ page: 1, limit: 4 }));
+  }, [dispatch]);
+  console.log(userCourses);
 
   const settings = {
     dots: true,
-    infinite: true,
+    infinite: userCourses.length > 1,
     speed: 500,
-    slidesToShow: 3,
+    slidesToShow: Math.min(userCourses.length, 3),
     slidesToScroll: 1,
-    nextArrow: <NextArrow />,
-    prevArrow: <PrevArrow />,
-    centerMode: false,
-    centerPadding: '0',
+    nextArrow: <ArrowButton direction="right" />,
+    prevArrow: <ArrowButton direction="left" />,
     responsive: [
       {
         breakpoint: 1024, // Tablet and below
         settings: {
-          slidesToShow: 2, // Show 2 courses at a time
+          slidesToShow: Math.min(userCourses.length, 2), // Show 2 courses at a time
         },
       },
       {
@@ -90,19 +53,23 @@ const Courses: React.FC = () => {
     ],
   };
 
+  if (loading) return <div className="text-center">Loading...</div>;
+  if (error) return <div className="text-center text-red-500">An error occurred. Please try again later.</div>;
+
   return (
     <div className="max-w-7xl mx-auto p-2 sm:p-4 lg:p-6 mt-12">
       <h2 className="text-4xl font-semibold text-[#00095B] mb-14 text-center">Khóa học nổi bật</h2>
       <Slider {...settings}>
-        {courses.map(course => (
-          <div key={course.id} className="px-2">
+        {userCourses.map((course) => (
+          <div key={course._id} className="px-2">
             <Course
-              id={course.id}
+              id={course._id}
               name={course.name}
               image={course.image}
-              price={course.price}
-              description={course.description}
-              rating={course.rating}
+              price={Number(course.price)}
+              discount={Number(course.discount)}
+              description={"7 chủ đề - 39 bài học - 67 bài tập"}
+              rating={5}
             />
           </div>
         ))}

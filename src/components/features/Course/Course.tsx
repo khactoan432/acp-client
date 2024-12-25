@@ -3,10 +3,11 @@ import Button from '../../common/Button';
 import { useNavigate } from 'react-router-dom';
 
 interface CourseProps {
-  id: number;
+  id: string;
   name: string;
   image: string;
   price: number;
+  discount: number;
   description: string;
   rating: number;
 }
@@ -19,14 +20,12 @@ const Rating: React.FC<{ rating: number }> = ({ rating }) => {
   return <div className="text-yellow-500 text-2xl">{stars}</div>;
 };
 
-const Course: React.FC<CourseProps> = ({ id, name, image, price, description, rating }) => {
+const Course: React.FC<CourseProps> = ({ id, name, image, price, discount, description, rating }) => {
   const navigate = useNavigate();
 
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300" id={id.toString()}
-      onClick={() => navigate("/course/"+id)}
-    >
-      <div className="relative">
+    <div className="bg-white max-w-[340px] rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300" id={id.toString()}>
+      <div className="relative" onClick={() => navigate("/course/"+id)}>
         <img src={image} alt={name} className="w-full h-64 object-cover" />
       </div>
 
@@ -43,13 +42,22 @@ const Course: React.FC<CourseProps> = ({ id, name, image, price, description, ra
           <span>4279 Học viên</span>
         </div>
 
-        <div className="flex justify-between items-center mt-4">
+        <div className="flex justify-between items-center my-3">
           <div className='flex items-center gap-4'>
-            <span className="text-xl font-semibold text-gray-900">{price}đ</span>
-            <span className="text-xl font-medium text-gray-900 line-through">${price}đ</span>
+            <span className="text-xl font-semibold text-gray-900">{new Intl.NumberFormat('vi-VN').format(price-discount)}đ</span>
+            <span className="text-xl font-medium text-gray-900 line-through">${new Intl.NumberFormat('vi-VN').format(price)}đ</span>
           </div>
+        </div>
+        <div className='flex gap-[10%] mt-3'>
+          <Button
+            onClick={() => navigate("/course/"+id)}
+            className='w-[45%]'
+          >
+            Chi tiết
+          </Button>
           <Button
             onClick={() => alert(`Added ${name} to cart!`)}
+            className='w-[45%]'
           >
             Mua ngay
           </Button>
