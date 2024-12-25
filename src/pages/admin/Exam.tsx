@@ -1,4 +1,5 @@
 import AdminHeader from "../../components/layout/Admin/header";
+import { FaEnvelope, FaCheckCircle } from "react-icons/fa";
 import Nav from "../../components/layout/Admin/nav";
 
 import React, { useState, useRef, useEffect } from "react";
@@ -13,6 +14,7 @@ import { MdOutlineDeleteOutline } from "react-icons/md";
 
 // import components
 import ButtonPlus from "../../components/button/plus";
+import MSInput from "../../components/input/MsInput";
 import ImageUploader from "../../components/helps/dropImage";
 import Loading from "../../components/loading";
 import Table from "../../components/table";
@@ -50,6 +52,33 @@ const AdminExam: React.FC = () => {
   const linkExam = useRef<HTMLInputElement>(null);
   const oldPrice = useRef<HTMLInputElement>(null);
   const newPrice = useRef<HTMLInputElement>(null);
+  //   test ----------------------
+  const inputRef = useRef<{
+    focus: () => void;
+    getValue: () => string;
+    setValue: (value: string) => void;
+    clear: () => void;
+  }>(null);
+
+  const handleGetValue = () => {
+    if (inputRef.current) {
+      alert("Input value: " + inputRef.current.getValue());
+    }
+  };
+
+  const handleSetValue = () => {
+    if (inputRef.current) {
+      inputRef.current.setValue("Hello World");
+    }
+  };
+
+  const handleClear = () => {
+    if (inputRef.current) {
+      inputRef.current.clear();
+    }
+  };
+
+  //   test ----------------------
 
   // get data
   useEffect(() => {
@@ -414,6 +443,34 @@ const AdminExam: React.FC = () => {
                           />
                         </div>
                       </div>
+                      {/* ---------------- test ----------------- */}
+                      <div>
+                        <MSInput
+                          ref={inputRef}
+                          label="Sample Input"
+                          placeholder="Enter something"
+                          type="text"
+                        />
+                        <button
+                          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded"
+                          onClick={handleGetValue}
+                        >
+                          Get Value
+                        </button>
+                        <button
+                          className="mt-4 ml-2 px-4 py-2 bg-green-500 text-white rounded"
+                          onClick={handleSetValue}
+                        >
+                          Set Value
+                        </button>
+                        <button
+                          className="mt-4 ml-2 px-4 py-2 bg-red-500 text-white rounded"
+                          onClick={handleClear}
+                        >
+                          Clear Input
+                        </button>
+                      </div>
+                      {/* test-------------------------- */}
                     </div>
                     {/* button save */}
                     <div className="mt-4 text-center">

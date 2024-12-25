@@ -36,19 +36,21 @@ const Table = <T extends Record<string, any>>({
               border: "1px solid #c9c9c9",
             }}
           >
-            {columns.map((col, index) => (
-              <th
-                key={index}
-                style={{
-                  padding: "8px",
-                  textAlign: "center",
-                  border: "1px solid  #c9c9c9",
-                }}
-                className="uppercase"
-              >
-                {col}
-              </th>
-            ))}
+            {columns &&
+              columns.length > 0 &&
+              columns.map((col, index) => (
+                <th
+                  key={index}
+                  style={{
+                    padding: "8px",
+                    textAlign: "center",
+                    border: "1px solid  #c9c9c9",
+                  }}
+                  className="uppercase"
+                >
+                  {col}
+                </th>
+              ))}
             <th style={{ padding: "8px", textAlign: "center" }}>ACTIONS</th>
           </tr>
         </thead>
@@ -137,8 +139,9 @@ const Table = <T extends Record<string, any>>({
                 <td style={{ padding: "8px", textAlign: "center" }}>
                   {actions &&
                     actions.length > 0 &&
-                    actions.map((action) => (
+                    actions.map((action, id) => (
                       <button
+                        key={id}
                         className="hover-action"
                         title={action.title}
                         style={action.style}
@@ -152,7 +155,11 @@ const Table = <T extends Record<string, any>>({
             ))}
           </tbody>
         ) : (
-          <h1>No data</h1>
+          <tbody>
+            <tr>
+              <th>No data</th>
+            </tr>
+          </tbody>
         )}
       </table>
     </div>
