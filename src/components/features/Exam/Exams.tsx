@@ -1,9 +1,20 @@
 // Exams.tsx
-import React from 'react';
+import React, { useEffect } from 'react';
 import Exam from './Exam'; // Import the Exam component
 import banner from "../../../assets/banner1.jpg";
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '../../../redux/store';
+import { fetchUserExams } from '../../../redux/slices/examSlice';
 
 const Exams: React.FC = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const { userExams, loading, error } = useSelector((state: RootState) => state.exams);
+
+  useEffect(() => {
+    dispatch(fetchUserExams({ page: 1, limit: 4 }));
+  }, [dispatch]);
+  console.log(userExams);
+
   const exams = [
     {
       id: 1,
@@ -89,18 +100,18 @@ const Exams: React.FC = () => {
     <div className="max-w-7xl mx-auto p-2 sm:p-4 lg:p-6 mt-12">
       <h2 className="text-4xl font-semibold text-[#00095B] mb-14 text-center">Đề thi mới nhất</h2>
       <div className='grid grid-cols-1 gap-x-4 gap-y-6 md:grid-cols-2 lg:grid-cols-4'>
-        {exams.map(exam => (
-          <div key={exam.id}>
+        {userExams.map(exam => (
+          <div key={exam._id}>
             <Exam
-              id={exam.id}
+              _id={exam._id}
               name={exam.name}
               image={exam.image}
-              price={exam.price}
-              time={exam.time}
-              rating={exam.rating}
-              rates={exam.rates}
-              problems={exam.problems}
-              users={exam.users}
+              price={Number(exam.price)}
+              time={15}
+              rating={4.8}
+              rates={46}
+              problems={12}
+              users={122}
 
             />
           </div>

@@ -50,7 +50,7 @@ const Course: React.FC<CourseProps> = ({ id, name, image, price, discount, descr
   };
 
   return (
-    <div className="bg-white max-w-[340px] rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300" id={id.toString()}>
+    <div className="bg-white max-w-[400px] rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300" id={id.toString()}>
       <div className="relative" onClick={() => navigate("/course/"+id)}>
         <img src={image} alt={name} className="w-full h-56 object-cover" />
       </div>
@@ -60,13 +60,12 @@ const Course: React.FC<CourseProps> = ({ id, name, image, price, discount, descr
         <p className="text-sm text-gray-600 mt-2">{description}</p>
 
         <div className="mt-2 flex justify-between items-center">
-          <div className='flex items-center gap-1.5'>
-            <span>{rating}</span>
-            <span className='text-yellow-500 text-2xl'> ★ </span>
-            <span>({234} đánh giá)</span>
+          <div className='flex items-center gap-2'>
+            <Rating rating={rating} />
+            <span>(241 Đánh giá)</span>
           </div>
-
-          <span>{2465} Học viên</span>
+          
+          <span>4279 Học viên</span>
         </div>
 
         <div className="flex justify-between items-center my-3">

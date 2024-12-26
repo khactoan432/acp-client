@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { getData, postData, putData, deleteData } from '../../axios';
 
 // Define the type for a user
-interface Course {
+interface Exam {
   _id: string;
   id_user: string;
   name: string;
@@ -14,54 +14,54 @@ interface Course {
 
 // Define the initial state
 interface UserState {
-  adminCourses: Course[];
-  userCourses: Course[];
+  adminExams: Exam[];
+  userExams: Exam[];
   totalAdmin: number;
   totalUser: number;
-  selectedCourse: Course | null,
+  selectedExam: Exam | null,
   loading: boolean;
   error: string | null;
 }
 
 const initialState: UserState = {
-  adminCourses: [],
-  userCourses: [],
+  adminExams: [],
+  userExams: [],
   totalAdmin: 0,
   totalUser: 0,
-  selectedCourse: null,
+  selectedExam: null,
   loading: false,
   error: null,
 };
 
 // Thunks for CRUD operations
 
-export const fetchUserCourses = createAsyncThunk(
-  'courses/fetchUserCourses',
+export const fetchUserExams = createAsyncThunk(
+  'exams/fetchUserExams',
   async ({page, limit}: {page: number, limit: number}, { rejectWithValue }) => {
     try {
-      const response = await getData(`api/courses?page=${page}&limit=${limit}`, {});
+      const response = await getData(`api/exams?page=${page}&limit=${limit}`, {});
       return response;
     } catch (error: any) {
-      return rejectWithValue(error.message || 'Failed to fetch Courses');
+      return rejectWithValue(error.message || 'Failed to fetch Exams');
     }
   }
 );
 
-export const fetchCourseDetail = createAsyncThunk(
-  'courses/fetchCourseDetail',
-  async (courseId: string, { rejectWithValue }) => {
+export const fetchExamDetail = createAsyncThunk(
+  'exams/fetchExamDetail',
+  async (examId: string, { rejectWithValue }) => {
     try {
-      const response = await getData(`api/course/${courseId}`, {});
+      const response = await getData(`api/exam/${examId}`, {});
       return response;
     } catch (error: any) {
-      return rejectWithValue(error.message || 'Failed to fetch course details');
+      return rejectWithValue(error.message || 'Failed to fetch exam details');
     }
   }
 );
 
 
-export const fetchAdminCourses = createAsyncThunk(
-  'courses/fetchAdminCourses',
+export const fetchAdminExams = createAsyncThunk(
+  'exams/fetchAdminExams',
   async ({role, page, limit}: {role: string, page: number, limit: number}, { rejectWithValue }) => {
     try {
       const response = await getData(`api/admin/users?role=${role}&page=${page}&limit=${limit}`, {
@@ -71,13 +71,13 @@ export const fetchAdminCourses = createAsyncThunk(
       });
       return response;
     } catch (error: any) {
-      return rejectWithValue(error.message || 'Failed to fetch Courses');
+      return rejectWithValue(error.message || 'Failed to fetch Exams');
     }
   }
 );
 
-export const createCourse = createAsyncThunk(
-  'courses/createCourse',
+export const createExam = createAsyncThunk(
+  'exams/createExam',
   async (userData: object, { rejectWithValue }) => {
     try {
       const response = await postData('api/admin/user', userData, {
@@ -88,13 +88,13 @@ export const createCourse = createAsyncThunk(
       });
       return response;
     } catch (error: any) {
-      return rejectWithValue(error.message || 'Failed to create Course');
+      return rejectWithValue(error.message || 'Failed to create Exam');
     }
   }
 );
 
-export const updateCourse = createAsyncThunk(
-  'courses/updateCourse',
+export const updateExam = createAsyncThunk(
+  'exams/updateExam',
   async (
     { userId, updatedData }: { userId: string; updatedData: object },
     { rejectWithValue }
@@ -108,13 +108,13 @@ export const updateCourse = createAsyncThunk(
       });
       return response;
     } catch (error: any) {
-      return rejectWithValue(error.message || 'Failed to update Course');
+      return rejectWithValue(error.message || 'Failed to update Exam');
     }
   }
 );
 
-export const deleteCourse = createAsyncThunk(
-  'courses/deleteCourse',
+export const deleteExam = createAsyncThunk(
+  'exams/deleteExam',
   async (userId: string, { rejectWithValue }) => {
     try {
       await deleteData(`api/admin/user/${userId}`, {
@@ -124,113 +124,113 @@ export const deleteCourse = createAsyncThunk(
       });
       return userId;
     } catch (error: any) {
-      return rejectWithValue(error.message || 'Failed to delete Course');
+      return rejectWithValue(error.message || 'Failed to delete Exam');
     }
   }
 );
 
-// Create the Course slice
-const courseSlice = createSlice({
-  name: 'course',
+// Create the Exam slice
+const examSlice = createSlice({
+  name: 'exam',
   initialState,
   reducers: {},
   extraReducers: (builder) => {
     builder
-      // Fetch User Courses
-      .addCase(fetchUserCourses.pending, (state) => {
+      // Fetch User Exams
+      .addCase(fetchUserExams.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchUserCourses.fulfilled, (state, action) => {
+      .addCase(fetchUserExams.fulfilled, (state, action) => {
         state.loading = false;
-        state.userCourses = action.payload.data;
+        state.userExams = action.payload.data;
         state.totalUser = action.payload.total;
       })
-      .addCase(fetchUserCourses.rejected, (state, action) => {
+      .addCase(fetchUserExams.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       })
 
-      // Fetch course detail
-      .addCase(fetchCourseDetail.pending, (state) => {
+      // Fetch Exam detail
+      .addCase(fetchExamDetail.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchCourseDetail.fulfilled, (state, action) => {
+      .addCase(fetchExamDetail.fulfilled, (state, action) => {
         state.loading = false;
-        state.selectedCourse = action.payload.data.course;
+        state.selectedExam = action.payload.data.exam;
       })
-      .addCase(fetchCourseDetail.rejected, (state, action) => {
+      .addCase(fetchExamDetail.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       })
 
-      // Fetch Admin Courses
-      .addCase(fetchAdminCourses.pending, (state) => {
+      // Fetch Admin Exams
+      .addCase(fetchAdminExams.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchAdminCourses.fulfilled, (state, action) => {
+      .addCase(fetchAdminExams.fulfilled, (state, action) => {
         state.loading = false;
-        state.adminCourses = action.payload.data;
+        state.adminExams = action.payload.data;
         state.totalAdmin = action.payload.total;
       })
-      .addCase(fetchAdminCourses.rejected, (state, action) => {
+      .addCase(fetchAdminExams.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       })
 
-      // Create Course
-      .addCase(createCourse.pending, (state) => {
+      // Create Exam
+      .addCase(createExam.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(createCourse.fulfilled, (state, action) => {
+      .addCase(createExam.fulfilled, (state, action) => {
         state.loading = false;
-        const createdCourses = action.payload.data;
-        console.log(action.payload ,state.adminCourses, createdCourses, state.adminCourses.concat(createdCourses))
+        const createdExams = action.payload.data;
+        console.log(action.payload ,state.adminExams, createdExams, state.adminExams.concat(createdExams))
 
-        state.adminCourses=state.adminCourses.concat(createdCourses);
+        state.adminExams=state.adminExams.concat(createdExams);
         state.totalAdmin = state.totalAdmin + 1;
       })
-      .addCase(createCourse.rejected, (state, action) => {
+      .addCase(createExam.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       })
 
-      // Update Course
-      .addCase(updateCourse.pending, (state) => {
+      // Update Exam
+      .addCase(updateExam.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(updateCourse.fulfilled, (state, action) => {
+      .addCase(updateExam.fulfilled, (state, action) => {
         state.loading = false;
-        const updatedCourse = action.payload.data;
-        const index = state.adminCourses.findIndex((user) => user._id === updatedCourse._id);
+        const updatedExam = action.payload.data;
+        const index = state.adminExams.findIndex((user) => user._id === updatedExam._id);
         if (index !== -1) {
-          state.adminCourses[index] = updatedCourse;
+          state.adminExams[index] = updatedExam;
         }
       })
-      .addCase(updateCourse.rejected, (state, action) => {
+      .addCase(updateExam.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       })
 
-      // Delete Course
-      .addCase(deleteCourse.pending, (state) => {
+      // Delete Exam
+      .addCase(deleteExam.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(deleteCourse.fulfilled, (state, action) => {
+      .addCase(deleteExam.fulfilled, (state, action) => {
         state.loading = false;
-        state.adminCourses = state.adminCourses.filter((user) => user._id !== action.payload);
+        state.adminExams = state.adminExams.filter((user) => user._id !== action.payload);
         state.totalAdmin = state.totalAdmin - 1;
       })
-      .addCase(deleteCourse.rejected, (state, action) => {
+      .addCase(deleteExam.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });
   },
 });
 
-export default courseSlice.reducer;
+export default examSlice.reducer;

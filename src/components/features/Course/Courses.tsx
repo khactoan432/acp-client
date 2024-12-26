@@ -33,10 +33,12 @@ const Courses: React.FC = () => {
     dots: true,
     infinite: userCourses.length > 1,
     speed: 500,
-    slidesToShow: Math.min(userCourses.length, 4),
+    slidesToShow: Math.min(userCourses.length, 3),
     slidesToScroll: 1,
     nextArrow: <ArrowButton direction="right" />,
     prevArrow: <ArrowButton direction="left" />,
+    // centerMode: true, // Bật chế độ căn giữa
+    // centerPadding: "20px", // Thêm khoảng cách giữa các slide
     responsive: [
       {
         breakpoint: 1024, // Tablet and below
@@ -61,7 +63,7 @@ const Courses: React.FC = () => {
       <h2 className="text-4xl font-semibold text-[#00095B] mb-14 text-center">Khóa học nổi bật</h2>
       <Slider {...settings}>
         {userCourses.map((course) => (
-          <div key={course._id} className="px-2">
+          <div key={course._id} className="px-4">
             <Course
               id={course._id}
               name={course.name}
