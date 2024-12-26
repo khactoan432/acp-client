@@ -32,6 +32,7 @@ const Login: React.FC = () => {
         },
         {}
       );
+      console.log("response: ", response);
       if (response.token) {
         if (redirectPath) {
           localStorage.setItem("redirectHistory", redirectPath);

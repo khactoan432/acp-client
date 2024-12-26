@@ -10,6 +10,7 @@ import { Button } from "antd";
 // import icon
 import { FaRegEdit } from "react-icons/fa";
 import { MdOutlineDeleteOutline } from "react-icons/md";
+import { MdAttractions } from "react-icons/md";
 
 // import components
 import ButtonPlus from "../../components/button/plus";
@@ -123,6 +124,12 @@ const AdminExam: React.FC = () => {
   };
 
   const actions = [
+    {
+      title: "Giới thiệu đề thi",
+      action: "INTRODUCE",
+      icon: <MdAttractions />,
+      style: styleAction,
+    },
     {
       title: "Chỉnh sửa",
       action: "EDIT",
@@ -244,16 +251,18 @@ const AdminExam: React.FC = () => {
   };
   // handle edit
   const handleActions = (type: string, row: any) => {
-    if (type === "EDIT") {
-      setAddExam(true);
-      setIsUpdate(true);
-      setDataEditExam(row);
-      console.log("row edit: ", row);
-    }
     if (type === "DELETE") {
       const id = row._id;
       setIdExamDeleted(id);
       setIdModalVisible(true);
+    }
+    if (type === "INTRODUCE") {
+      const id = row._id;
+      setIdExamDeleted(id);
+      setIdModalVisible(true);
+    }
+    if (type === "INTRODUCE") {
+      navigate(`/admin/exam/${row._id}/introduce`);
     }
 
     console.log("Edit row:", row);
