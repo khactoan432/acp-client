@@ -5,6 +5,7 @@ import bannerReducer from './slices/bannerSlice';
 import achievementReducer from './slices/achievementSlice';
 import teacherReducer from './slices/teacherSlice';
 import courseReducer from './slices/courseSlice';
+import examReducer from './slices/examSlice';
 
 const store = configureStore({
   reducer: {
@@ -12,7 +13,8 @@ const store = configureStore({
     banners: bannerReducer,
     achievements: achievementReducer,
     teachers: teacherReducer,
-    courses: courseReducer
+    courses: courseReducer,
+    exams: examReducer,
   },
 })
 

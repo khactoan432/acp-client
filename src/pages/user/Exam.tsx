@@ -1,12 +1,23 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import banner from '../../assets/banner1.jpg';
 import banner3 from '../../assets/banner3.jpg';
 import Advisory from '../../components/features/Advisory/Advisory';
 import Exam from '../../components/features/Exam/Exam';
 import SideFilter from '../../components/features/SideFilter/SideFilter';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '../../redux/store';
+import { fetchUserExams } from '../../redux/slices/examSlice';
 
 const UserExam: React.FC = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const { userExams, loading, error } = useSelector((state: RootState) => state.exams);
+
+  useEffect(() => {
+    dispatch(fetchUserExams({ page: 1, limit: 4 }));
+  }, [dispatch]);
+  console.log(userExams);
+
   const exams = [
     {
       id: 1,
@@ -162,10 +173,10 @@ const UserExam: React.FC = () => {
   // Calculate indices for the exams to display
   const indexOfLastExam = currentPage * examsPerPage;
   const indexOfFirstExam = indexOfLastExam - examsPerPage;
-  const currentExams = exams.slice(indexOfFirstExam, indexOfLastExam);
+  const currentExams = userExams.slice(indexOfFirstExam, indexOfLastExam);
 
   // Calculate total pages
-  const totalPages = Math.ceil(exams.length / examsPerPage);
+  const totalPages = Math.ceil(userExams.length / examsPerPage);
 
   // Ref for scrolling
   const examListRef = useRef<HTMLDivElement>(null);
@@ -205,7 +216,7 @@ const UserExam: React.FC = () => {
         </p>
 
         <div className="flex pt-14">
-          <div className="w-full lg:w-1/3 px-4 rounded-lg sticky top-[80px] h-max">
+          <div className="w-full max-w-[20%] lg:w-1/3 px-4 rounded-lg sticky top-[80px] h-max">
             {/* All Categories Section */}
             <div className="mb-6">
               <h3 className="font-bold text-lg mb-2">Tất Cả Danh Mục</h3>
@@ -310,23 +321,24 @@ const UserExam: React.FC = () => {
             </div>
           </div>
 
-          <div>
+          <div className='max-w-[80%] w-full'>
             <div
               className="grid grid-cols-1 gap-x-8 gap-y-6 md:grid-cols-2 lg:grid-cols-3 mx-3"
               ref={examListRef}
             >
               {currentExams.map((exam) => (
-                <div key={exam.id}>
+                <div key={exam._id}>
                   <Exam
-                    id={exam.id}
+                    _id={exam._id}
                     name={exam.name}
                     image={exam.image}
-                    price={exam.price}
-                    time={exam.time}
-                    rating={exam.rating}
-                    rates={exam.rates}
-                    problems={exam.problems}
-                    users={exam.users}
+                    price={Number(exam.price)}
+                    discount={Number(exam.discount)}
+                    time={15}
+                    rating={4.8}
+                    rates={123}
+                    problems={15}
+                    users={234}
                   />
                 </div>
               ))}

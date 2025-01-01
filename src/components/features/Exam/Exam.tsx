@@ -3,10 +3,11 @@ import Button from '../../common/Button';
 import { useNavigate } from 'react-router-dom';
 
 interface ExamProps {
-  id: number;
+  _id: string;
   name: string;
   image: string;
   price: number;
+  discount: number;
   time: number;
   rating: number;
   rates: number;
@@ -14,14 +15,12 @@ interface ExamProps {
   users: number;
 }
 
-const Exam: React.FC<ExamProps> = ({ id, name, image, price, time, rating, rates, problems, users }) => {
+const Exam: React.FC<ExamProps> = ({ _id, name, image, price, discount, time, rating, rates, problems, users }) => {
   const navigate = useNavigate();
 
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300" id={id.toString()}
-      onClick={() => navigate("/exam/"+id)}
-    >
-      <div className="relative">
+    <div className="bg-white w-full max-w-[380px] rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300" id={_id.toString()}>
+      <div className="relative" onClick={() => navigate("/exam/"+_id)}>
         <img src={image} alt={name} className="w-full h-48 object-cover" />
       </div>
 
@@ -41,13 +40,13 @@ const Exam: React.FC<ExamProps> = ({ id, name, image, price, time, rating, rates
 
         <div className="flex justify-between items-center mt-3">
           <div className='flex items-center gap-4'>
-            <span className="text-xl font-semibold text-gray-900">{price}đ</span>
+            <span className="text-xl font-semibold text-gray-900">{price-discount}đ</span>
             <span className="text-xl font-medium text-gray-900 line-through">${price}đ</span>
           </div>
         </div>
         <div className='flex gap-[10%] mt-3'>
           <Button
-            onClick={() => alert(`Added ${name} to cart!`)}
+            onClick={() => navigate("/exam/"+_id)}
             className='w-[45%]'
           >
             Chi tiết

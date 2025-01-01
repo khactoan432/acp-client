@@ -36,7 +36,7 @@ const UserCourse: React.FC = () => {
           
           <div className='pt-14'>
             <p className='text-3xl font-bold pb-5'>Lớp cơ bản:</p>
-            <div className='grid grid-cols-1 gap-x-8 gap-y-6 md:grid-cols-2 lg:grid-cols-3'>
+            <div className='grid grid-cols-1 gap-x-8 gap-y-8 md:grid-cols-2 lg:grid-cols-3'>
               {userCourses?.map(course => (
                 <div key={course._id}>
                   <Course
