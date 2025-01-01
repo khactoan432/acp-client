@@ -20,7 +20,6 @@ const TOKEN_EXPIRED = "Token expired.";
 export const getData = async (endpoint: string, header: object) => {
   try {
     const response = await api.get(endpoint, header);
-    console.log("res: ", response);
     return response.data;
   } catch (error: any) {
     if (error.response) {
@@ -46,7 +45,16 @@ export const postData = async (
   try {
     const response = await api.post(endpoint, data, header);
     return response.data;
-  } catch (error) {
+  } catch (error: any) {
+    if (error.response) {
+      console.log("Error response: ", error.response);
+      if (error.response.data?.message === TOKEN_EXPIRED) {
+        console.log("Token expired");
+        store.dispatch(logout());
+        navigateTo("/login", { state: { from: window.location.pathname } });
+        throw new Error(TOKEN_EXPIRED);
+      }
+    }
     console.error("Error posting data", error);
     throw error;
   }
@@ -61,7 +69,16 @@ export const putData = async (
   try {
     const response = await api.put(endpoint, data, header);
     return response.data;
-  } catch (error) {
+  } catch (error: any) {
+    if (error.response) {
+      console.log("Error response: ", error.response);
+      if (error.response.data?.message === TOKEN_EXPIRED) {
+        console.log("Token expired");
+        store.dispatch(logout());
+        navigateTo("/login", { state: { from: window.location.pathname } });
+        throw new Error(TOKEN_EXPIRED);
+      }
+    }
     console.error("Error posting data", error);
     throw error;
   }
@@ -72,7 +89,16 @@ export const deleteData = async (endpoint: string, header: object) => {
   try {
     const response = await api.delete(endpoint, header);
     return response.data;
-  } catch (error) {
+  } catch (error: any) {
+    if (error.response) {
+      console.log("Error response: ", error.response);
+      if (error.response.data?.message === TOKEN_EXPIRED) {
+        console.log("Token expired");
+        store.dispatch(logout());
+        navigateTo("/login", { state: { from: window.location.pathname } });
+        throw new Error(TOKEN_EXPIRED);
+      }
+    }
     console.error("Error posting data", error);
     throw error;
   }
@@ -87,7 +113,16 @@ export const postFile = async (endpoint: string, data: object) => {
       },
     });
     return response.data;
-  } catch (error) {
+  } catch (error: any) {
+    if (error.response) {
+      console.log("Error response: ", error.response);
+      if (error.response.data?.message === TOKEN_EXPIRED) {
+        console.log("Token expired");
+        store.dispatch(logout());
+        navigateTo("/login", { state: { from: window.location.pathname } });
+        throw new Error(TOKEN_EXPIRED);
+      }
+    }
     console.error("Error posting data", error);
     throw error;
   }
