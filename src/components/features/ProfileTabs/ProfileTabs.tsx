@@ -73,7 +73,7 @@ const ProfileTabs: React.FC = () => {
   return (
     <div className="">
       {/* Tabs Header */}
-      <div className="pt-4 flex justify-center font-semibold border-b border-gray-300 bg-white">
+      <div className="pt-4 flex justify-center border-b border-gray-300 bg-white">
         <button
           onClick={() => setActiveTab("courses")}
           className={`px-4 py-2 ${
@@ -112,18 +112,14 @@ const ProfileTabs: React.FC = () => {
                     className="w-full h-32 object-cover rounded-md"
                   />
                   <div className="w-full p-4">
-                    <h3 className="text-lg font-semibold mb-2">
-                      {course.name}
-                    </h3>
+                    <h3 className="text-lg mb-2">{course.name}</h3>
                     <div className="w-full bg-gray-200 rounded-full h-[10px] mb-2">
                       <div
                         className="bg-blue-600 rounded-full h-[10px]"
                         style={{ width: `${10}%` }}
                       ></div>
                     </div>
-                    <p className="text-sm font-semibold text-gray-600 pb-3">
-                      Tiến độ: {10}%
-                    </p>
+                    <p className="text-sm text-gray-600 pb-3">Tiến độ: {10}%</p>
 
                     <Button
                       onClick={() => navigate("/learning/" + course._id)}
@@ -153,7 +149,7 @@ const ProfileTabs: React.FC = () => {
                   className="w-full h-32 object-cover rounded-md"
                 />
                 <div className="w-full p-4">
-                  <h3 className="text-lg font-semibold mb-2">{exam.name}</h3>
+                  <h3 className="text-lg mb-2">{exam.name}</h3>
                   <p
                     className={`text-lg font-bold pb-3 ${
                       !exam.score

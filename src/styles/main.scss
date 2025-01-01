@@ -5,6 +5,8 @@
 :root {
   --color__primary: #f2f2f2;
   --color__secondary: #2d3c88;
+
+  --color__hover-primary: #4558b7;
 }
 
 body {
@@ -25,26 +27,22 @@ body {
   color: white !important;
 }
 
-.bg-secondary {
-  background-color: var(--color__secondary);
-  color: white;
-}
+// background color
 
 .bg-primary {
   background-color: var(--color__primary);
 }
 
+.bg-secondary {
+  background-color: var(--color__secondary);
+  color: white;
+}
+
 .primary-color-text {
   color: var(--color__secondary);
 }
-.secondary-color-bg {
-  background-color: var(--color__secondary);
-}
 
-.secondary-color-bg {
-  background-color: #00095b;
-}
-
+// btn
 .btn-primary {
   background-color: var(--color__secondary);
   border-color: var(--color__secondary);
@@ -52,35 +50,11 @@ body {
 }
 
 .btn-primary:hover {
-  background-color: var(--color__secondary);
+  background-color: var(--color__hover-primary);
   border-color: var(--color__secondary);
   color: #fff;
 }
-.box-shadow_primary {
-  border-radius: 6px;
-  box-shadow: 1px 1px rgba(0, 0, 0, 0.1019607843),
-    0 1px 1px rgba(0, 0, 0, 0.0588235294);
-  border: 2px solid transparent;
-}
 
-/* Định nghĩa các lớp cho nút Cancel */
-.button-cancel {
-  background-color: white;
-  color: var(--color__secondary);
-  border: 2px solid var(--color__secondary);
-  padding: 8px 16px;
-  border-radius: 8px;
-  transition: all 0.3s ease-in-out;
-}
-
-.button-cancel:hover {
-  background-color: var(--color__secondary);
-  color: white;
-  opacity: 1;
-  filter: brightness(1.6); /* Làm sáng nền khi hover */
-}
-
-/* Định nghĩa các lớp cho nút Save */
 .button-save {
   background-color: var(--color__secondary);
   color: white;
@@ -101,16 +75,62 @@ body {
   background-color: #00095b70;
 }
 
+.button-cancel {
+  background-color: white;
+  color: var(--color__secondary);
+  border: 2px solid var(--color__secondary);
+  padding: 8px 16px;
+  border-radius: 8px;
+  transition: all 0.3s ease-in-out;
+}
+
+.button-cancel:hover {
+  background-color: var(--color__secondary);
+  color: white;
+  opacity: 1;
+  filter: brightness(1.6); /* Làm sáng nền khi hover */
+}
+// box shadow
+
+.box-shadow_primary {
+  border-radius: 6px;
+  box-shadow: 1px 1px rgba(0, 0, 0, 0.1019607843),
+    0 1px 1px rgba(0, 0, 0, 0.0588235294);
+  border: 2px solid transparent;
+}
+
+// input
 .blurred-input {
   color: #0000004a;
   background: #dedede;
   pointer-events: none; /* Ngăn người dùng tương tác */
 }
-// hover
+
+// :hover
 .hover-action:hover {
   background-color: #dedede !important;
 }
+.ant-menu-submenu-title:hover {
+  background-color: var(--color__hover-primary) !important;
+}
+// font-size text title
+.font-size-20 {
+  font-size: 20px !important;
+}
+.font-size-18 {
+  font-size: 18px !important;
+}
+
+// padding
 
 .pa-primary {
   padding: 5px 8px 12px 20px;
+}
+
+// margin
+
+input:focus {
+  border-width: 0.5px;
+  border-color: var(--color__hover-primary);
+  outline: none;
 }

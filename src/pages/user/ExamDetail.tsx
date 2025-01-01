@@ -75,9 +75,7 @@ const UserExamDetail: React.FC = () => {
               <div className="my-2 flex justify-between items-center">
                 <div className="flex items-center gap-3">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-yellow-500 font-semibold">
-                      {course.rating}
-                    </span>
+                    <span className="text-yellow-500">{course.rating}</span>
                     <Rating rating={course.rating} />
                   </div>
                   <span>({course.rates} đánh giá)</span>
@@ -121,7 +119,7 @@ const UserExamDetail: React.FC = () => {
                     smooth={true}
                     offset={-140}
                     duration={500}
-                    className="cursor-pointer font-semibold hover:text-blue-600 transition duration-200"
+                    className="cursor-pointer hover:text-blue-600 transition duration-200"
                     activeClass="text-blue-600"
                   >
                     {item.name}
@@ -245,7 +243,7 @@ const UserExamDetail: React.FC = () => {
                 alt="alt"
               />
               <div className="mt-6">
-                <p className="text-gray-700 text-lg font-semibold">
+                <p className="text-gray-700 text-lg">
                   Ưu đãi đặc biệt tháng 12/2024:
                 </p>
                 <div className="flex gap-4 mt-2">
@@ -262,7 +260,7 @@ const UserExamDetail: React.FC = () => {
                   </div>
                 </div>
               </div>
-              <button className="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg mt-4 hover:bg-blue-700">
+              <button className="w-full bg-blue-600 text-white py-2 rounded-lg mt-4 hover:bg-blue-700">
                 MUA ĐỀ THI NGAY
               </button>
               <ul className="mt-6 text-sm text-gray-600 space-y-2">

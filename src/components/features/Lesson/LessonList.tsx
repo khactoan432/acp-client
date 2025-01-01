@@ -40,7 +40,7 @@ const LessonList: React.FC<LessonListProps> = ({
         <div key={section._id} className="">
           <button
             onClick={() => toggleSection(section._id)}
-            className="w-full justify-between items-center px-4 py-3 bg-gray-100 text-left text-black font-semibold border-b-[0.3px] border-solid border-gray-300 hover:bg-gray-200"
+            className="w-full justify-between items-center px-4 py-3 bg-gray-100 text-left text-black border-b-[0.3px] border-solid border-gray-300 hover:bg-gray-200"
           >
             <p>{section.name}</p>
             <p className="font-extralight text-xs text-black">

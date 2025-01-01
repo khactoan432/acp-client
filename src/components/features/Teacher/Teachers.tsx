@@ -7,7 +7,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../redux/store";
 import { fetchUserTeachers } from "../../../redux/slices/teacherSlice";
 
-
 const Teachers: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { userTeachers, loading, error } = useSelector(
@@ -42,44 +41,45 @@ const Teachers: React.FC = () => {
     ],
   };
 
-  return (
-    loading ? "Waiting for Loading" 
-    : error ? "Something have wrong"
-    : <div className="relative pt-10 pb-16 bg-[#F9FFF2]">
-        {/* Background Image */}
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat bg-[#F9FFF2] top-16"
-          style={{
-            backgroundImage: `url(${bgImage})`,
-            backgroundSize: "80%", // Makes the background twice the size of the div
-            backgroundPosition: "center", // Keeps the background centered
-            opacity: 0.15, // Adjust opacity for the background
-          }}
-        ></div>
+  return loading ? (
+    "Waiting for Loading"
+  ) : error ? (
+    "Something have wrong"
+  ) : (
+    <div className="relative pt-10 pb-16 bg-[#F9FFF2]">
+      {/* Background Image */}
+      <div
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat bg-[#F9FFF2] top-16"
+        style={{
+          backgroundImage: `url(${bgImage})`,
+          backgroundSize: "80%", // Makes the background twice the size of the div
+          backgroundPosition: "center", // Keeps the background centered
+          opacity: 0.15, // Adjust opacity for the background
+        }}
+      ></div>
 
-        {/* Content Overlay */}
-        <div className="relative max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
-          <h2 className="text-4xl font-semibold text-[#00095B] mb-16 text-center">
-            Đội ngũ giáo viên xuất sắc
-          </h2>
-          <Slider {...settings}>
-            {userTeachers.map((teacher) => (
-              <div key={teacher._id} className="px-4">
-                <div className="max-w-[272px] max-h-[360px] overflow-hidden rounded-lg shadow-lg mx-auto">
-                  <img
-                    src={teacher.image}
-                    alt={ teacher?.image.split("/").pop() || "Teacher"}
-                    className="w-full h-full object-contain"
-                  />
-                </div>
+      {/* Content Overlay */}
+      <div className="relative max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+        <h2 className="text-4xl text-[#00095B] mb-16 text-center">
+          Đội ngũ giáo viên xuất sắc
+        </h2>
+        <Slider {...settings}>
+          {userTeachers.map((teacher) => (
+            <div key={teacher._id} className="px-4">
+              <div className="max-w-[272px] max-h-[360px] overflow-hidden rounded-lg shadow-lg mx-auto">
+                <img
+                  src={teacher.image}
+                  alt={teacher?.image.split("/").pop() || "Teacher"}
+                  className="w-full h-full object-contain"
+                />
               </div>
-            ))}
-          </Slider>
-        </div>
+            </div>
+          ))}
+        </Slider>
       </div>
+    </div>
   );
 };
-
 
 const NextArrow: React.FC<{ onClick?: () => void }> = ({ onClick }) => {
   return (

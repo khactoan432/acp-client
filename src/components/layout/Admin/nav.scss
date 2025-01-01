@@ -4,7 +4,7 @@
 }
 
 .ant-menu-inline .ant-menu-item:hover {
-  background-color: #1e2753 !important;
+  background-color: var(--color__hover-primary) !important;
 }
 
 .ant-menu-inline .ant-menu-item-selected {

@@ -1,17 +1,19 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from "react";
 
-import banner from '../../assets/banner1.jpg';
-import banner3 from '../../assets/banner3.jpg';
-import Advisory from '../../components/features/Advisory/Advisory';
-import Exam from '../../components/features/Exam/Exam';
-import SideFilter from '../../components/features/SideFilter/SideFilter';
-import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, RootState } from '../../redux/store';
-import { fetchUserExams } from '../../redux/slices/examSlice';
+import banner from "../../assets/banner1.jpg";
+import banner3 from "../../assets/banner3.jpg";
+import Advisory from "../../components/features/Advisory/Advisory";
+import Exam from "../../components/features/Exam/Exam";
+import SideFilter from "../../components/features/SideFilter/SideFilter";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../redux/store";
+import { fetchUserExams } from "../../redux/slices/examSlice";
 
 const UserExam: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { userExams, loading, error } = useSelector((state: RootState) => state.exams);
+  const { userExams, loading, error } = useSelector(
+    (state: RootState) => state.exams
+  );
 
   useEffect(() => {
     dispatch(fetchUserExams({ page: 1, limit: 4 }));
@@ -21,7 +23,7 @@ const UserExam: React.FC = () => {
   const exams = [
     {
       id: 1,
-      name: 'Introduction to HTML & CSS',
+      name: "Introduction to HTML & CSS",
       time: 15,
       image: banner,
       price: 50000,
@@ -32,7 +34,7 @@ const UserExam: React.FC = () => {
     },
     {
       id: 2,
-      name: 'JavaScript Essentials',
+      name: "JavaScript Essentials",
       time: 25,
       image: banner,
       price: 75000,
@@ -43,7 +45,7 @@ const UserExam: React.FC = () => {
     },
     {
       id: 3,
-      name: 'React for Beginners',
+      name: "React for Beginners",
       time: 20,
       image: banner,
       price: 79000,
@@ -54,7 +56,7 @@ const UserExam: React.FC = () => {
     },
     {
       id: 4,
-      name: 'Advanced React Patterns',
+      name: "Advanced React Patterns",
       time: 30,
       image: banner,
       price: 99000,
@@ -65,7 +67,7 @@ const UserExam: React.FC = () => {
     },
     {
       id: 5,
-      name: 'Python for Data Science',
+      name: "Python for Data Science",
       time: 40,
       image: banner,
       price: 120000,
@@ -76,7 +78,7 @@ const UserExam: React.FC = () => {
     },
     {
       id: 6,
-      name: 'Django for Web Development',
+      name: "Django for Web Development",
       time: 35,
       image: banner,
       price: 115000,
@@ -87,7 +89,7 @@ const UserExam: React.FC = () => {
     },
     {
       id: 7,
-      name: 'SQL Database Fundamentals',
+      name: "SQL Database Fundamentals",
       time: 20,
       image: banner,
       price: 68000,
@@ -98,7 +100,7 @@ const UserExam: React.FC = () => {
     },
     {
       id: 8,
-      name: 'Machine Learning Basics',
+      name: "Machine Learning Basics",
       time: 50,
       image: banner,
       price: 150000,
@@ -109,7 +111,7 @@ const UserExam: React.FC = () => {
     },
     {
       id: 9,
-      name: 'Introduction to Cybersecurity',
+      name: "Introduction to Cybersecurity",
       time: 25,
       image: banner,
       price: 85000,
@@ -120,7 +122,7 @@ const UserExam: React.FC = () => {
     },
     {
       id: 10,
-      name: 'UI/UX Design Principles',
+      name: "UI/UX Design Principles",
       time: 30,
       image: banner,
       price: 99000,
@@ -131,7 +133,7 @@ const UserExam: React.FC = () => {
     },
     {
       id: 11,
-      name: 'DevOps with AWS',
+      name: "DevOps with AWS",
       time: 45,
       image: banner,
       price: 140000,
@@ -142,7 +144,7 @@ const UserExam: React.FC = () => {
     },
     {
       id: 12,
-      name: 'AI-Powered Chatbots with Python',
+      name: "AI-Powered Chatbots with Python",
       time: 40,
       image: banner,
       price: 130000,
@@ -153,7 +155,7 @@ const UserExam: React.FC = () => {
     },
     {
       id: 13,
-      name: 'AI-Powered Chatbots with Python',
+      name: "AI-Powered Chatbots with Python",
       time: 40,
       image: banner,
       price: 130000,
@@ -186,12 +188,11 @@ const UserExam: React.FC = () => {
       const offset = 100; // Desired offset from the top
       const topPosition =
         examListRef.current.getBoundingClientRect().top + window.pageYOffset;
-  
+
       // Scroll smoothly to the correct position
-      window.scrollTo({ top: topPosition - offset, behavior: 'smooth' });
+      window.scrollTo({ top: topPosition - offset, behavior: "smooth" });
     }
   };
-  
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -207,7 +208,7 @@ const UserExam: React.FC = () => {
       </div>
 
       <div className="max-w-[1228px] mx-auto mt-20 text-[#00095B] pb-20">
-        <p className="text-4xl font-semibold mb-2">Đề thi online</p>
+        <p className="text-4xl mb-2">Đề thi online</p>
         <p className="text-base">
           Phần mềm và chương trình học online chất lượng cao của STUDY4 được
           thiết kế theo chương trình tiếng Anh chuẩn CEFR (A1 -C2) của đại học
@@ -222,11 +223,19 @@ const UserExam: React.FC = () => {
               <h3 className="font-bold text-lg mb-2">Tất Cả Danh Mục</h3>
               <ul className="space-y-2 text-sm text-gray-700">
                 <li className="text-red-500 font-medium">Đề ICPC</li>
-                <li className="hover:text-blue-500 cursor-pointer">Đề Tài năng tin học trẻ</li>
-                <li className="hover:text-blue-500 cursor-pointer">Đề Chuyên tin học THPT</li>
-                <li className="hover:text-blue-500 cursor-pointer">Đề Olympic tin học</li>
+                <li className="hover:text-blue-500 cursor-pointer">
+                  Đề Tài năng tin học trẻ
+                </li>
+                <li className="hover:text-blue-500 cursor-pointer">
+                  Đề Chuyên tin học THPT
+                </li>
+                <li className="hover:text-blue-500 cursor-pointer">
+                  Đề Olympic tin học
+                </li>
                 {showMoreCategories && (
-                  <li className="hover:text-blue-500 cursor-pointer">Danh Mục Khác</li>
+                  <li className="hover:text-blue-500 cursor-pointer">
+                    Danh Mục Khác
+                  </li>
                 )}
                 <li
                   className="text-blue-500 cursor-pointer"
@@ -242,7 +251,9 @@ const UserExam: React.FC = () => {
               <h3 className="font-bold text-lg mb-2">Bộ Lọc Tìm Kiếm</h3>
               <div className="mb-4">
                 {/* Category Filter */}
-                <h4 className="text-sm font-medium mb-2">Theo Độ Khó</h4>
+                <h4 className="font-size-18 text-sm font-medium mb-2">
+                  Theo Độ Khó
+                </h4>
                 <ul className="space-y-2 text-sm text-gray-700">
                   <li>
                     <label className="flex items-center">
@@ -287,7 +298,9 @@ const UserExam: React.FC = () => {
 
               {/* Location Filter */}
               <div>
-                <h4 className="text-sm font-medium mb-2">Theo khu vực</h4>
+                <h4 className="font-size-18 text-sm font-medium mb-2">
+                  Theo khu vực
+                </h4>
                 <ul className="space-y-2 text-sm text-gray-700">
                   <li>
                     <label className="flex items-center">
@@ -321,7 +334,7 @@ const UserExam: React.FC = () => {
             </div>
           </div>
 
-          <div className='max-w-[80%] w-full'>
+          <div className="max-w-[80%] w-full">
             <div
               className="grid grid-cols-1 gap-x-8 gap-y-6 md:grid-cols-2 lg:grid-cols-3 mx-3"
               ref={examListRef}
@@ -349,8 +362,8 @@ const UserExam: React.FC = () => {
               <button
                 className={`px-4 py-2 mx-1 ${
                   currentPage === 1
-                    ? 'bg-gray-300 cursor-not-allowed'
-                    : 'bg-blue-500 text-white hover:bg-blue-600'
+                    ? "bg-gray-300 cursor-not-allowed"
+                    : "bg-blue-500 text-white hover:bg-blue-600"
                 } rounded`}
                 disabled={currentPage === 1}
                 onClick={() => {
@@ -365,8 +378,8 @@ const UserExam: React.FC = () => {
                   key={index + 1}
                   className={`px-4 py-2 mx-1 ${
                     currentPage === index + 1
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-200 hover:bg-blue-500 hover:text-white'
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-200 hover:bg-blue-500 hover:text-white"
                   } rounded`}
                   onClick={() => handlePageChange(index + 1)}
                 >
@@ -377,8 +390,8 @@ const UserExam: React.FC = () => {
               <button
                 className={`px-4 py-2 mx-1 ${
                   currentPage === totalPages
-                    ? 'bg-gray-300 cursor-not-allowed'
-                    : 'bg-blue-500 text-white hover:bg-blue-600'
+                    ? "bg-gray-300 cursor-not-allowed"
+                    : "bg-blue-500 text-white hover:bg-blue-600"
                 } rounded`}
                 disabled={currentPage === totalPages}
                 onClick={() => handlePageChange(currentPage + 1)}

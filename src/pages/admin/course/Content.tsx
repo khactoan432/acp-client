@@ -735,7 +735,7 @@ const Content: React.FC = () => {
               <FaChevronLeft />
               Back
             </Button>
-            <h4 className="font-semibold primary-color-text uppercase pb-2">
+            <h4 className="font-size-18 primary-color-text uppercase pb-2">
               Nội dung khoá học
             </h4>
             <ButtonPlus
@@ -1099,8 +1099,10 @@ const Content: React.FC = () => {
                             {lesson.exercise &&
                               lesson.exercise.map((data) => (
                                 <div>
-                                  <div className="mb-2 secondary-color-bg px-4 py-1 rounded-lg inline-block">
-                                    <h4 className="text-white">{data.name}</h4>
+                                  <div className="mb-2 bg-secondary px-4 py-1 rounded-lg inline-block">
+                                    <h4 className="font-size-18 text-white">
+                                      {data.name}
+                                    </h4>
                                   </div>
                                   <p>
                                     <a
@@ -1184,8 +1186,8 @@ const Content: React.FC = () => {
                       onClick={() => handleShowAddLesson(topic)}
                     />
                     {/* Hiển thị tiêu đề topic */}
-                    <div className="mb-2 secondary-color-bg px-4 py-2 rounded-lg inline-block">
-                      <h4 className="text-white">{topic.name}</h4>
+                    <div className="mb-2 bg-secondary px-4 py-2 rounded-lg inline-block">
+                      <h4 className="font-size-18 text-white">{topic.name}</h4>
                     </div>
 
                     {/* Hiển thị danh sách các lesson trong topic */}
@@ -1281,8 +1283,8 @@ const Content: React.FC = () => {
                               {lesson.exercise &&
                                 lesson.exercise.map((data) => (
                                   <div>
-                                    <div className="mb-2 secondary-color-bg px-4 py-1 rounded-lg inline-block">
-                                      <h4 className="text-white">
+                                    <div className="mb-2 bg-secondary px-4 py-1 rounded-lg inline-block">
+                                      <h4 className="font-size-18 text-white">
                                         {data.name}
                                       </h4>
                                     </div>

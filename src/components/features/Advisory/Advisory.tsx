@@ -11,7 +11,9 @@ const Advisory: React.FC = () => {
     course: "",
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
@@ -36,7 +38,7 @@ const Advisory: React.FC = () => {
           <h2 className="text-3xl font-bold text-center text-[#00095B] mb-2">
             Đăng ký ngay hôm nay
           </h2>
-          <h2 className="text-xl font-semibold text-center text-[#00095B] mb-6">
+          <h2 className="text-xl text-center text-[#00095B] mb-6">
             Nhận ưu đãi cực kỳ hấp dẫn
           </h2>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -82,15 +84,11 @@ const Advisory: React.FC = () => {
               <option value="fullstack">Fullstack Development</option>
               <option value="data-science">Data Science</option>
             </select>
-            <Button
-              type="submit"
-              className="w-full py-2"
-            >
+            <Button type="submit" className="w-full py-2">
               Đăng ký tư vấn miễn phí
             </Button>
           </form>
         </div>
-        
       </div>
     </div>
   );

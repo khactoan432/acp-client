@@ -437,7 +437,7 @@ const IntroduceExam: React.FC = () => {
               <FaChevronLeft />
               Back
             </Button>
-            <h4 className="font-semibold primary-color-text uppercase pb-2">
+            <h4 className="font-size-18 primary-color-text uppercase pb-2">
               Giới thiệu đề thi
             </h4>
             <ButtonPlus
@@ -477,7 +477,7 @@ const IntroduceExam: React.FC = () => {
                 <div className="mb-2 pl-6 relative">
                   <div className="absolute left-4 top-1/2 transform -translate-y-1/2 h-[100%] w-[0.2px] bg-[#1e2753]"></div>{" "}
                   {/* Đường line màu đỏ */}
-                  <h4 className="font-semibold primary-color-text">
+                  <h4 className="font-size-18 primary-color-text">
                     Thêm mô tả
                   </h4>
                   <ButtonPlus
@@ -587,8 +587,8 @@ const IntroduceExam: React.FC = () => {
                       className="absolute cursor-pointer top-[4px] left-[42px] text-red-500 hover:text-red-700"
                       title="Chỉnh sửa mô tả"
                     />
-                    <div className="mb-2 secondary-color-bg px-4 py-2 rounded-lg inline-block">
-                      <h4 className="text-white">{descs?.desc}</h4>
+                    <div className="mb-2 bg-secondary px-4 py-2 rounded-lg inline-block">
+                      <h4 className="font-size-18 text-white">{descs?.desc}</h4>
                     </div>
                     <div className="mb-2">
                       {descs.overviews &&

@@ -106,9 +106,9 @@ const Nav: React.FC = () => {
 
   return (
     <div
-      className={`nav-container ${
+      className={`nav-container bg-secondary rounded-br-lg pb-3 ${
         collapsed ? "collapsed" : ""
-      } bg-[#1e2753] rounded-br-lg pb-3`}
+      }`}
     >
       <Button
         className="rounded-none rounded-br-lg flex items-center justify-center"
@@ -121,9 +121,7 @@ const Nav: React.FC = () => {
         selectedKeys={[selectedKey]} // Chọn mục theo selectedKey
         defaultOpenKeys={["sub1"]}
         mode="inline"
-        style={{
-          backgroundColor: "#1e2753",
-        }}
+        className="bg-secondary"
         inlineCollapsed={collapsed}
         items={items}
         onClick={({ key }) => handleNavigation(key)} // Điều hướng khi click vào menu

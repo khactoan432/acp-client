@@ -78,7 +78,7 @@ const AdminModal = <T extends Record<string, any>>({
       <div className="space-y-6">
         {fields.length > 0 && (
           <div>
-            <h3 className="text-lg font-semibold mb-4">Information</h3>
+            <h3 className="text-lg mb-4">Information</h3>
             <div className="grid grid-cols-2 gap-4">
               {fields.map((field, id) => (
                 <div className="flex flex-col gap-1" key={String(id)}>
@@ -99,7 +99,7 @@ const AdminModal = <T extends Record<string, any>>({
         )}
         {enableImageUpload && (
           <div>
-            <h3 className="text-lg font-semibold mb-4">Upload Files</h3>
+            <h3 className="text-lg mb-4">Upload Files</h3>
             <Upload
               listType="picture"
               fileList={fileList}

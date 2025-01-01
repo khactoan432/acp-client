@@ -174,7 +174,7 @@ const ExamVideo: React.FC = () => {
               <FaChevronLeft />
               Back
             </Button>
-            <h4 className="font-semibold primary-color-text uppercase pb-2">
+            <h4 className="font-size-18 primary-color-text uppercase pb-2">
               Video sửa đề thi
             </h4>
             <MSInput

@@ -121,11 +121,7 @@ const Login: React.FC = () => {
             <label htmlFor="rememberMe">Keep me signed in</label>
           </div>
 
-          <button
-            className="secondary-color-bg"
-            type="submit"
-            style={styles.button}
-          >
+          <button className="bg-secondary" type="submit" style={styles.button}>
             Login
           </button>
           <p

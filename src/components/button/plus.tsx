@@ -39,7 +39,7 @@ const ButtonPlus: React.FC<HoverCardProps> = ({
         </div>
         <div className="w-[32px] absolute"></div>
         <div
-          className={`secondary-color-bg flex justify-center text-center items-center ${paddingLeft} ${paddingRight} ${height} ${
+          className={`bg-secondary flex justify-center text-center items-center ${paddingLeft} ${paddingRight} ${height} ${
             disabled ? "disable-bg" : ""
           } relative left-[15px] transition-all duration-300
             rounded-tr-[16px] rounded-br-[16px] group-hover:rounded-[16px]`}
