@@ -20,6 +20,7 @@ interface MSInputProps {
   placeholder?: string;
   type: "text" | "email" | "number" | "tel"; // Loại input
   required?: boolean; // Input có bắt buộc không
+  disabled?: boolean; // Input
   validate?: "email" | "phone" | "number"; // Kiểu validation
   leftIcon?: IconType; // Icon bên trái
   rightIcon?: IconType; // Icon bên phải
@@ -35,6 +36,7 @@ const MSInput = forwardRef<MSInputHandle, MSInputProps>(
       placeholder,
       type,
       required = false,
+      disabled = false,
       validate,
       leftIcon: LeftIcon,
       rightIcon: RightIcon,
@@ -109,7 +111,7 @@ const MSInput = forwardRef<MSInputHandle, MSInputProps>(
         )}
         <div className="relative">
           {LeftIcon && (
-            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-500">
+            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none primary-color-text">
               <LeftIcon />
             </div>
           )}
@@ -120,6 +122,7 @@ const MSInput = forwardRef<MSInputHandle, MSInputProps>(
             onBlur={handleBlur}
             value={value}
             onChange={handleChange}
+            disabled={disabled}
             className={`w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none ${
               LeftIcon ? "pl-10" : ""
             } ${RightIcon ? "pr-10" : ""} ${
@@ -127,7 +130,7 @@ const MSInput = forwardRef<MSInputHandle, MSInputProps>(
             }`}
           />
           {RightIcon && (
-            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-500">
+            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none primary-color-text">
               <RightIcon />
             </div>
           )}

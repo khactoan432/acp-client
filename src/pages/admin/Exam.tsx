@@ -11,6 +11,7 @@ import { Button } from "antd";
 import { FaRegEdit } from "react-icons/fa";
 import { MdOutlineDeleteOutline } from "react-icons/md";
 import { MdAttractions } from "react-icons/md";
+import { FaPhotoVideo } from "react-icons/fa";
 
 // import components
 import ButtonPlus from "../../components/button/plus";
@@ -124,6 +125,12 @@ const AdminExam: React.FC = () => {
   };
 
   const actions = [
+    {
+      title: "Video đề thi",
+      action: "VIDEO",
+      icon: <FaPhotoVideo />,
+      style: styleAction,
+    },
     {
       title: "Giới thiệu đề thi",
       action: "INTRODUCE",
@@ -263,6 +270,10 @@ const AdminExam: React.FC = () => {
     }
     if (type === "INTRODUCE") {
       navigate(`/admin/exam/${row._id}/introduce`);
+    }
+
+    if (type === "VIDEO") {
+      navigate(`/admin/exam/${row._id}/videos`);
     }
 
     console.log("Edit row:", row);

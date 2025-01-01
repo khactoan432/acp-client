@@ -11,7 +11,9 @@ import Banners from "../pages/admin/Banners";
 import Achievement from "../pages/admin/Achievement";
 import Teacher from "../pages/admin/Teacher";
 import Exam from "../pages/admin/Exam";
-import IntroduceExam from "../pages/admin/Exam/Introduce";
+import Categories from "../pages/admin/categories/Categories";
+import VideoExam from "../pages/admin/exam/VideoExam";
+import IntroduceExam from "../pages/admin/exam/Introduce";
 import Schedules from "../pages/admin/Schedules";
 import Ranks from "../pages/admin/InforRank";
 import Orders from "../pages/admin/Orders";
@@ -99,6 +101,22 @@ const AdminRoutes: React.FC = () => {
         element={
           <ProtectedRoute allowedRoles={["ADMIN"]}>
             <IntroduceExam />
+          </ProtectedRoute>
+        }
+      ></Route>
+      <Route
+        path="/exam/:idExam/videos"
+        element={
+          <ProtectedRoute allowedRoles={["ADMIN"]}>
+            <VideoExam />
+          </ProtectedRoute>
+        }
+      ></Route>
+      <Route
+        path="/categories"
+        element={
+          <ProtectedRoute allowedRoles={["ADMIN"]}>
+            <Categories />
           </ProtectedRoute>
         }
       ></Route>

@@ -505,19 +505,6 @@ const IntroduceExam: React.FC = () => {
                           className="absolute cursor-pointer top-1 right-2 text-red-500 hover:text-red-700"
                           title="Xoá mô tả"
                         />
-                        {/* <label className="text-[12px] text-[#5a607f]">
-                          Mô tả {desc.id}
-                        </label>
-                        <input
-                          ref={(el) => (descInputRefs.current[id] = el)}
-                          defaultValue={
-                            dataEditDesc?.overviews
-                              ? dataEditDesc?.overviews[id]?.desc
-                              : ""
-                          }
-                          placeholder="Thành thạo ngôn ngữ lập trình c#"
-                          className="border border-[#f3f3f3] rounded-[4px] p-1 mt-1 focus:border-[#1e2753] focus:outline-none"
-                        /> */}
                         <MSInput
                           ref={(el) => {
                             descInputRefs.current[id] = el!;

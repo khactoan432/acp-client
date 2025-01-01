@@ -23,7 +23,8 @@ const AdminModal = <T extends Record<string, any>>({
   onSave,
   title,
 }: AdminModalProps<T>) => {
-  const [formData, setFormData] = useState<Partial<T & { files?: File[] }>>(data);
+  const [formData, setFormData] =
+    useState<Partial<T & { files?: File[] }>>(data);
   const [fileList, setFileList] = useState<UploadFile[]>([]);
 
   // Reset form data and file list when modal opens or data changes
@@ -81,7 +82,9 @@ const AdminModal = <T extends Record<string, any>>({
             <div className="grid grid-cols-2 gap-4">
               {fields.map((field, id) => (
                 <div className="flex flex-col gap-1" key={String(id)}>
-                  <span className="text-gray-500">{field.placeholder}</span>
+                  <span className="primary-color-text">
+                    {field.placeholder}
+                  </span>
                   <Input
                     key={field.name as string}
                     placeholder={field.placeholder}

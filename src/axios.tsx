@@ -1,4 +1,12 @@
 import axios from "axios";
+import { navigateTo } from "./helpers/navigation";
+import store from "./redux/store";
+import { logout } from "./redux/slices/authSlice";
+
+interface Response {
+  message: string;
+  data: any;
+}
 
 const api = axios.create({
   baseURL: "http://localhost:8080",
@@ -6,13 +14,24 @@ const api = axios.create({
     "Content-Type": "application/json",
   },
 });
+const TOKEN_EXPIRED = "Token expired.";
 
 // Hàm gửi yêu cầu GET
 export const getData = async (endpoint: string, header: object) => {
   try {
     const response = await api.get(endpoint, header);
+    console.log("res: ", response);
     return response.data;
-  } catch (error) {
+  } catch (error: any) {
+    if (error.response) {
+      console.log("Error response: ", error.response);
+      if (error.response.data?.message === TOKEN_EXPIRED) {
+        console.log("Token expired");
+        store.dispatch(logout());
+        navigateTo("/login", { state: { from: window.location.pathname } });
+        throw new Error(TOKEN_EXPIRED);
+      }
+    }
     console.error("Error fetching data", error);
     throw error;
   }

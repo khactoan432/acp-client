@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import banner from "../../../assets/banner1.jpg";
-import Button from '../../common/Button';
-import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, RootState } from '../../../redux/store';
-import { fetchUserCourses } from '../../../redux/slices/courseSlice';
+import Button from "../../common/Button";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../../redux/store";
+import { fetchUserCourses } from "../../../redux/slices/courseSlice";
 
 interface Course {
   id: string;
@@ -38,20 +38,20 @@ interface ExamResult {
 
 const sampleExamResults: ExamResult[] = [
   {
-    id: '1',
-    name: 'Bài thi thử lập trình cơ bản',
+    id: "1",
+    name: "Bài thi thử lập trình cơ bản",
     image: banner,
     score: 85, // Điểm số 85
   },
   {
-    id: '2',
-    name: 'Bài thi thử JavaScript',
+    id: "2",
+    name: "Bài thi thử JavaScript",
     image: banner,
     score: 42, // Điểm số 72
   },
   {
-    id: '2',
-    name: 'Bài thi thử JavaScript nâng cao',
+    id: "2",
+    name: "Bài thi thử JavaScript nâng cao",
     image: banner,
     score: null, // Điểm số 72
   },
@@ -59,33 +59,37 @@ const sampleExamResults: ExamResult[] = [
 
 const ProfileTabs: React.FC = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'courses' | 'results'>('courses');
+  const [activeTab, setActiveTab] = useState<"courses" | "results">("courses");
 
   const dispatch = useDispatch<AppDispatch>();
-    const { userCourses, loading, error } = useSelector(
-      (state: RootState) => state.courses
-    );
-  
-    useEffect(() => {
-      dispatch(fetchUserCourses({ page: 1, limit: 100 }));
-    }, [dispatch]);
+  const { userCourses, loading, error } = useSelector(
+    (state: RootState) => state.courses
+  );
+
+  useEffect(() => {
+    dispatch(fetchUserCourses({ page: 1, limit: 100 }));
+  }, [dispatch]);
 
   return (
     <div className="">
       {/* Tabs Header */}
       <div className="pt-4 flex justify-center font-semibold border-b border-gray-300 bg-white">
         <button
-          onClick={() => setActiveTab('courses')}
+          onClick={() => setActiveTab("courses")}
           className={`px-4 py-2 ${
-            activeTab === 'courses' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500'
+            activeTab === "courses"
+              ? "border-b-2 border-blue-600 text-blue-600"
+              : "primary-color-text"
           }`}
         >
           Khóa học
         </button>
         <button
-          onClick={() => setActiveTab('results')}
+          onClick={() => setActiveTab("results")}
           className={`px-4 py-2 ${
-            activeTab === 'results' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500'
+            activeTab === "results"
+              ? "border-b-2 border-blue-600 text-blue-600"
+              : "primary-color-text"
           }`}
         >
           Kết quả luyện thi
@@ -94,7 +98,7 @@ const ProfileTabs: React.FC = () => {
 
       {/* Tabs Content */}
       <div className="py-8">
-        {activeTab === 'courses' ? (
+        {activeTab === "courses" ? (
           userCourses.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               {userCourses.map((course) => (
@@ -107,7 +111,7 @@ const ProfileTabs: React.FC = () => {
                     alt={course.name}
                     className="w-full h-32 object-cover rounded-md"
                   />
-                  <div className='w-full p-4'>
+                  <div className="w-full p-4">
                     <h3 className="text-lg font-semibold mb-2">
                       {course.name}
                     </h3>
@@ -122,17 +126,19 @@ const ProfileTabs: React.FC = () => {
                     </p>
 
                     <Button
-                    onClick={() => navigate("/learning/"+course._id)}
-                    className='w-full'
-                  >
-                    {"Tiếp tục"}
-                  </Button>
+                      onClick={() => navigate("/learning/" + course._id)}
+                      className="w-full"
+                    >
+                      {"Tiếp tục"}
+                    </Button>
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-center text-gray-600">Bạn chưa đăng ký học khóa học nào!</p>
+            <p className="text-center text-gray-600">
+              Bạn chưa đăng ký học khóa học nào!
+            </p>
           )
         ) : sampleExamResults.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
@@ -146,30 +152,34 @@ const ProfileTabs: React.FC = () => {
                   alt={exam.name}
                   className="w-full h-32 object-cover rounded-md"
                 />
-                <div className='w-full p-4'>
-                  <h3 className="text-lg font-semibold mb-2">
-                    {exam.name}
-                  </h3>
+                <div className="w-full p-4">
+                  <h3 className="text-lg font-semibold mb-2">{exam.name}</h3>
                   <p
                     className={`text-lg font-bold pb-3 ${
-                      !exam.score? 'text-yellow-600' : exam.score >= 50 ? 'text-green-600' : 'text-red-600'
+                      !exam.score
+                        ? "text-yellow-600"
+                        : exam.score >= 50
+                        ? "text-green-600"
+                        : "text-red-600"
                     }`}
                   >
-                    Điểm: {exam.score?exam.score:"Chưa thi thử"}
+                    Điểm: {exam.score ? exam.score : "Chưa thi thử"}
                   </p>
 
                   <Button
                     onClick={() => alert(`Added ${name} to cart!`)}
-                    className='w-full'
+                    className="w-full"
                   >
-                    {exam.score?"Làm lại":"Bắt đầu"}
+                    {exam.score ? "Làm lại" : "Bắt đầu"}
                   </Button>
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <p className="text-center text-gray-600">Không có kết quả luyện thi nào!</p>
+          <p className="text-center text-gray-600">
+            Không có kết quả luyện thi nào!
+          </p>
         )}
       </div>
     </div>

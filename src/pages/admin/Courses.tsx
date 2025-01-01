@@ -42,7 +42,7 @@ const AdminExam: React.FC = () => {
   const [imageIntroCourse, setImageIntroCourse] = useState<File[]>([]);
   // state boolean
   const [addCourse, setAddCourse] = useState(false);
-  const [isModalVisible, setIdModalVisible] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   // data store
   const [allCourse, setAllCourse] = useState([]);
@@ -242,7 +242,7 @@ const AdminExam: React.FC = () => {
     if (type === "DELETE") {
       const id = row._id;
       setIdCourseDeleted(id);
-      setIdModalVisible(true);
+      setIsModalVisible(true);
     }
     if (type === "INTRODUCE") {
       navigate(`/admin/course/${row._id}/introduce`);
@@ -255,7 +255,7 @@ const AdminExam: React.FC = () => {
   // hanle delete
 
   const handleClosePopup = () => {
-    setIdModalVisible(false);
+    setIsModalVisible(false);
     setIdCourseDeleted("");
   };
   const handleDeleteCourse = async () => {
@@ -272,7 +272,7 @@ const AdminExam: React.FC = () => {
       console.log("Error deleting: ", err);
     } finally {
       setIsLoading(false);
-      setIdModalVisible(false);
+      setIsModalVisible(false);
       setIdCourseDeleted("");
       setIsFetchData(!isFetchData);
     }

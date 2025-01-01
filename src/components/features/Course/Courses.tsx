@@ -1,17 +1,20 @@
-import React, { useEffect } from 'react';
-import Slider from 'react-slick';
-import Course from './Course'; // Import the Course component
-import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
-import { AppDispatch, RootState } from '../../../redux/store';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchUserCourses } from '../../../redux/slices/courseSlice';
+import React, { useEffect } from "react";
+import Slider from "react-slick";
+import Course from "./Course"; // Import the Course component
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { AppDispatch, RootState } from "../../../redux/store";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchUserCourses } from "../../../redux/slices/courseSlice";
 
-const ArrowButton: React.FC<{ onClick?: () => void; direction: 'left' | 'right' }> = ({ onClick, direction }) => {
-  const isLeft = direction === 'left';
+const ArrowButton: React.FC<{
+  onClick?: () => void;
+  direction: "left" | "right";
+}> = ({ onClick, direction }) => {
+  const isLeft = direction === "left";
   return (
     <div
       className={`absolute top-1/2 transform -translate-y-1/2 bg-blue-500 text-white p-3 rounded-full cursor-pointer hover:bg-blue-600 z-10 ${
-        isLeft ? 'left-4' : 'right-4'
+        isLeft ? "left-4" : "right-4"
       }`}
       onClick={onClick}
     >
@@ -22,7 +25,9 @@ const ArrowButton: React.FC<{ onClick?: () => void; direction: 'left' | 'right' 
 
 const Courses: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { userCourses, loading, error } = useSelector((state: RootState) => state.courses);
+  const { userCourses, loading, error } = useSelector(
+    (state: RootState) => state.courses
+  );
 
   useEffect(() => {
     dispatch(fetchUserCourses({ page: 1, limit: 4 }));
@@ -54,11 +59,18 @@ const Courses: React.FC = () => {
   };
 
   if (loading) return <div className="text-center">Loading...</div>;
-  if (error) return <div className="text-center text-red-500">An error occurred. Please try again later.</div>;
+  if (error)
+    return (
+      <div className="text-center text-red-500">
+        An error occurred. Please try again later.
+      </div>
+    );
 
   return (
     <div className="max-w-7xl mx-auto p-2 sm:p-4 lg:p-6 mt-12">
-      <h2 className="text-4xl font-semibold text-[#00095B] mb-14 text-center">Khóa học nổi bật</h2>
+      <h2 className="text-4xl font-semibold text-[#00095B] mb-14 text-center uppercase">
+        Khóa học nổi bật
+      </h2>
       <Slider {...settings}>
         {userCourses.map((course) => (
           <div key={course._id} className="px-2">

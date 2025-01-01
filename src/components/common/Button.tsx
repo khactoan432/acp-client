@@ -13,13 +13,13 @@ const Button: React.FC<ButtonProps> = ({
   children,
   className,
   disabled,
-  type
+  type,
 }) => {
   return (
     <button
       onClick={onClick}
       className={`${className}
-                  px-4 py-1.5 bg-[#00095bbc] hover:bg-[#00095B] rounded-lg text-white focus:outline-none transition duration-200
+                  px-4 py-1.5 btn-primary  hover:bg-[#00095bbc] rounded-lg text-white focus:outline-none transition duration-200
                   ${
                     disabled ? "bg-gray-400 cursor-not-allowed opacity-50" : ""
                   }`}

@@ -17,6 +17,7 @@ import { PiRankingThin } from "react-icons/pi";
 import { PiShoppingBagOpenLight } from "react-icons/pi";
 import { TbSettingsCode } from "react-icons/tb";
 import { VscSettings } from "react-icons/vsc";
+import { BiCategory } from "react-icons/bi";
 import "./nav.scss";
 
 type MenuItem = Required<MenuProps>["items"][number];
@@ -36,13 +37,14 @@ const items: MenuItem[] = [
   { key: "3", icon: <FolderOutlined />, label: "Học sinh xuất sắc" },
   { key: "4", icon: <GiTeacher />, label: "Đội ngũ giảng viên" },
   { key: "5", icon: <PiExamLight />, label: "Đề thi" },
+  { key: "6", icon: <BiCategory />, label: "Quản lý danh mục" },
   {
     type: "group",
     label: "Other Information",
     children: [
-      { key: "6", icon: <GrSchedule />, label: "Lịch hẹn tư vấn" },
-      { key: "7", icon: <PiRankingThin />, label: "Thông tin rank" },
-      { key: "8", icon: <PiShoppingBagOpenLight />, label: "Orders" },
+      { key: "7", icon: <GrSchedule />, label: "Lịch hẹn tư vấn" },
+      { key: "8", icon: <PiRankingThin />, label: "Thông tin rank" },
+      { key: "9", icon: <PiShoppingBagOpenLight />, label: "Orders" },
     ],
   },
   {
@@ -50,12 +52,12 @@ const items: MenuItem[] = [
     label: "Setting",
     children: [
       {
-        key: "9",
+        key: "10",
         icon: <TbSettingsCode />,
         label: "Personal settings",
       },
       {
-        key: "10",
+        key: "11",
         icon: <VscSettings />,
         label: "Global settings",
       },
@@ -76,12 +78,13 @@ const Nav: React.FC = () => {
     "2": "/admin/banners",
     "3": "/admin/achievements",
     "4": "/admin/teachers",
-    "5": "/admin/exam",
-    "6": "/admin/schedules",
-    "7": "/admin/ranks",
-    "8": "/admin/orders",
-    "9": "/admin/personal-setting",
-    "10": "/admin/global-setting",
+    "5": "/admin/exams",
+    "6": "/admin/categories",
+    "7": "/admin/schedules",
+    "8": "/admin/ranks",
+    "9": "/admin/orders",
+    "10": "/admin/personal-setting",
+    "11": "/admin/global-setting",
   };
 
   useEffect(() => {

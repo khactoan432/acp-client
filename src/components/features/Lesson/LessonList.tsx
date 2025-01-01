@@ -19,12 +19,14 @@ interface Section {
 interface LessonListProps {
   sections: Section[];
   currentLesson: Lesson;
-  changeLesson: (topicId:string, lessonId: string)=>void
+  changeLesson: (topicId: string, lessonId: string) => void;
 }
 
-const LessonList: React.FC<LessonListProps> = ({ sections, currentLesson, changeLesson }) => {
-  
-
+const LessonList: React.FC<LessonListProps> = ({
+  sections,
+  currentLesson,
+  changeLesson,
+}) => {
   const [activeSection, setActiveSection] = useState<string | null>(null);
 
   const toggleSection = (id: string) => {
@@ -40,10 +42,10 @@ const LessonList: React.FC<LessonListProps> = ({ sections, currentLesson, change
             onClick={() => toggleSection(section._id)}
             className="w-full justify-between items-center px-4 py-3 bg-gray-100 text-left text-black font-semibold border-b-[0.3px] border-solid border-gray-300 hover:bg-gray-200"
           >
-            <p>
-               {section.name} 
+            <p>{section.name}</p>
+            <p className="font-extralight text-xs text-black">
+              ({0}/{3}) | {"23:09"}
             </p>
-            <p className="font-extralight text-xs text-black">({0}/{3}) | {"23:09"}</p>
           </button>
           {activeSection === section._id && (
             <ul className="bg-gray-100 rounded-lg">
@@ -51,16 +53,20 @@ const LessonList: React.FC<LessonListProps> = ({ sections, currentLesson, change
                 <li
                   key={lesson._id}
                   className={`flex justify-between items-center px-4 py-3 rounded cursor-pointer ${
-                    lesson._id===currentLesson._id ?  "bg-blue-100 text-black":"bg-gray-50 text-gray-500 hover:bg-gray-200"
+                    lesson._id === currentLesson._id
+                      ? "bg-blue-100 text-black"
+                      : "bg-gray-50 primary-color-text hover:bg-gray-200"
                   }`}
-                  onClick={()=>changeLesson(section._id, lesson._id)}
+                  onClick={() => changeLesson(section._id, lesson._id)}
                 >
                   <span className="pr-2"> {lesson.name}</span>
                   <span>{"23:09"}</span>
                 </li>
               ))}
               {section.lessons.length === 0 && (
-                <p className="text-gray-500 italic text-sm">Không có bài học nào.</p>
+                <p className="primary-color-text italic text-sm">
+                  Không có bài học nào.
+                </p>
               )}
             </ul>
           )}

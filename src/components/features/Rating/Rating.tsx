@@ -40,7 +40,9 @@ const RatingPage: React.FC = () => {
 
   const [showForm, setShowForm] = useState(false);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
@@ -54,7 +56,10 @@ const RatingPage: React.FC = () => {
     if (form.name && form.phone && form.stars > 0 && form.comment) {
       const newRating: Rating = {
         id: ratings.length + 1,
-        userInitials: form.name.split(" ").map((word) => word[0]).join(""),
+        userInitials: form.name
+          .split(" ")
+          .map((word) => word[0])
+          .join(""),
         userName: form.name,
         timeAgo: "Vừa xong",
         stars: form.stars,
@@ -70,7 +75,8 @@ const RatingPage: React.FC = () => {
   };
 
   const totalRatings = ratings.length;
-  const averageRating = ratings.reduce((acc, cur) => acc + cur.stars, 0) / totalRatings || 0;
+  const averageRating =
+    ratings.reduce((acc, cur) => acc + cur.stars, 0) / totalRatings || 0;
   const ratingDistribution = [0, 0, 0, 0, 0];
   ratings.forEach((rating) => {
     ratingDistribution[5 - rating.stars]++;
@@ -84,8 +90,12 @@ const RatingPage: React.FC = () => {
         <div className="flex items-center space-x-6">
           {/* Average Score */}
           <div className="text-center w-1/4">
-            <p className="text-6xl font-bold text-yellow-500">{averageRating.toFixed(1)}</p>
-            <div className="text-yellow-500 text-2xl">{"★".repeat(Math.round(averageRating))}</div>
+            <p className="text-6xl font-bold text-yellow-500">
+              {averageRating.toFixed(1)}
+            </p>
+            <div className="text-yellow-500 text-2xl">
+              {"★".repeat(Math.round(averageRating))}
+            </div>
           </div>
 
           {/* Rating Distribution */}
@@ -101,7 +111,9 @@ const RatingPage: React.FC = () => {
                     }}
                   ></div>
                 </div>
-                <span className="text-sm w-[36px] text-center">{((count / totalRatings) * 100).toFixed(0)}%</span>
+                <span className="text-sm w-[36px] text-center">
+                  {((count / totalRatings) * 100).toFixed(0)}%
+                </span>
               </div>
             ))}
           </div>
@@ -119,14 +131,18 @@ const RatingPage: React.FC = () => {
       {/* Review Form */}
       <div
         className={`bg-white rounded-lg shadow-md overflow-hidden transition-all duration-500 ${
-          showForm ? "max-h-[800px] opacity-100 p-6 mb-6" : "max-h-0 opacity-0 p-0"
+          showForm
+            ? "max-h-[800px] opacity-100 p-6 mb-6"
+            : "max-h-0 opacity-0 p-0"
         }`}
         style={{ visibility: showForm ? "visible" : "hidden" }}
       >
         <h3 className="text-xl font-bold mb-4">Gửi đánh giá của bạn</h3>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label className="block mb-2 font-medium">1. Đánh giá của bạn về khóa học</label>
+            <label className="block mb-2 font-medium">
+              1. Đánh giá của bạn về khóa học
+            </label>
             <div className="flex space-x-2">
               {[1, 2, 3, 4, 5].map((star) => (
                 <span
@@ -143,7 +159,9 @@ const RatingPage: React.FC = () => {
           </div>
 
           <div className="mb-4">
-            <label className="block mb-2 font-medium">2. Viết cảm nhận của bạn về khóa học</label>
+            <label className="block mb-2 font-medium">
+              2. Viết cảm nhận của bạn về khóa học
+            </label>
             <textarea
               name="comment"
               value={form.comment}
@@ -154,7 +172,9 @@ const RatingPage: React.FC = () => {
           </div>
 
           <div className="mb-4">
-            <label className="block mb-2 font-medium">3. Thông tin cá nhân của bạn</label>
+            <label className="block mb-2 font-medium">
+              3. Thông tin cá nhân của bạn
+            </label>
             <div className="grid grid-cols-3 gap-4">
               <input
                 type="text"
@@ -202,8 +222,10 @@ const RatingPage: React.FC = () => {
               </div>
               <div>
                 <p className="font-bold h-[20px]">{rating.userName}</p>
-                <div className="text-yellow-500">{"★".repeat(rating.stars)}</div>
-                <p className="text-sm text-gray-500">{rating.timeAgo}</p>
+                <div className="text-yellow-500">
+                  {"★".repeat(rating.stars)}
+                </div>
+                <p className="text-sm primary-color-text">{rating.timeAgo}</p>
                 <p className="mt-2 text-gray-700">{rating.comment}</p>
                 <button className="text-blue-500 text-sm mt-2 hover:underline">
                   1 Trả lời

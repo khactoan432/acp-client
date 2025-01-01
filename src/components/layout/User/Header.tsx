@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../../redux/store';
-import { logout } from '../../../redux/slices/authSlice'; 
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../../../redux/store";
+import { logout } from "../../../redux/slices/authSlice";
 
 import Button from "../../common/Button";
 
@@ -13,6 +13,8 @@ import User from "../../../assets/user3.png";
 const Header = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const link = window.location.href;
+  console.log(link);
 
   const { user, access_token } = useSelector((state: RootState) => state.auth);
 
@@ -23,8 +25,8 @@ const Header = () => {
 
   const handleLogout = () => {
     dispatch(logout());
-    localStorage.removeItem('user');
-    localStorage.removeItem('access_token');
+    localStorage.removeItem("user");
+    localStorage.removeItem("access_token");
     navigate("/login");
   };
 
@@ -42,39 +44,45 @@ const Header = () => {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex space-x-6">
-          <a href="/" className="text-gray-500 hover:text-blue-600 font-semibold">
+          <a
+            href="/"
+            className="primary-color-text hover:text-blue-600 font-semibold link"
+          >
             Trang chủ
           </a>
           <a
             href="/course"
-            className="text-gray-500 hover:text-blue-600 font-semibold"
+            className="primary-color-text hover:text-blue-600 font-semibold link"
           >
             Chương trình học
           </a>
           <a
             href="/exam"
-            className="text-gray-500 hover:text-blue-600 font-semibold"
+            className="primary-color-text hover:text-blue-600 font-semibold link"
           >
             Đề thi online
           </a>
           <a
             href="/about"
-            className="text-gray-500 hover:text-blue-600 font-semibold"
+            className="primary-color-text hover:text-blue-600 font-semibold link"
           >
             Về chúng tôi
           </a>
-          <a href="/" className="text-gray-500 hover:text-blue-600 font-semibold">
+          <a
+            href="/"
+            className="primary-color-text hover:text-blue-600 font-semibold link"
+          >
             Liên hệ
           </a>
         </nav>
 
-        {isLogin
-          ?<div className="hidden md:block relative">
+        {isLogin ? (
+          <div className="hidden md:block relative">
             {/* User Icon/Button */}
             <div className=" w-[110px] flex justify-end">
               <button
                 className="flex items-center focus:outline-none"
-                onClick={()=>setIsUserOpen(!isUserOpen)}
+                onClick={() => setIsUserOpen(!isUserOpen)}
               >
                 <img
                   src={User} // Replace with actual user avatar
@@ -86,37 +94,30 @@ const Header = () => {
                 </span> */}
               </button>
             </div>
-      
+
             {/* Dropdown Menu */}
             {isUserOpen && (
               <div className="absolute right-0 mt-2 w-60 bg-white rounded-lg shadow-lg border border-gray-200">
                 {/* Notification Section */}
                 <div className="p-4 border-b border-gray-300">
                   <h3 className="text-gray-700 font-semibold">Thông báo</h3>
-                  <p className="text-gray-500 text-sm mt-1">Bạn chưa có thông báo mới.</p>
-                  <a
-                    href="#"
-                    className="text-blue-500 text-sm mt-1 block"
-                  >
+                  <p className="primary-color-text text-sm mt-1">
+                    Bạn chưa có thông báo mới.
+                  </p>
+                  <a href="#" className="text-blue-500 text-sm mt-1 block">
                     Xem tất cả &gt;&gt;
                   </a>
                 </div>
-      
+
                 {/* Links Section */}
                 <ul className="p-4 text-gray-700">
                   <li className="mb-2">
-                    <a
-                      href="/profile"
-                      className="hover:text-blue-500"
-                    >
+                    <a href="/profile" className="hover:text-blue-500">
                       Lịch học của tôi
                     </a>
                   </li>
                   <li className="mb-2">
-                    <a
-                      href="/profile"
-                      className="hover:text-blue-500"
-                    >
+                    <a href="/profile" className="hover:text-blue-500">
                       Trang cá nhân
                     </a>
                   </li>
@@ -132,13 +133,14 @@ const Header = () => {
               </div>
             )}
           </div>
-          :<Button
+        ) : (
+          <Button
             className="hidden md:block h-[36px] rounded-[17px]"
-            onClick={()=>navigate("/login")}
+            onClick={() => navigate("/login")}
           >
             Đăng nhập
           </Button>
-        }   
+        )}
 
         {/* Mobile Menu Button */}
         <button
@@ -168,48 +170,49 @@ const Header = () => {
           <div className="flex flex-col items-start space-y-4 pb-4">
             <a
               href="#"
-              className="text-gray-500 hover:text-blue-600 font-semibold"
+              className="primary-color-text hover:text-blue-600 font-semibold"
             >
               Trang chủ
             </a>
             <a
               href="#"
-              className="text-gray-500 hover:text-blue-600 font-semibold"
+              className="primary-color-text hover:text-blue-600 font-semibold"
             >
               Chương trình học
             </a>
             <a
               href="#"
-              className="text-gray-500 hover:text-blue-600 font-semibold"
+              className="primary-color-text hover:text-blue-600 font-semibold"
             >
               Đề thi online
             </a>
             <a
               href="#"
-              className="text-gray-500 hover:text-blue-600 font-semibold"
+              className="primary-color-text hover:text-blue-600 font-semibold"
             >
               Về chúng tôi
             </a>
             <a
               href="#"
-              className="text-gray-500 hover:text-blue-600 font-semibold"
+              className="primary-color-text hover:text-blue-600 font-semibold"
             >
               Liên hệ
             </a>
-            {isLogin
-              ? <Button
-                  onClick={handleLogout}
-                  className="md::hidden h-[36px] w-full rounded-[17px]"
-                >
-                  Đăng xuất
-                </Button>
-              : <Button
-                  onClick={() => navigate("/login")}
-                  className="md::hidden h-[36px] w-full rounded-[17px]"
-                >
-                  Đăng nhập
-                </Button>
-            } 
+            {isLogin ? (
+              <Button
+                onClick={handleLogout}
+                className="md::hidden h-[36px] w-full rounded-[17px]"
+              >
+                Đăng xuất
+              </Button>
+            ) : (
+              <Button
+                onClick={() => navigate("/login")}
+                className="md::hidden h-[36px] w-full rounded-[17px]"
+              >
+                Đăng nhập
+              </Button>
+            )}
           </div>
         </nav>
       )}

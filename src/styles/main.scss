@@ -2,12 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --color__primary: #f2f2f2;
+  --color__secondary: #2d3c88;
+}
+
 body {
   width: 100%;
-  font-family: Arial, sans-serif;
+  font-family: "SF Mono", "monospace";
   margin: 0;
   padding: 0;
-  background-color: #f2f2f2;
+  background-color: white;
 }
 #root {
   width: 100%;
@@ -20,11 +25,20 @@ body {
   color: white !important;
 }
 
+.bg-secondary {
+  background-color: var(--color__secondary);
+  color: white;
+}
+
+.bg-primary {
+  background-color: var(--color__primary);
+}
+
 .primary-color-text {
-  color: #1e2753;
+  color: var(--color__secondary);
 }
 .secondary-color-bg {
-  background-color: #1e2753;
+  background-color: var(--color__secondary);
 }
 
 .secondary-color-bg {
@@ -32,29 +46,35 @@ body {
 }
 
 .btn-primary {
-  background-color: #1e2753;
-  border-color: #1e2753;
+  background-color: var(--color__secondary);
+  border-color: var(--color__secondary);
   color: white;
 }
 
 .btn-primary:hover {
-  background-color: #1e2753;
-  border-color: #1e2753;
+  background-color: var(--color__secondary);
+  border-color: var(--color__secondary);
   color: #fff;
+}
+.box-shadow_primary {
+  border-radius: 6px;
+  box-shadow: 1px 1px rgba(0, 0, 0, 0.1019607843),
+    0 1px 1px rgba(0, 0, 0, 0.0588235294);
+  border: 2px solid transparent;
 }
 
 /* Định nghĩa các lớp cho nút Cancel */
 .button-cancel {
   background-color: white;
-  color: #1e2753;
-  border: 2px solid #1e2753;
+  color: var(--color__secondary);
+  border: 2px solid var(--color__secondary);
   padding: 8px 16px;
   border-radius: 8px;
   transition: all 0.3s ease-in-out;
 }
 
 .button-cancel:hover {
-  background-color: #1e2753;
+  background-color: var(--color__secondary);
   color: white;
   opacity: 1;
   filter: brightness(1.6); /* Làm sáng nền khi hover */
@@ -62,9 +82,9 @@ body {
 
 /* Định nghĩa các lớp cho nút Save */
 .button-save {
-  background-color: #1e2753;
+  background-color: var(--color__secondary);
   color: white;
-  border: 2px solid #1e2753;
+  border: 2px solid var(--color__secondary);
   padding: 8px 16px;
   border-radius: 8px;
   transition: all 0.3s ease-in-out;
@@ -72,7 +92,7 @@ body {
 
 .button-save:hover {
   background-color: white;
-  color: #1e2753;
+  color: var(--color__secondary);
   opacity: 1;
   filter: brightness(1.6); /* Làm sáng nền khi hover */
 }
@@ -89,4 +109,8 @@ body {
 // hover
 .hover-action:hover {
   background-color: #dedede !important;
+}
+
+.pa-primary {
+  padding: 5px 8px 12px 20px;
 }

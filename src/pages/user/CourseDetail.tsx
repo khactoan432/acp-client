@@ -1,19 +1,19 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import { Link } from "react-scroll";
-import bg from '../../assets/banner-detail.jpg';
-import banner from '../../assets/banner1.jpg';
-import play from '../../assets/play.png';
-import RatingPage from '../../components/features/Rating/Rating';
-import CommentPage from '../../components/features/Comment/Comment';
-import VideoPopup from '../../components/features/Video/Video';
+import bg from "../../assets/banner-detail.jpg";
+import banner from "../../assets/banner1.jpg";
+import play from "../../assets/play.png";
+import RatingPage from "../../components/features/Rating/Rating";
+import CommentPage from "../../components/features/Comment/Comment";
+import VideoPopup from "../../components/features/Video/Video";
 
 import { useParams } from "react-router-dom";
 
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../redux/store";
 import { fetchCourseDetail } from "../../redux/slices/courseSlice";
-import Lesson from '../../components/features/Video/Lesson';
-import { postData } from '../../axios';
+import Lesson from "../../components/features/Video/Lesson";
+import { postData } from "../../axios";
 
 interface User {
   _id: string;
@@ -24,7 +24,6 @@ interface User {
   codeforce_name: string;
   role: string;
 }
-
 
 const UserCourseDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -41,14 +40,15 @@ const UserCourseDetail = () => {
 
   const course = {
     id: 1,
-    name: 'React for Beginners 1',
-    description: 'Learn React from scratch with hands-on examples to get frequent.',
+    name: "React for Beginners 1",
+    description:
+      "Learn React from scratch with hands-on examples to get frequent.",
     image: banner,
     rates: 23,
     price: 299000,
     rating: 4.9,
-    users: 79
-  }
+    users: 79,
+  };
 
   // const topics = [
   //   {
@@ -106,7 +106,7 @@ const UserCourseDetail = () => {
     try {
       console.log("Payment initiated for:", id_material);
 
-      const userString = localStorage.getItem('user');
+      const userString = localStorage.getItem("user");
       let user: User | null = null;
 
       // Nếu có giá trị, phân tích JSON
@@ -119,17 +119,21 @@ const UserCourseDetail = () => {
       }
 
       // Gửi request thanh toán
-      const pm = await postData("/api/payment/momo", {
-        id_user: user?._id || "6756abc20424abb76abb1eb0", // ID người dùng
-        id_material: id_material,          // ID khóa học
-        type: "COURSE",                    // Loại thanh toán
-      }, {});
+      const pm = await postData(
+        "/api/payment/momo",
+        {
+          id_user: user?._id || "6756abc20424abb76abb1eb0", // ID người dùng
+          id_material: id_material, // ID khóa học
+          type: "COURSE", // Loại thanh toán
+        },
+        {}
+      );
 
       console.log("Payment response:", pm);
 
       // Điều hướng đến URL thanh toán
       if (pm.data?.payUrl) {
-        window.location.href = pm.data.payUrl; 
+        window.location.href = pm.data.payUrl;
       } else {
         console.error("Payment URL not found in response.");
         alert("Không thể thực hiện thanh toán, vui lòng thử lại sau.");
@@ -140,10 +144,12 @@ const UserCourseDetail = () => {
     }
   };
 
-  return (
-    loading ? "Waiting for Loading" 
-    : error ? "Something have wrong"
-    : <div>
+  return loading ? (
+    "Waiting for Loading"
+  ) : error ? (
+    "Something have wrong"
+  ) : (
+    <div>
       <div className="relative flex items-center justify-center">
         {/* Background with opacity */}
         <div
@@ -153,15 +159,17 @@ const UserCourseDetail = () => {
 
         <div className="flex items-center justify-center w-full h-full shadow-md bg-[#010101]">
           <div className="relative max-w-[1228px] my-10 py-6 rounded-lg w-full">
-            <div className='w-2/3 text-white px-3'>
+            <div className="w-2/3 text-white px-3">
               <h2 className="text-3xl font-bold mb-2">
                 {selectedCourse?.name}
               </h2>
 
               <div className="my-2 flex justify-between items-center">
-                <div className='flex items-center gap-3'>
-                  <div className='flex items-center gap-1.5'>
-                    <span className='text-yellow-500 font-semibold'>{course.rating}</span>
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-yellow-500 font-semibold">
+                      {course.rating}
+                    </span>
                     <Rating rating={course.rating} />
                   </div>
                   <span>({course.rates} đánh giá)</span>
@@ -169,20 +177,24 @@ const UserCourseDetail = () => {
                 </div>
               </div>
 
-              <div className='flex flex-col gap-2'>
+              <div className="flex flex-col gap-2">
                 <p>✅ Dành các bạn học code C++</p>
-                <p>✅ Nhiều giờ học video giảng bài và bài tập lập trình thực hành từ chi tiết tới nâng cao</p>
-                <p>✅ Làm bài chấm bài tự động với codeforce, các bài sẽ có lời giải chi tiết qua video</p>
+                <p>
+                  ✅ Nhiều giờ học video giảng bài và bài tập lập trình thực
+                  hành từ chi tiết tới nâng cao
+                </p>
+                <p>
+                  ✅ Làm bài chấm bài tự động với codeforce, các bài sẽ có lời
+                  giải chi tiết qua video
+                </p>
               </div>
             </div>
-            <div className='w-1/3'>
-
-            </div>
+            <div className="w-1/3"></div>
           </div>
         </div>
       </div>
 
-      <div className=''>
+      <div className="">
         {/* Header phụ */}
         <div
           className={`h-14 border-b-2 border-[#e0e0e0] border-solid z-30 bg-white duration-300 ${
@@ -198,7 +210,7 @@ const UserCourseDetail = () => {
                 { name: "Đánh giá", to: "rate" },
                 { name: "Bình luận", to: "comment" },
               ].map((item, index) => (
-                <li key={index} className='text-gray-500'>
+                <li key={index} className="primary-color-text">
                   <Link
                     to={item.to}
                     spy={true}
@@ -216,19 +228,22 @@ const UserCourseDetail = () => {
           </nav>
         </div>
 
-
         {/* Content Sections */}
-        <div className='flex max-w-[1228px] mx-auto'>
-          <div className='w-2/3 px-3'>
-            <div id="overview" className="text-[#00095B] my-6 bg-white p-4 rounded-[0.65rem] border border-solid border-[#e0e0e0] shadow-[0_4px_0_0_rgba(143,156,173,0.2)]">
+        <div className="flex max-w-[1228px] mx-auto">
+          <div className="w-2/3 px-3">
+            <div
+              id="overview"
+              className="text-[#00095B] my-6 bg-white p-4 rounded-[0.65rem] border border-solid border-[#e0e0e0] shadow-[0_4px_0_0_rgba(143,156,173,0.2)]"
+            >
               <div className="flex flex-col items-center justify-center w-full h-full">
                 {selectedCourse?.describes?.map((item) => (
-                  <div className="relative mb-6 rounded-lg w-full" key={item._id}>
-                    <h2 className="text-2xl font-bold mb-6">
-                      {item.desc}
-                    </h2>
+                  <div
+                    className="relative mb-6 rounded-lg w-full"
+                    key={item._id}
+                  >
+                    <h2 className="text-2xl font-bold mb-6">{item.desc}</h2>
 
-                    <div className='flex flex-col gap-2'>
+                    <div className="flex flex-col gap-2">
                       {item.overviews.map((overview) => (
                         <p key={overview._id}>✅ {overview.desc})</p>
                       ))}
@@ -268,26 +283,42 @@ const UserCourseDetail = () => {
               </div>
             </div>
 
-            <div id="content" className="text-[#00095B] mb-6 bg-white p-4 rounded-[0.65rem] border border-solid border-[#e0e0e0] shadow-[0_4px_0_0_rgba(143,156,173,0.2)]">
+            <div
+              id="content"
+              className="text-[#00095B] mb-6 bg-white p-4 rounded-[0.65rem] border border-solid border-[#e0e0e0] shadow-[0_4px_0_0_rgba(143,156,173,0.2)]"
+            >
               <div className="flex flex-col items-center justify-center w-full h-full">
                 <div className="relative rounded-lg w-full">
-                  <h2 className="text-2xl font-bold mb-6">
-                    Nội dung khóa học
-                  </h2>
+                  <h2 className="text-2xl font-bold mb-6">Nội dung khóa học</h2>
 
-                  {selectedCourse?.topics?.map(topic => (
-                    <div key={topic._id} className=''>
-                      <p className='bg-sky-500 text-white font-semibold text-lg py-1 px-2'>{topic.name}</p>
+                  {selectedCourse?.topics?.map((topic) => (
+                    <div key={topic._id} className="">
+                      <p className="bg-sky-500 text-white font-semibold text-lg py-1 px-2">
+                        {topic.name}
+                      </p>
 
-                      <div className='flex flex-col divide-y divide-gray-200'>
-                        {topic?.lessons?.map(lesson => (
-                          <div className='flex items-center justify-between px-2' key={lesson._id}>
-                            <div className='flex items-center'>
-                              <img className='w-[25px] h-[25px]' src={play} alt="alt" />
-                              <p className='text-base py-2 px-2'>{lesson.name}</p>
+                      <div className="flex flex-col divide-y divide-gray-200">
+                        {topic?.lessons?.map((lesson) => (
+                          <div
+                            className="flex items-center justify-between px-2"
+                            key={lesson._id}
+                          >
+                            <div className="flex items-center">
+                              <img
+                                className="w-[25px] h-[25px]"
+                                src={play}
+                                alt="alt"
+                              />
+                              <p className="text-base py-2 px-2">
+                                {lesson.name}
+                              </p>
                             </div>
 
-                            {lesson.status==="PUBLIC"?<Lesson url={lesson.video} name={"dsd"} />:""}
+                            {lesson.status === "PUBLIC" ? (
+                              <Lesson url={lesson.video} name={"dsd"} />
+                            ) : (
+                              ""
+                            )}
                           </div>
                         ))}
                       </div>
@@ -306,27 +337,53 @@ const UserCourseDetail = () => {
                 </div>
               </div>
             </div>
-            
           </div>
-          <div className='w-1/3 px-3'>
-            <div className={`bg-white shadow-lg rounded-lg p-3 mx-auto mt-[-320px] z-40 ${
-              isSticky ? "sticky top-[70px]" : "relative"
-              }`}>
+          <div className="w-1/3 px-3">
+            <div
+              className={`bg-white shadow-lg rounded-lg p-3 mx-auto mt-[-320px] z-40 ${
+                isSticky ? "sticky top-[70px]" : "relative"
+              }`}
+            >
               {/* <video className='rounded-md w-full h-[180px]' src={selectedCourse?.video} controls/> */}
-              <VideoPopup url={selectedCourse?.video} name={"dfds"}/>
+              <VideoPopup url={selectedCourse?.video} name={"dfds"} />
               <div className="mt-6">
-                <p className="text-gray-700 text-lg font-semibold">Ưu đãi đặc biệt trong tháng:</p>
+                <p className="text-gray-700 text-lg font-semibold">
+                  Ưu đãi đặc biệt trong tháng:
+                </p>
                 <div className="flex gap-4 mt-2">
-                  <p className="text-green-600 text-2xl font-bold mt-2">{new Intl.NumberFormat('vi-VN').format((selectedCourse?.price ?? 0) - (selectedCourse?.discount ?? 0))}đ</p>
+                  <p className="text-green-600 text-2xl font-bold mt-2">
+                    {new Intl.NumberFormat("vi-VN").format(
+                      (selectedCourse?.price ?? 0) -
+                        (selectedCourse?.discount ?? 0)
+                    )}
+                    đ
+                  </p>
                   <div>
-                    <p className="text-gray-400 line-through text-sm">Giá gốc: {new Intl.NumberFormat('vi-VN').format(selectedCourse?.price)}đ</p>
-                    <p className="text-red-500 text-sm font-medium">Tiết kiệm: {new Intl.NumberFormat('vi-VN').format(selectedCourse?.discount)}đ (
-                      -{Math.round((selectedCourse?.discount ?? 0) / (selectedCourse?.price ?? 1) * 100)}%)
+                    <p className="text-gray-400 line-through text-sm">
+                      Giá gốc:{" "}
+                      {new Intl.NumberFormat("vi-VN").format(
+                        selectedCourse?.price
+                      )}
+                      đ
+                    </p>
+                    <p className="text-red-500 text-sm font-medium">
+                      Tiết kiệm:{" "}
+                      {new Intl.NumberFormat("vi-VN").format(
+                        selectedCourse?.discount
+                      )}
+                      đ ( -
+                      {Math.round(
+                        ((selectedCourse?.discount ?? 0) /
+                          (selectedCourse?.price ?? 1)) *
+                          100
+                      )}
+                      %)
                     </p>
                   </div>
                 </div>
               </div>
-              <button className="w-full bg-blue-600 text-white font-semibold py-3 rounded-lg mt-4 hover:bg-blue-700"
+              <button
+                className="w-full bg-blue-600 text-white font-semibold py-3 rounded-lg mt-4 hover:bg-blue-700"
                 onClick={() => payment(selectedCourse?._id)}
               >
                 MUA KHÓA HỌC NGAY
@@ -341,7 +398,7 @@ const UserCourseDetail = () => {
                 <li>📦 Khóa học có giá trị 6 tháng</li>
                 <li>💻 Có thể học trên điện thoại và máy tính</li>
               </ul>
-              <p className="text-sm text-gray-500 mt-6">
+              <p className="text-sm primary-color-text mt-6">
                 Chưa chắc chắn khóa học này dành cho bạn?{" "}
                 <a href="#" className="text-blue-600 underline">
                   Liên hệ để nhận tư vấn miễn phí!
@@ -351,7 +408,7 @@ const UserCourseDetail = () => {
           </div>
         </div>
 
-        <div className='max-w-[1228px] mx-auto px-3'>
+        <div className="max-w-[1228px] mx-auto px-3">
           <div id="rate" className="text-[#00095B] mb-6">
             <div className="flex flex-col items-center justify-center w-full h-full">
               <div className="relative mt-6 mb-6 rounded-lg w-full">
@@ -359,7 +416,7 @@ const UserCourseDetail = () => {
                   Đánh giá của học viên
                 </h2>
 
-                <RatingPage/>
+                <RatingPage />
               </div>
             </div>
           </div>
@@ -367,9 +424,7 @@ const UserCourseDetail = () => {
           <div id="comment" className="text-[#00095B] mb-6">
             <div className="flex flex-col items-center justify-center w-full h-full">
               <div className="relative mt-6 mb-6 rounded-lg w-full">
-                <h2 className="text-2xl font-bold mb-6">
-                  Bình luận
-                </h2>
+                <h2 className="text-2xl font-bold mb-6">Bình luận</h2>
 
                 <CommentPage />
               </div>
@@ -378,15 +433,15 @@ const UserCourseDetail = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
 const Rating: React.FC<{ rating: number }> = ({ rating }) => {
   const stars = Array.from({ length: 5 }, (_, index) => {
-    return index < rating ? '★' : '☆';
-  }).join(' ');
+    return index < rating ? "★" : "☆";
+  }).join(" ");
 
   return <div className="text-yellow-500 text-2xl">{stars}</div>;
-};  
+};
 
-export default UserCourseDetail
+export default UserCourseDetail;

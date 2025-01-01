@@ -38,8 +38,8 @@ const CommentPage: React.FC = () => {
       text: "Những bài tập thực hành rất sát thực tế, giúp em cải thiện kỹ năng rất nhiều.",
       date: "18 ngày trước",
       images: [],
-    }
-  ]);  
+    },
+  ]);
 
   const [newComment, setNewComment] = useState("");
   const [newImages, setNewImages] = useState<File[]>([]);
@@ -73,7 +73,9 @@ const CommentPage: React.FC = () => {
       setNewImages([...newImages, ...newFiles]);
 
       // Tạo URL xem trước cho các ảnh
-      const newPreviewImages = newFiles.map((file) => URL.createObjectURL(file));
+      const newPreviewImages = newFiles.map((file) =>
+        URL.createObjectURL(file)
+      );
       setPreviewImages([...previewImages, ...newPreviewImages]);
     }
   };
@@ -118,8 +120,12 @@ const CommentPage: React.FC = () => {
 
         {/* File Input for Images */}
         <div className="absolute right-6 top-6">
-          <label htmlFor="image-upload" className="flex items-center gap-3 w-fit cursor-pointer">
-            <IoImages className="w-[25px] h-[25px] hover:text-blue-500"/> {/* Icon tải ảnh */}
+          <label
+            htmlFor="image-upload"
+            className="flex items-center gap-3 w-fit cursor-pointer"
+          >
+            <IoImages className="w-[25px] h-[25px] hover:text-blue-500" />{" "}
+            {/* Icon tải ảnh */}
             {/* <span className="text-sm text-gray-600">Tải ảnh lên</span> */}
           </label>
           <input
@@ -179,7 +185,7 @@ const CommentPage: React.FC = () => {
               />
               <div className="w-full">
                 <p className="font-bold">{comment.name}</p>
-                <p className="text-gray-500 text-sm">{comment.date}</p>
+                <p className="primary-color-text text-sm">{comment.date}</p>
                 <p className="mt-2 text-gray-700">{comment.text}</p>
                 {comment.images && comment.images.length > 0 && (
                   <div className="mt-2 flex flex-wrap gap-4">
