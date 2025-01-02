@@ -18,7 +18,7 @@ const UserRoutes: React.FC = () => {
         <Route path="/" element={<Home />} />
         <Route path="/course" element={<Course />} />
         <Route path="/course/:id" element={<CourseDetail />} />
-        <Route path="/exam" element={<Exam />} />
+        <Route path="/exam/:category" element={<Exam />} />
         <Route path="/exam/:id" element={<ExamDetail />} />
         <Route path="/about" element={<About />} />
         <Route path="/profile" element={<Profile />} />

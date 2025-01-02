@@ -111,6 +111,7 @@ const Exams: React.FC = () => {
               name={exam.name}
               image={exam.image}
               price={Number(exam.price)}
+              discount={Number(exam.discount)}
               time={15}
               rating={4.8}
               rates={46}

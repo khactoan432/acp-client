@@ -57,8 +57,8 @@ const Header = () => {
             Chương trình học
           </a>
           <a
-            href="/exam"
-            className="primary-color-text hover:text-blue-600 font-semibold link"
+            href="/exam/all"
+            className="text-gray-500 hover:text-blue-600 font-semibold"
           >
             Đề thi online
           </a>
