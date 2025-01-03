@@ -721,7 +721,7 @@ const Content: React.FC = () => {
       <div className="flex flex-1">
         <Nav />
         <div className="w-full h-full bg-white">
-          <div className="mx-2 my-2 pt-8 pb-[10px] pl-8 bg-[rgba(255,246,244,1)] rounded-lg h-full">
+          <div className="mx-2 my-2 bg-primary rounded-lg h-full">
             <Button
               className="mr-4 button-cancel mb-6"
               style={{
@@ -735,18 +735,16 @@ const Content: React.FC = () => {
               <FaChevronLeft />
               Back
             </Button>
-            <h4 className="font-semibold primary-color-text uppercase pb-2">
+            <h4 className="font-size-18 primary-color-text uppercase pb-2">
               Nội dung khoá học
             </h4>
             <ButtonPlus
               content="Thêm chương học"
               icon={CiCirclePlus}
-              iconSize="text-[24px]"
-              textSize="text-[12px]"
-              height="h-[24px]"
-              width="w-[36%]"
-              paddingLeft="pl-7"
-              paddingRight="pr-4"
+              iconSize="text-[30px]"
+              textSize="text-[14px"
+              height="h-[32px]"
+              width="w-[16%]"
               onClick={() => {
                 setAddCourseContent(!addCourseContent);
                 setIsUpdateTitleTopic(true);
@@ -794,11 +792,11 @@ const Content: React.FC = () => {
                   <ButtonPlus
                     content="Thêm bài học"
                     icon={CiCirclePlus}
-                    iconSize="text-[24px]"
+                    iconSize="text-[22px]"
                     textSize="text-[12px]"
                     height="h-[24px]"
-                    width="w-[36%]"
-                    paddingLeft="pl-7"
+                    width="w-[12%]"
+                    paddingLeft="pl-6"
                     paddingRight="pr-4"
                     disabled={
                       (isUpdateTitleTopic === true &&
@@ -858,11 +856,11 @@ const Content: React.FC = () => {
                         <ButtonPlus
                           content="Thêm bài tập"
                           icon={CiCirclePlus}
-                          iconSize="text-[24px]"
+                          iconSize="text-[22px]"
                           textSize="text-[12px]"
                           height="h-[24px]"
-                          width="w-[36%]"
-                          paddingLeft="pl-7"
+                          width="w-[12%]"
+                          paddingLeft="pl-6"
                           paddingRight="pr-4"
                           onClick={() =>
                             hanleAddLinkCodeFource(
@@ -1099,8 +1097,10 @@ const Content: React.FC = () => {
                             {lesson.exercise &&
                               lesson.exercise.map((data) => (
                                 <div>
-                                  <div className="mb-2 secondary-color-bg px-4 py-1 rounded-lg inline-block">
-                                    <h4 className="text-white">{data.name}</h4>
+                                  <div className="mb-2 bg-secondary px-4 py-1 rounded-lg inline-block">
+                                    <h4 className="font-size-18 text-white">
+                                      {data.name}
+                                    </h4>
                                   </div>
                                   <p>
                                     <a
@@ -1184,8 +1184,8 @@ const Content: React.FC = () => {
                       onClick={() => handleShowAddLesson(topic)}
                     />
                     {/* Hiển thị tiêu đề topic */}
-                    <div className="mb-2 secondary-color-bg px-4 py-2 rounded-lg inline-block">
-                      <h4 className="text-white">{topic.name}</h4>
+                    <div className="mb-2 bg-secondary px-4 py-2 rounded-lg inline-block">
+                      <h4 className="font-size-18 text-white">{topic.name}</h4>
                     </div>
 
                     {/* Hiển thị danh sách các lesson trong topic */}
@@ -1281,8 +1281,8 @@ const Content: React.FC = () => {
                               {lesson.exercise &&
                                 lesson.exercise.map((data) => (
                                   <div>
-                                    <div className="mb-2 secondary-color-bg px-4 py-1 rounded-lg inline-block">
-                                      <h4 className="text-white">
+                                    <div className="mb-2 bg-secondary px-4 py-1 rounded-lg inline-block">
+                                      <h4 className="font-size-18 text-white">
                                         {data.name}
                                       </h4>
                                     </div>

@@ -167,9 +167,7 @@ const UserCourseDetail = () => {
               <div className="my-2 flex justify-between items-center">
                 <div className="flex items-center gap-3">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-yellow-500 font-semibold">
-                      {course.rating}
-                    </span>
+                    <span className="text-yellow-500">{course.rating}</span>
                     <Rating rating={course.rating} />
                   </div>
                   <span>({course.rates} đánh giá)</span>
@@ -217,7 +215,7 @@ const UserCourseDetail = () => {
                     smooth={true}
                     offset={-140}
                     duration={500}
-                    className="cursor-pointer font-semibold hover:text-blue-600 transition duration-200"
+                    className="cursor-pointer hover:text-blue-600 transition duration-200"
                     activeClass="text-blue-600"
                   >
                     {item.name}
@@ -293,7 +291,7 @@ const UserCourseDetail = () => {
 
                   {selectedCourse?.topics?.map((topic) => (
                     <div key={topic._id} className="">
-                      <p className="bg-sky-500 text-white font-semibold text-lg py-1 px-2">
+                      <p className="bg-sky-500 text-white text-lg py-1 px-2">
                         {topic.name}
                       </p>
 
@@ -347,7 +345,7 @@ const UserCourseDetail = () => {
               {/* <video className='rounded-md w-full h-[180px]' src={selectedCourse?.video} controls/> */}
               <VideoPopup url={selectedCourse?.video} name={"dfds"} />
               <div className="mt-6">
-                <p className="text-gray-700 text-lg font-semibold">
+                <p className="text-gray-700 text-lg">
                   Ưu đãi đặc biệt trong tháng:
                 </p>
                 <div className="flex gap-4 mt-2">
@@ -383,12 +381,12 @@ const UserCourseDetail = () => {
                 </div>
               </div>
               <button
-                className="w-full bg-blue-600 text-white font-semibold py-3 rounded-lg mt-4 hover:bg-blue-700"
+                className="w-full bg-blue-600 text-white py-3 rounded-lg mt-4 hover:bg-blue-700"
                 onClick={() => payment(selectedCourse?._id)}
               >
                 MUA KHÓA HỌC NGAY
               </button>
-              <button className="w-full bg-gray-200 text-gray-800 font-semibold py-3 rounded-lg mt-3 hover:bg-gray-300">
+              <button className="w-full bg-gray-200 text-gray-800 py-3 rounded-lg mt-3 hover:bg-gray-300">
                 Học thử miễn phí
               </button>
               <ul className="mt-6 text-sm text-gray-600 space-y-2">

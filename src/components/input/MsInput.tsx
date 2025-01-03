@@ -1,4 +1,3 @@
-import { current } from "@reduxjs/toolkit";
 import React, {
   forwardRef,
   useImperativeHandle,
@@ -6,6 +5,9 @@ import React, {
   useState,
 } from "react";
 import { IconType } from "react-icons";
+
+// scss
+import "./MsInput.scss";
 
 // Định nghĩa interface cho các phương thức của ref
 interface MSInputHandle {
@@ -123,7 +125,7 @@ const MSInput = forwardRef<MSInputHandle, MSInputProps>(
             value={value}
             onChange={handleChange}
             disabled={disabled}
-            className={`w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none ${
+            className={`w-full px-4 py-2 border rounded-md ${
               LeftIcon ? "pl-10" : ""
             } ${RightIcon ? "pr-10" : ""} ${
               error ? "border-red-500" : "border-gray-300"

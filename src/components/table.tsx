@@ -30,9 +30,8 @@ const Table = <T extends Record<string, any>>({
       >
         <thead>
           <tr
+            className="bg-secondary"
             style={{
-              backgroundColor: "#1e2753",
-              color: "white",
               border: "1px solid #c9c9c9",
             }}
           >

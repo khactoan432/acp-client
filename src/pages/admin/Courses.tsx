@@ -349,20 +349,22 @@ const AdminExam: React.FC = () => {
       <AdminHeader />
       <div className="flex flex-1">
         <Nav />
-        <div className="w-full h-full overflow-y-auto bg-[rgba(255,246,244,1)]">
+        <div className="w-full h-full overflow-y-auto bg-primary">
           <div className="my-3">
             <div className="px-3 md:px-5">
-              <div className="w-[30%] rounded-lg secondary-color-bg flex justify-center">
-                <h4 className="text-white p-2 uppercase">Khoá học</h4>
+              <div className="w-[30%] rounded-lg bg-secondary flex justify-center">
+                <h4 className="font-size-18 text-white p-2 uppercase">
+                  Khoá học
+                </h4>
               </div>
               {/* button them khoa hoc */}
               <ButtonPlus
                 content="Thêm khoá học mới"
                 icon={CiCirclePlus}
-                iconSize="text-[32px]"
+                iconSize="text-[30px]"
                 textSize="text-[14px"
                 height="h-[32px]"
-                width="w-[22%]"
+                width="w-[17%]"
                 onClick={() => setAddCourse(!addCourse)}
               />
               {/* add thong tin khoa hoc */}
@@ -371,7 +373,7 @@ const AdminExam: React.FC = () => {
                   {/* thong tin khoa hoc */}
                   <div className="bg-white rounded-lg w-[60%] p-4">
                     <div className="mb-2">
-                      <h4 className="font-semibold primary-color-text">
+                      <h4 className="font-size-18 primary-color-text">
                         Thông tin khoá học
                       </h4>
                     </div>
@@ -402,7 +404,7 @@ const AdminExam: React.FC = () => {
                       onUrlsReset={hanleResetUrlsImage}
                     />
                     <div>
-                      <h4 className="font-semibold primary-color-text">
+                      <h4 className="font-size-18 primary-color-text">
                         Video giới thiệu khoá học
                       </h4>
                       <ImageUploader
@@ -415,7 +417,7 @@ const AdminExam: React.FC = () => {
                     </div>
                     {/* chi phí khoá học */}
                     <div>
-                      <h4 className="font-semibold primary-color-text">
+                      <h4 className="font-size-18 primary-color-text">
                         Giá khoá học
                       </h4>
                       <div className="flex justify-around">

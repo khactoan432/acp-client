@@ -8,12 +8,12 @@ import Button from "../../components/common/Button";
 
 import { FaLock } from "react-icons/fa";
 import { FaUnlock } from "react-icons/fa";
-import { useParams } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, RootState } from '../../redux/store';
-import { fetchExamDetail } from '../../redux/slices/examSlice';
-import VideoPopup from '../../components/features/Video/Video';
-import { postData } from '../../axios';
+import { useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../redux/store";
+import { fetchExamDetail } from "../../redux/slices/examSlice";
+import VideoPopup from "../../components/features/Video/Video";
+import { postData } from "../../axios";
 
 interface User {
   _id: string;
@@ -87,7 +87,7 @@ const UserExamDetail: React.FC = () => {
     try {
       console.log("Payment initiated for:", id_material);
 
-      const userString = localStorage.getItem('user');
+      const userString = localStorage.getItem("user");
       let user: User | null = null;
 
       // Nếu có giá trị, phân tích JSON
@@ -100,17 +100,21 @@ const UserExamDetail: React.FC = () => {
       }
 
       // Gửi request thanh toán
-      const pm = await postData("/api/payment/momo", {
-        id_user: user?._id || "6756abc20424abb76abb1eb0", // ID người dùng
-        id_material: id_material,          // ID khóa học
-        type: "COURSE",                    // Loại thanh toán
-      }, {});
+      const pm = await postData(
+        "/api/payment/momo",
+        {
+          id_user: user?._id || "6756abc20424abb76abb1eb0", // ID người dùng
+          id_material: id_material, // ID khóa học
+          type: "COURSE", // Loại thanh toán
+        },
+        {}
+      );
 
       console.log("Payment response:", pm);
 
       // Điều hướng đến URL thanh toán
       if (pm.data?.payUrl) {
-        window.location.href = pm.data.payUrl; 
+        window.location.href = pm.data.payUrl;
       } else {
         console.error("Payment URL not found in response.");
         alert("Không thể thực hiện thanh toán, vui lòng thử lại sau.");
@@ -133,16 +137,12 @@ const UserExamDetail: React.FC = () => {
         <div className="flex items-center justify-center w-full h-full shadow-md bg-[#010101]">
           <div className="relative max-w-[1228px] my-10 py-6 rounded-lg w-full">
             <div className="w-2/3 text-white px-3">
-              <h2 className="text-3xl font-bold mb-2">
-                {selectedExam?.name}
-              </h2>
+              <h2 className="text-3xl font-bold mb-2">{selectedExam?.name}</h2>
 
               <div className="my-2 flex justify-between items-center">
                 <div className="flex items-center gap-3">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-yellow-500 font-semibold">
-                      {course.rating}
-                    </span>
+                    <span className="text-yellow-500">{course.rating}</span>
                     <Rating rating={course.rating} />
                   </div>
                   <span>({course.rates} đánh giá)</span>
@@ -186,7 +186,7 @@ const UserExamDetail: React.FC = () => {
                     smooth={true}
                     offset={-140}
                     duration={500}
-                    className="cursor-pointer font-semibold hover:text-blue-600 transition duration-200"
+                    className="cursor-pointer hover:text-blue-600 transition duration-200"
                     activeClass="text-blue-600"
                   >
                     {item.name}
@@ -206,12 +206,13 @@ const UserExamDetail: React.FC = () => {
             >
               <div className="flex flex-col items-center justify-center w-full h-full">
                 {selectedExam?.describes?.map((item) => (
-                  <div className="relative mb-6 rounded-lg w-full" key={item._id}>
-                    <h2 className="text-2xl font-bold mb-6">
-                      {item.desc}
-                    </h2>
+                  <div
+                    className="relative mb-6 rounded-lg w-full"
+                    key={item._id}
+                  >
+                    <h2 className="text-2xl font-bold mb-6">{item.desc}</h2>
 
-                    <div className='flex flex-col gap-2'>
+                    <div className="flex flex-col gap-2">
                       {item.overviews.map((overview) => (
                         <p key={overview._id}>✅ {overview.desc})</p>
                       ))}
@@ -313,25 +314,51 @@ const UserExamDetail: React.FC = () => {
             </div>
           </div>
 
-          <div className='w-1/3 px-3'>
-            <div className={`bg-white shadow-lg rounded-lg p-3 mx-auto mt-[-320px] z-40 ${
-              isSticky ? "sticky top-[70px]" : "relative"
-              }`}>
+          <div className="w-1/3 px-3">
+            <div
+              className={`bg-white shadow-lg rounded-lg p-3 mx-auto mt-[-320px] z-40 ${
+                isSticky ? "sticky top-[70px]" : "relative"
+              }`}
+            >
               {/* <video className='rounded-md w-full h-[180px]' src={selectedExam?.video} controls/> */}
-              <VideoPopup url={selectedExam?.video} name={"dfds"}/>
+              <VideoPopup url={selectedExam?.video} name={"dfds"} />
               <div className="mt-6">
-                <p className="text-gray-700 text-lg font-semibold">Ưu đãi đặc biệt trong tháng:</p>
+                <p className="text-gray-700 text-lg font-semibold">
+                  Ưu đãi đặc biệt trong tháng:
+                </p>
                 <div className="flex gap-4 mt-2">
-                  <p className="text-green-600 text-2xl font-bold mt-2">{new Intl.NumberFormat('vi-VN').format((selectedExam?.price ?? 0) - (selectedExam?.discount ?? 0))}đ</p>
+                  <p className="text-green-600 text-2xl font-bold mt-2">
+                    {new Intl.NumberFormat("vi-VN").format(
+                      (selectedExam?.price ?? 0) - (selectedExam?.discount ?? 0)
+                    )}
+                    đ
+                  </p>
                   <div>
-                    <p className="text-gray-400 line-through text-sm">Giá gốc: {new Intl.NumberFormat('vi-VN').format(selectedExam?.price)}đ</p>
-                    <p className="text-red-500 text-sm font-medium">Tiết kiệm: {new Intl.NumberFormat('vi-VN').format(selectedExam?.discount)}đ (
-                      -{Math.round((selectedExam?.discount ?? 0) / (selectedExam?.price ?? 1) * 100)}%)
+                    <p className="text-gray-400 line-through text-sm">
+                      Giá gốc:{" "}
+                      {new Intl.NumberFormat("vi-VN").format(
+                        selectedExam?.price
+                      )}
+                      đ
+                    </p>
+                    <p className="text-red-500 text-sm font-medium">
+                      Tiết kiệm:{" "}
+                      {new Intl.NumberFormat("vi-VN").format(
+                        selectedExam?.discount
+                      )}
+                      đ ( -
+                      {Math.round(
+                        ((selectedExam?.discount ?? 0) /
+                          (selectedExam?.price ?? 1)) *
+                          100
+                      )}
+                      %)
                     </p>
                   </div>
                 </div>
               </div>
-              <button className="w-full bg-blue-600 text-white font-semibold py-3 rounded-lg mt-4 hover:bg-blue-700"
+              <button
+                className="w-full bg-blue-600 text-white font-semibold py-3 rounded-lg mt-4 hover:bg-blue-700"
                 onClick={() => payment(selectedExam?._id)}
               >
                 MUA KHÓA HỌC NGAY

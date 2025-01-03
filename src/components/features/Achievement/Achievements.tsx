@@ -6,7 +6,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../redux/store";
 import { fetchUserAchievements } from "../../../redux/slices/achievementSlice";
 
-
 const Achievements: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { userAchievements, loading, error } = useSelector(
@@ -41,34 +40,34 @@ const Achievements: React.FC = () => {
     ],
   };
 
-  return (
-    loading ? "Waiting for Loading" 
-    : error ? "Something have wrong"
-    : <div className="relative pt-10 pb-16 bg-[#EDFDFF]">
-
-        {/* Content Overlay */}
-        <div className="relative max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
-          <h2 className="text-4xl font-semibold text-[#00095B] mb-16 text-center">
-            Thành tích xuất sắc của học viên khóa trước
-          </h2>
-          <Slider {...settings}>
-            {userAchievements.map((achievement) => (
-              <div key={achievement._id} className="px-4">
-                <div className="max-w-[272px] max-h-[380px] overflow-hidden rounded-lg shadow-lg mx-auto">
-                  <img
-                    src={achievement.image}
-                    alt={achievement?.image?.split("/").pop() || "achievement"}
-                    className="w-full h-full object-contain" // Adjusted to "object-cover" for proper fit
-                  />
-                </div>
+  return loading ? (
+    "Waiting for Loading"
+  ) : error ? (
+    "Something have wrong"
+  ) : (
+    <div className="relative pt-10 pb-16 bg-[#EDFDFF]">
+      {/* Content Overlay */}
+      <div className="relative max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+        <h2 className="text-4xl text-[#00095B] mb-16 text-center">
+          Thành tích xuất sắc của học viên khóa trước
+        </h2>
+        <Slider {...settings}>
+          {userAchievements.map((achievement) => (
+            <div key={achievement._id} className="px-4">
+              <div className="max-w-[272px] max-h-[380px] overflow-hidden rounded-lg shadow-lg mx-auto">
+                <img
+                  src={achievement.image}
+                  alt={achievement?.image?.split("/").pop() || "achievement"}
+                  className="w-full h-full object-contain" // Adjusted to "object-cover" for proper fit
+                />
               </div>
-            ))}
-          </Slider>
-        </div>
+            </div>
+          ))}
+        </Slider>
       </div>
+    </div>
   );
 };
-
 
 const NextArrow: React.FC<{ onClick?: () => void }> = ({ onClick }) => {
   return (

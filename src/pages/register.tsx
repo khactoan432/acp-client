@@ -207,11 +207,7 @@ const Register: React.FC = () => {
             <p style={styles.error}>Phone number is required</p>
           )}
 
-          <button
-            className="secondary-color-bg"
-            type="submit"
-            style={styles.button}
-          >
+          <button className="bg-secondary" type="submit" style={styles.button}>
             Create Account
           </button>
           <p className="mt-4 text-center">

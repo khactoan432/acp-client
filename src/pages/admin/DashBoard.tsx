@@ -172,9 +172,9 @@ const AdminDashboard = () => {
       <AdminHeader />
       <div className="flex flex-1 md:flex-row">
         <Nav />
-        <div className="w-full h-full overflow-y-auto bg-[rgba(255,246,244,1)]">
+        <div className="w-full h-full overflow-y-auto bg-primary">
           <div className="px-3 md:px-5">
-            <div className="text-2xl font-semibold my-3">
+            <div className="text-2xl my-3">
               <h2>DashBoard</h2>
             </div>
 
@@ -182,7 +182,7 @@ const AdminDashboard = () => {
             <div className="flex flex-wrap justify-center gap-4 my-3">
               <div className="w-full sm:w-[45%] lg:w-[208px] bg-white rounded-lg flex p-2 items-center justify-around">
                 <div>
-                  <p className="text-[20px] font-semibold">100.000.000đ</p>
+                  <p className="text-[20px]">100.000.000đ</p>
                   <p className="text-xs">Tổng lợi nhuận</p>
                   <div className="flex items-center text-[rgb(6,165,97)]">
                     12%
@@ -195,7 +195,7 @@ const AdminDashboard = () => {
               </div>
               <div className="w-full sm:w-[45%] lg:w-[208px] bg-white rounded-lg flex p-2 items-center justify-around">
                 <div className="left">
-                  <p className="text-[20px] font-semibold">1.056</p>
+                  <p className="text-[20px]">1.056</p>
                   <p style={{ fontSize: "12px" }}>Mua khoá học</p>
                   <div className="flex items-center text-[rgb(6,165,97)]">
                     15,34%
@@ -212,7 +212,7 @@ const AdminDashboard = () => {
               </div>
               <div className="w-full sm:w-[45%] lg:w-[208px] bg-white rounded-lg flex p-2 items-center justify-around">
                 <div className="left">
-                  <p className="text-[20px] font-semibold">1.567</p>
+                  <p className="text-[20px]">1.567</p>
                   <p style={{ fontSize: "12px" }}>Mua đề thi</p>
                   <div className="flex items-center text-[rgb(6,165,97)]">
                     12,6%
@@ -229,7 +229,7 @@ const AdminDashboard = () => {
               </div>
               <div className="w-full sm:w-[45%] lg:w-[208px] bg-white rounded-lg flex p-2 items-center justify-around">
                 <div className="left">
-                  <p className="text-[20px] font-semibold">201</p>
+                  <p className="text-[20px]">201</p>
                   <p style={{ fontSize: "12px" }}>Người quay lại</p>
                   <div className="flex items-center text-[#ff0000]">
                     8%
@@ -246,7 +246,7 @@ const AdminDashboard = () => {
               </div>
               <div className="w-full sm:w-[45%] lg:w-[208px] bg-white rounded-lg flex p-2 items-center justify-around">
                 <div className="left">
-                  <p className="text-[20px] font-semibold">9.678</p>
+                  <p className="text-[20px]">9.678</p>
                   <p style={{ fontSize: "12px" }}>Tổng người dùng</p>
                   <div className="flex items-center text-[rgb(6,165,97)]">
                     19%
@@ -279,9 +279,7 @@ const AdminDashboard = () => {
               </div>
 
               <div className="w-full md:w-[35%] bg-white p-2 rounded-lg">
-                <h2 className="text-center font-semibold">
-                  Đồ thị 7 ngày gần nhất
-                </h2>
+                <h2 className="text-center">Đồ thị 7 ngày gần nhất</h2>
                 <ChartCol data={dataCol} options={optionsCol} />
               </div>
             </div>
@@ -289,13 +287,13 @@ const AdminDashboard = () => {
             {/* Table */}
             <div className="flex flex-col lg:flex-row gap-4 my-3 justify-around">
               <div className="w-full lg:w-[49%] h-[400px] bg-white rounded-lg overflow-auto">
-                <h2 className="px-5 py-4 font-semibold text-[rgba(30,39,83,1)]">
+                <h2 className="px-5 py-4 text-[rgba(30,39,83,1)]">
                   Những khoá học bán chạy
                 </h2>
                 <Table columns={columnsCourse} data={dataCourse} />
               </div>
               <div className="w-full lg:w-[49%] h-[400px] bg-white rounded-lg overflow-auto">
-                <h2 className="px-5 py-4 font-semibold text-[rgba(30,39,83,1)]">
+                <h2 className="px-5 py-4 text-[rgba(30,39,83,1)]">
                   Những đề thi bán chạy
                 </h2>
                 <Table columns={columnsExam} data={dataExam} />

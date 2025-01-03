@@ -61,7 +61,7 @@ const MultiFileUpload: React.FC = () => {
     <div className="max-w-[1228px] mx-auto bg-white p-6 rounded-lg shadow-md">
       <h2 className="text-xl font-bold mb-4">Upload nhiều file (Ảnh/Video)</h2>
       <div className="mb-4">
-        <label className="block font-semibold mb-2" htmlFor="folderPath">
+        <label className="block mb-2" htmlFor="folderPath">
           Nhập đường dẫn folder:
         </label>
         <input

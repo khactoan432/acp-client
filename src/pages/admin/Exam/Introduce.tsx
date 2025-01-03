@@ -423,7 +423,7 @@ const IntroduceExam: React.FC = () => {
       <div className="flex flex-1">
         <Nav />
         <div className="w-full h-full bg-white">
-          <div className="mx-2 my-2 pt-8 pb-[10px] pl-8 bg-[rgba(255,246,244,1)] rounded-lg h-full">
+          <div className="mx-2 my-2 bg-primary rounded-lg h-full">
             <Button
               className="mr-4 button-cancel mb-6"
               style={{
@@ -437,18 +437,16 @@ const IntroduceExam: React.FC = () => {
               <FaChevronLeft />
               Back
             </Button>
-            <h4 className="font-semibold primary-color-text uppercase pb-2">
+            <h4 className="font-size-18 primary-color-text uppercase pb-2">
               Giới thiệu đề thi
             </h4>
             <ButtonPlus
               content="Thêm giới thiệu"
               icon={CiCirclePlus}
-              iconSize="text-[24px]"
-              textSize="text-[12px]"
-              height="h-[24px]"
-              width="w-[36%]"
-              paddingLeft="pl-7"
-              paddingRight="pr-4"
+              iconSize="text-[30px]"
+              textSize="text-[14px"
+              height="h-[32px]"
+              width="w-[16%]"
               onClick={() => setAddIntroduce(!addIntroduce)}
             />
             {addIntroduce && (
@@ -477,17 +475,17 @@ const IntroduceExam: React.FC = () => {
                 <div className="mb-2 pl-6 relative">
                   <div className="absolute left-4 top-1/2 transform -translate-y-1/2 h-[100%] w-[0.2px] bg-[#1e2753]"></div>{" "}
                   {/* Đường line màu đỏ */}
-                  <h4 className="font-semibold primary-color-text">
+                  <h4 className="font-size-18 primary-color-text">
                     Thêm mô tả
                   </h4>
                   <ButtonPlus
                     content="Thêm mô tả"
                     icon={CiCirclePlus}
-                    iconSize="text-[24px]"
+                    iconSize="text-[22px]"
                     textSize="text-[12px]"
                     height="h-[24px]"
-                    width="w-[36%]"
-                    paddingLeft="pl-7"
+                    width="w-[11%]"
+                    paddingLeft="pl-6"
                     paddingRight="pr-4"
                     onClick={() => hanleAddDesc()}
                   />
@@ -587,8 +585,8 @@ const IntroduceExam: React.FC = () => {
                       className="absolute cursor-pointer top-[4px] left-[42px] text-red-500 hover:text-red-700"
                       title="Chỉnh sửa mô tả"
                     />
-                    <div className="mb-2 secondary-color-bg px-4 py-2 rounded-lg inline-block">
-                      <h4 className="text-white">{descs?.desc}</h4>
+                    <div className="mb-2 bg-secondary px-4 py-2 rounded-lg inline-block">
+                      <h4 className="font-size-18 text-white">{descs?.desc}</h4>
                     </div>
                     <div className="mb-2">
                       {descs.overviews &&

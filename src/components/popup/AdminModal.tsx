@@ -1,11 +1,30 @@
-import React, { useState, useEffect } from "react";
-import { Modal, Input, Button, Upload, UploadFile } from "antd";
+import React, { useState, useEffect, useRef } from "react";
+
+// import component
+import ButtonPlus from "../button/plus";
+import MSInput from "../input/MsInput";
+
+import { Modal, Input, Button, Upload, UploadFile, Select } from "antd";
+
+// import icon
+import { CiCirclePlus } from "react-icons/ci";
 import { UploadOutlined } from "@ant-design/icons";
+
+interface ArrayValue {
+  id?: number;
+  value?: string;
+}
 
 type AdminModalProps<T> = {
   isOpen: boolean;
   onClose: () => void;
-  fields?: { name: string; placeholder: string }[];
+  fields?: {
+    name?: string;
+    placeholder?: string;
+    type?: string;
+    value?: string[];
+    label?: string;
+  }[];
   data?: any;
   enableImageUpload?: boolean;
   multiple?: boolean;
@@ -13,6 +32,7 @@ type AdminModalProps<T> = {
   title: string;
 };
 
+const { Option } = Select;
 const AdminModal = <T extends Record<string, any>>({
   isOpen,
   onClose,
@@ -24,8 +44,33 @@ const AdminModal = <T extends Record<string, any>>({
   title,
 }: AdminModalProps<T>) => {
   const [formData, setFormData] =
-    useState<Partial<T & { files?: File[] }>>(data);
+    useState<
+      Partial<T & { files?: File[]; type?: string; arrayValue?: ArrayValue[] }>
+    >(data);
+
+  let fieldHaveOption = fields.filter((field) => field.type === "OPTION");
+  const [selectedValue, setSelectedValue] = useState(
+    fieldHaveOption.length > 0 &&
+      fieldHaveOption[0].value &&
+      fieldHaveOption[0].value.length > 0
+      ? fieldHaveOption[0].value[0]
+      : "option1"
+  );
+  console.log("data edit: ", data);
+
   const [fileList, setFileList] = useState<UploadFile[]>([]);
+
+  const [arrValue, setArrValue] = useState<ArrayValue[]>([]);
+
+  // ref
+  const refValue = useRef<
+    {
+      focus: () => void;
+      getValue: () => string;
+      setValue: (value: string) => void;
+      clear: () => void;
+    }[]
+  >([]);
 
   // Reset form data and file list when modal opens or data changes
   useEffect(() => {
@@ -63,8 +108,23 @@ const AdminModal = <T extends Record<string, any>>({
   };
 
   const handleSave = () => {
+    formData.type = selectedValue;
+    formData.arrayValue = refValue.current;
     onSave(formData as T & { files?: File[] });
+    //
     onClose();
+  };
+
+  const handleSelectOption = (value: string) => {
+    setSelectedValue(value);
+  };
+
+  const handleAdd = () => {
+    const category = {
+      id: arrValue.length + 1,
+      value: "",
+    };
+    setArrValue((prev) => [...prev, category]);
   };
 
   return (
@@ -78,20 +138,79 @@ const AdminModal = <T extends Record<string, any>>({
       <div className="space-y-6">
         {fields.length > 0 && (
           <div>
-            <h3 className="text-lg font-semibold mb-4">Information</h3>
+            <h3 className="text-lg mb-4 primary-color-text">Information</h3>
             <div className="grid grid-cols-2 gap-4">
               {fields.map((field, id) => (
                 <div className="flex flex-col gap-1" key={String(id)}>
-                  <span className="primary-color-text">
-                    {field.placeholder}
-                  </span>
-                  <Input
-                    key={field.name as string}
-                    placeholder={field.placeholder}
-                    name={field.name as string}
-                    value={(formData[field.name] as string) || ""}
-                    onChange={handleInputChange}
-                  />
+                  {field.type === "OPTION" && (
+                    <div className="flex flex-col">
+                      <label className="primary-color-text mb-1">
+                        {field.label}
+                      </label>
+                      <Select
+                        defaultValue={
+                          data && data.type ? data.type : selectedValue
+                        }
+                        style={{ width: 120 }}
+                        onChange={handleSelectOption}
+                      >
+                        {field.value &&
+                          field.value?.length > 0 &&
+                          field.value.map((v, id) => (
+                            <Option key={id} value={v}>
+                              {v}
+                            </Option>
+                          ))}
+                      </Select>
+                    </div>
+                  )}
+                  {field.type === "ARRAY" && (
+                    <div className="max-h-[420px] overflow-y-auto pr-2">
+                      <ButtonPlus
+                        content="Thêm mới"
+                        icon={CiCirclePlus}
+                        iconSize="text-[22px]"
+                        textSize="text-[12px]"
+                        height="h-[24px]"
+                        width="w-[32%]"
+                        paddingLeft="pl-6"
+                        paddingRight="pr-4"
+                        onClick={() => handleAdd()}
+                      />
+                      {arrValue &&
+                        arrValue.length > 0 &&
+                        arrValue.map((arr, id) => (
+                          <div key={id}>
+                            <MSInput
+                              ref={(el) => {
+                                refValue.current[id] = el!;
+                              }}
+                              label={`Category: ${id}`}
+                              placeholder="Enter a category"
+                              type="text"
+                              required
+                            />
+                          </div>
+                        ))}
+                    </div>
+                  )}
+                  {!field.type && (
+                    <div className="flex flex-col">
+                      <label className="primary-color-text mb-1">
+                        {field.label}
+                      </label>
+                      <Input
+                        key={field.name as string}
+                        placeholder={field.placeholder}
+                        name={field.name as string}
+                        value={
+                          (formData[field.name ? field.name : ""] as string) ||
+                          ""
+                        }
+                        onChange={handleInputChange}
+                      />
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -99,7 +218,7 @@ const AdminModal = <T extends Record<string, any>>({
         )}
         {enableImageUpload && (
           <div>
-            <h3 className="text-lg font-semibold mb-4">Upload Files</h3>
+            <h3 className="text-lg mb-4">Upload Files</h3>
             <Upload
               listType="picture"
               fileList={fileList}
@@ -113,9 +232,11 @@ const AdminModal = <T extends Record<string, any>>({
           </div>
         )}
         <div className="flex justify-end space-x-4">
-          <Button onClick={onClose}>Cancel</Button>
-          <Button type="primary" onClick={handleSave}>
-            Save
+          <Button className="button-cancel" onClick={onClose}>
+            Huỷ
+          </Button>
+          <Button type="primary" className="button-save" onClick={handleSave}>
+            Tạo mới
           </Button>
         </div>
       </div>

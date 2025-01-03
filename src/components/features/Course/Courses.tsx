@@ -70,7 +70,7 @@ const Courses: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto p-2 sm:p-4 lg:p-6 mt-12">
-      <h2 className="text-4xl font-semibold text-[#00095B] mb-14 text-center uppercase">
+      <h2 className="text-4xl text-[#00095B] mb-14 text-center uppercase">
         Khóa học nổi bật
       </h2>
       <Slider {...settings}>

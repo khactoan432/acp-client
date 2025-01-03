@@ -28,7 +28,7 @@ interface Teacher {
 
 interface SaveData {
   files?: File[];
-  default_file: [{name: string, url: string}];
+  default_file: [{ name: string; url: string }];
   name: string;
   email: string;
   password: string;
@@ -51,23 +51,31 @@ const AdminTeacher: React.FC = () => {
   );
 
   useEffect(() => {
-    dispatch(fetchAdminTeachers({ role: "TEACHER", page: currentPage, limit: PAGE_SIZE }));
+    dispatch(
+      fetchAdminTeachers({
+        role: "TEACHER",
+        page: currentPage,
+        limit: PAGE_SIZE,
+      })
+    );
   }, [dispatch, currentPage]);
 
-  const getDataForEdit = (id: string|null): SaveData => {
+  const getDataForEdit = (id: string | null): SaveData => {
     const teacher = adminTeachers.find((b) => b._id === id);
     return {
-      default_file: [{
-        name: teacher?.image.split("/").pop() || "",
-        url: teacher?.image || "",
-      }],
+      default_file: [
+        {
+          name: teacher?.image.split("/").pop() || "",
+          url: teacher?.image || "",
+        },
+      ],
       name: teacher?.name || "",
       email: teacher?.email || "",
       password: teacher?.password || "",
       repassword: teacher?.repassword || "",
       codeforce_name: teacher?.codeforce_name || "",
-      phone_number: teacher?.phone_number || ""
-    }
+      phone_number: teacher?.phone_number || "",
+    };
   };
 
   const handleSave = async (data: SaveData): Promise<void> => {
@@ -76,11 +84,18 @@ const AdminTeacher: React.FC = () => {
       return;
     }
 
-    if (!data.name || !data.email || !data.password || !data.repassword || !data.codeforce_name ||!data.phone_number) {
+    if (
+      !data.name ||
+      !data.email ||
+      !data.password ||
+      !data.repassword ||
+      !data.codeforce_name ||
+      !data.phone_number
+    ) {
       toast.error("Please fill all information.");
       return;
     }
-  
+
     try {
       const formData = new FormData();
       data.files.forEach((file) => formData.append("files", file));
@@ -91,7 +106,7 @@ const AdminTeacher: React.FC = () => {
       formData.append("codeforce_name", data.codeforce_name);
       formData.append("phone_number", data.phone_number);
       formData.append("role", "TEACHER");
-  
+
       await dispatch(createTeacher(formData)).unwrap();
       toast.success("Upload successful!");
 
@@ -101,13 +116,13 @@ const AdminTeacher: React.FC = () => {
       console.error(error);
     }
   };
-  
+
   const handleUpdate = async (data: SaveData): Promise<void> => {
     if (!currentEdit) {
       toast.error("Please upload at least one file.");
       return;
     }
-  
+
     try {
       const formData = new FormData();
       data.files?.forEach((file) => formData.append("files", file));
@@ -119,23 +134,24 @@ const AdminTeacher: React.FC = () => {
         { key: "codeforce_name", value: data.codeforce_name },
         { key: "phone_number", value: data.phone_number },
       ];
-      
+
       fields.forEach((field) => {
         if (field.value && String(field.value).trim() !== "") {
           formData.append(field.key, field.value);
         }
-      });      
-  
-      await dispatch(updateTeacher({ userId: currentEdit, updatedData: formData })).unwrap();
-  
+      });
+
+      await dispatch(
+        updateTeacher({ userId: currentEdit, updatedData: formData })
+      ).unwrap();
+
       toast.success("Update successful!");
       setIsModalUpdateOpen(false);
     } catch (error) {
       toast.error("Update failed!");
       console.error(error);
-    } 
+    }
   };
-  
 
   const handleDelete = async (userId: string): Promise<void> => {
     try {
@@ -210,7 +226,7 @@ const AdminTeacher: React.FC = () => {
   if (loading) {
     return <Loading message="Loading data..." size="large" />;
   }
-  
+
   if (error) {
     toast.error(error);
   }
@@ -251,7 +267,14 @@ const AdminTeacher: React.FC = () => {
             rowKey="_id"
           />
 
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "16px" }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginTop: "16px",
+            }}
+          >
             <span>{totalAdmin} Results</span>
             <Pagination
               current={currentPage}
@@ -262,18 +285,26 @@ const AdminTeacher: React.FC = () => {
           </div>
         </div>
       </div>
-      
+
       <AdminModal
         isOpen={isModalSaveOpen}
         multiple={false}
         onClose={() => setIsModalSaveOpen(false)}
         fields={[
-          { name: "name", placeholder: "Name" },
-          { name: "email", placeholder: "Email" },
-          { name: "password", placeholder: "Password" },
-          { name: "repassword", placeholder: "Re-enter Password" },
-          { name: "codeforce_name", placeholder: "Codeforce Name" },
-          { name: "phone_number", placeholder: "Phone Number" },
+          { name: "name", placeholder: "Name", label: "Name" },
+          { name: "email", placeholder: "Email", label: "Email" },
+          { name: "password", placeholder: "Password", label: "Password" },
+          {
+            name: "repassword",
+            placeholder: "Re-enter Password",
+            label: "Re-enter Password",
+          },
+          {
+            name: "codeforce_name",
+            placeholder: "Codeforce Name",
+            label: "Codeforce Name",
+          },
+          { name: "phone_number", placeholder: "Phone Number", label: "Phone" },
         ]}
         enableImageUpload={true}
         onSave={handleSave}
@@ -289,10 +320,18 @@ const AdminTeacher: React.FC = () => {
           setCurrentEdit(null);
         }}
         fields={[
-          { name: "name", placeholder: "Name" },
-          { name: "email", placeholder: "Email" },
-          { name: "codeforce_name", placeholder: "Codeforce Name" },
-          { name: "phone_number", placeholder: "Phone Number" },
+          { name: "name", placeholder: "Name", label: "Name" },
+          { name: "email", placeholder: "Email", label: "Email" },
+          {
+            name: "codeforce_name",
+            placeholder: "Codeforce Name",
+            label: "Codeforce Name",
+          },
+          {
+            name: "phone_number",
+            placeholder: "Phone Number",
+            label: "Phone Number",
+          },
         ]}
         enableImageUpload={true}
         onSave={handleUpdate}

@@ -44,15 +44,12 @@ const Header = () => {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex space-x-6">
-          <a
-            href="/"
-            className="primary-color-text hover:text-blue-600 font-semibold link"
-          >
+          <a href="/" className="primary-color-text hover:text-blue-600 link">
             Trang chủ
           </a>
           <a
             href="/course"
-            className="primary-color-text hover:text-blue-600 font-semibold link"
+            className="primary-color-text hover:text-blue-600 link"
           >
             Chương trình học
           </a>
@@ -64,14 +61,11 @@ const Header = () => {
           </a>
           <a
             href="/about"
-            className="primary-color-text hover:text-blue-600 font-semibold link"
+            className="primary-color-text hover:text-blue-600 link"
           >
             Về chúng tôi
           </a>
-          <a
-            href="/"
-            className="primary-color-text hover:text-blue-600 font-semibold link"
-          >
+          <a href="/" className="primary-color-text hover:text-blue-600 link">
             Liên hệ
           </a>
         </nav>
@@ -100,7 +94,7 @@ const Header = () => {
               <div className="absolute right-0 mt-2 w-60 bg-white rounded-lg shadow-lg border border-gray-200">
                 {/* Notification Section */}
                 <div className="p-4 border-b border-gray-300">
-                  <h3 className="text-gray-700 font-semibold">Thông báo</h3>
+                  <h3 className="text-gray-700">Thông báo</h3>
                   <p className="primary-color-text text-sm mt-1">
                     Bạn chưa có thông báo mới.
                   </p>
@@ -168,34 +162,19 @@ const Header = () => {
       {isOpen && (
         <nav className="md:hidden bg-white shadow-md px-8">
           <div className="flex flex-col items-start space-y-4 pb-4">
-            <a
-              href="#"
-              className="primary-color-text hover:text-blue-600 font-semibold"
-            >
+            <a href="#" className="primary-color-text hover:text-blue-600">
               Trang chủ
             </a>
-            <a
-              href="#"
-              className="primary-color-text hover:text-blue-600 font-semibold"
-            >
+            <a href="#" className="primary-color-text hover:text-blue-600">
               Chương trình học
             </a>
-            <a
-              href="#"
-              className="primary-color-text hover:text-blue-600 font-semibold"
-            >
+            <a href="#" className="primary-color-text hover:text-blue-600">
               Đề thi online
             </a>
-            <a
-              href="#"
-              className="primary-color-text hover:text-blue-600 font-semibold"
-            >
+            <a href="#" className="primary-color-text hover:text-blue-600">
               Về chúng tôi
             </a>
-            <a
-              href="#"
-              className="primary-color-text hover:text-blue-600 font-semibold"
-            >
+            <a href="#" className="primary-color-text hover:text-blue-600">
               Liên hệ
             </a>
             {isLogin ? (
