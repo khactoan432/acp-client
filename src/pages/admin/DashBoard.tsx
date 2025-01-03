@@ -172,7 +172,7 @@ const AdminDashboard = () => {
       <AdminHeader />
       <div className="flex flex-1 md:flex-row">
         <Nav />
-        <div className="w-full h-full overflow-y-auto bg-[rgba(255,246,244,1)]">
+        <div className="w-full h-full overflow-y-auto bg-primary">
           <div className="px-3 md:px-5">
             <div className="text-2xl my-3">
               <h2>DashBoard</h2>

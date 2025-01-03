@@ -160,23 +160,40 @@ const ExamVideo: React.FC = () => {
       <div className="flex flex-1">
         <Nav />
         <div className="w-full h-full bg-white">
-          <div className="mx-2 my-2 pt-8 pb-[10px] pl-8 bg-[rgba(255,246,244,1)] rounded-lg h-full">
-            <Button
-              className="mr-4 button-cancel mb-6"
-              style={{
-                backgroundColor: "white",
-                color: "#1e2753",
-                borderColor: "#1e2753",
-              }}
-              ghost
-              onClick={() => navigate(`/admin/exams`)}
-            >
-              <FaChevronLeft />
-              Back
-            </Button>
-            <h4 className="font-size-18 primary-color-text uppercase pb-2">
-              Video sửa đề thi
-            </h4>
+          <div className="m-2 h-full">
+            <div className="bg-primary px-5 py-3 mb-2">
+              <Button
+                className="button-cancel px-5 py-3"
+                style={{
+                  backgroundColor: "white",
+                  color: "#1e2753",
+                  borderColor: "#1e2753",
+                }}
+                ghost
+                onClick={() => navigate(`/admin/exams`)}
+              >
+                <FaChevronLeft />
+                Back
+              </Button>
+            </div>
+            <div className="header_categories flex justify-between items-center bg-primary px-5 py-3">
+              <div className="left uppercase">
+                <h2 className="font-size-20">Video sửa đề thi</h2>
+              </div>
+              <div className="right uppercase">
+                <Button
+                  className="button-save box-shadow-btn-save"
+                  style={{
+                    backgroundColor: "#2d3c88",
+                    color: "white",
+                    borderColor: "#4558b7",
+                    borderWidth: "0.1px",
+                  }}
+                >
+                  Thêm mới
+                </Button>
+              </div>
+            </div>
             <MSInput
               ref={titleRef}
               label="Tiêu đề"

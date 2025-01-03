@@ -349,7 +349,7 @@ const AdminExam: React.FC = () => {
       <AdminHeader />
       <div className="flex flex-1">
         <Nav />
-        <div className="w-full h-full overflow-y-auto bg-[rgba(255,246,244,1)]">
+        <div className="w-full h-full overflow-y-auto bg-primary">
           <div className="my-3">
             <div className="px-3 md:px-5">
               <div className="w-[30%] rounded-lg bg-secondary flex justify-center">
@@ -361,10 +361,10 @@ const AdminExam: React.FC = () => {
               <ButtonPlus
                 content="Thêm khoá học mới"
                 icon={CiCirclePlus}
-                iconSize="text-[32px]"
+                iconSize="text-[30px]"
                 textSize="text-[14px"
                 height="h-[32px]"
-                width="w-[22%]"
+                width="w-[17%]"
                 onClick={() => setAddCourse(!addCourse)}
               />
               {/* add thong tin khoa hoc */}

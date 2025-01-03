@@ -25,7 +25,7 @@ interface Achievement {
 
 interface SaveData {
   files?: File[];
-  default_file: [{name: string, url: string}];
+  default_file: [{ name: string; url: string }];
   email_user: string;
   prize: string;
   competition: string;
@@ -39,32 +39,42 @@ const AdminAchievement: React.FC = () => {
   const [currentEdit, setCurrentEdit] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const fields= [
-    { name: "email_user", placeholder: "Student Email ..." },
-    { name: "prize", placeholder: "Prize ..." },
-    { name: "competition", placeholder: "Competition ..." },
-  ]
+  const fields = [
+    {
+      name: "email_user",
+      placeholder: "Student Email ...",
+      label: "Student Email ...",
+    },
+    { name: "prize", placeholder: "Prize ...", label: "Prize ..." },
+    {
+      name: "competition",
+      placeholder: "Competition ...",
+      label: "Competition ...",
+    },
+  ];
 
   const dispatch = useDispatch<AppDispatch>();
-    const { adminAchievements, totalAdmin, loading, error } = useSelector(
-      (state: RootState) => state.achievements
-    );
-  
+  const { adminAchievements, totalAdmin, loading, error } = useSelector(
+    (state: RootState) => state.achievements
+  );
+
   useEffect(() => {
     dispatch(fetchAdminAchievements({ page: currentPage, limit: PAGE_SIZE }));
   }, [dispatch, currentPage]);
 
-  const getDataForEdit = (id: string|null): SaveData => {
+  const getDataForEdit = (id: string | null): SaveData => {
     const achievement = adminAchievements.find((b) => b._id === id);
     return {
-      default_file: [{
-        name: achievement?.image.split("/").pop() || "",
-        url: achievement?.image || "",
-      }],
+      default_file: [
+        {
+          name: achievement?.image.split("/").pop() || "",
+          url: achievement?.image || "",
+        },
+      ],
       email_user: achievement?.email_user || "",
       prize: achievement?.prize || "",
       competition: achievement?.competition || "",
-    }
+    };
   };
 
   const handleSave = async (data: SaveData): Promise<void> => {
@@ -77,14 +87,14 @@ const AdminAchievement: React.FC = () => {
       toast.error("Please fill all information.");
       return;
     }
-  
+
     try {
       const formData = new FormData();
       data.files.forEach((file) => formData.append("files", file));
       formData.append("email_user", data.email_user);
       formData.append("prize", data.prize);
       formData.append("competition", data.competition);
-  
+
       await dispatch(createAchievement(formData)).unwrap();
       toast.success("Upload successful!");
 
@@ -94,13 +104,13 @@ const AdminAchievement: React.FC = () => {
       console.error(error);
     }
   };
-  
+
   const handleUpdate = async (data: SaveData): Promise<void> => {
     if (!currentEdit) {
       toast.error("Please upload at least one file.");
       return;
     }
-  
+
     try {
       const formData = new FormData();
       data.files?.forEach((file) => formData.append("files", file));
@@ -109,14 +119,16 @@ const AdminAchievement: React.FC = () => {
         { key: "prize", value: data.prize },
         { key: "competition", value: data.competition },
       ];
-      
+
       fields.forEach((field) => {
         if (field.value && String(field.value).trim() !== "") {
           formData.append(field.key, field.value);
         }
-      });      
-  
-      await dispatch(updateAchievement({ achievementId: currentEdit, updatedData: formData })).unwrap();
+      });
+
+      await dispatch(
+        updateAchievement({ achievementId: currentEdit, updatedData: formData })
+      ).unwrap();
       toast.success("Update successful!");
 
       setIsModalUpdateOpen(false);
@@ -125,7 +137,6 @@ const AdminAchievement: React.FC = () => {
       console.error(error);
     }
   };
-  
 
   const handleDelete = async (achievementId: string): Promise<void> => {
     try {
@@ -237,7 +248,14 @@ const AdminAchievement: React.FC = () => {
             rowKey="_id"
           />
 
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "16px" }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginTop: "16px",
+            }}
+          >
             <span>{totalAdmin} Results</span>
             <Pagination
               current={currentPage}
@@ -246,7 +264,6 @@ const AdminAchievement: React.FC = () => {
               onChange={(page) => setCurrentPage(page)}
             />
           </div>
-          
         </div>
       </div>
 

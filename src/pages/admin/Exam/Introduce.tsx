@@ -423,7 +423,7 @@ const IntroduceExam: React.FC = () => {
       <div className="flex flex-1">
         <Nav />
         <div className="w-full h-full bg-white">
-          <div className="mx-2 my-2 pt-8 pb-[10px] pl-8 bg-[rgba(255,246,244,1)] rounded-lg h-full">
+          <div className="mx-2 my-2 bg-primary rounded-lg h-full">
             <Button
               className="mr-4 button-cancel mb-6"
               style={{
@@ -443,12 +443,10 @@ const IntroduceExam: React.FC = () => {
             <ButtonPlus
               content="Thêm giới thiệu"
               icon={CiCirclePlus}
-              iconSize="text-[24px]"
-              textSize="text-[12px]"
-              height="h-[24px]"
-              width="w-[36%]"
-              paddingLeft="pl-7"
-              paddingRight="pr-4"
+              iconSize="text-[30px]"
+              textSize="text-[14px"
+              height="h-[32px]"
+              width="w-[16%]"
               onClick={() => setAddIntroduce(!addIntroduce)}
             />
             {addIntroduce && (
@@ -483,11 +481,11 @@ const IntroduceExam: React.FC = () => {
                   <ButtonPlus
                     content="Thêm mô tả"
                     icon={CiCirclePlus}
-                    iconSize="text-[24px]"
+                    iconSize="text-[22px]"
                     textSize="text-[12px]"
                     height="h-[24px]"
-                    width="w-[36%]"
-                    paddingLeft="pl-7"
+                    width="w-[11%]"
+                    paddingLeft="pl-6"
                     paddingRight="pr-4"
                     onClick={() => hanleAddDesc()}
                   />
