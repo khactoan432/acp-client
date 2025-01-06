@@ -1,3 +1,4 @@
+import { Input } from "antd";
 import React from "react";
 
 interface Action {
@@ -35,6 +36,27 @@ const Table = <T extends Record<string, any>>({
               border: "1px solid #c9c9c9",
             }}
           >
+            <th
+              style={{
+                width: "24px",
+                padding: "8px",
+                textAlign: "center",
+                border: "1px solid  #c9c9c9",
+              }}
+            >
+              <Input type="checkbox" style={{ transform: "scale(1.5)" }} />
+            </th>
+            <th
+              style={{
+                width: "24px",
+                padding: "8px",
+                textAlign: "center",
+                border: "1px solid  #c9c9c9",
+              }}
+            >
+              STT
+            </th>
+
             {columns &&
               columns.length > 0 &&
               columns.map((col, index) => (
@@ -63,6 +85,24 @@ const Table = <T extends Record<string, any>>({
                   color: "#1e2753",
                 }}
               >
+                <td
+                  style={{
+                    padding: "8px",
+                    textAlign: "center",
+                    border: "1px solid  #c9c9c9",
+                  }}
+                >
+                  <Input type="checkbox" style={{ transform: "scale(1.5)" }} />
+                </td>
+                <td
+                  style={{
+                    padding: "8px",
+                    textAlign: "center",
+                    border: "1px solid  #c9c9c9",
+                  }}
+                >
+                  {rowIndex + 1}
+                </td>
                 {columns.map((col, colIndex) => (
                   <td
                     key={colIndex}

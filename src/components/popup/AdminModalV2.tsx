@@ -3,7 +3,6 @@ import React, { useState, useEffect, useRef } from "react";
 // import component
 import ButtonPlus from "../button/plus";
 import MSInput from "../input/MsInput";
-import ImageUploader from "../helps/dropImage";
 
 import { Modal, Input, Button, Upload, UploadFile, Select } from "antd";
 
@@ -28,20 +27,18 @@ type AdminModalProps<T> = {
   }[];
   data?: any;
   enableImageUpload?: boolean;
-  enableVideoUpload?: boolean;
   multiple?: boolean;
   onSave: (data: T & { files?: File[] }) => void;
   title: string;
 };
 
 const { Option } = Select;
-const AdminModal = <T extends Record<string, any>>({
+const AdminModalV2 = <T extends Record<string, any>>({
   isOpen,
   onClose,
   fields = [],
   data = {},
   enableImageUpload = false,
-  enableVideoUpload = false,
   multiple = false,
   onSave,
   title,
@@ -51,9 +48,6 @@ const AdminModal = <T extends Record<string, any>>({
       Partial<T & { files?: File[]; type?: string; arrayValue?: ArrayValue[] }>
     >(data);
 
-  const [uploadVideo, setUploadVideo] = useState<File[]>([]);
-  const [dataEdit, setDataEdit] = useState<any>(null);
-
   let fieldHaveOption = fields.filter((field) => field.type === "OPTION");
   const [selectedValue, setSelectedValue] = useState(
     fieldHaveOption.length > 0 &&
@@ -62,6 +56,7 @@ const AdminModal = <T extends Record<string, any>>({
       ? fieldHaveOption[0].value[0]
       : "option1"
   );
+  console.log("data edit: ", data);
 
   const [fileList, setFileList] = useState<UploadFile[]>([]);
 
@@ -92,7 +87,7 @@ const AdminModal = <T extends Record<string, any>>({
     }
   }, [isOpen, data]);
 
-  console.log(formData);
+  // console.log(formData);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -113,13 +108,8 @@ const AdminModal = <T extends Record<string, any>>({
   };
 
   const handleSave = () => {
-    if (formData.type !== "option1") {
-      formData.type = selectedValue;
-    }
+    formData.type = selectedValue;
     formData.arrayValue = refValue.current;
-    console.log("uploadVideo: ", uploadVideo);
-    formData.video =
-      uploadVideo.length !== 0 ? uploadVideo : data.video ? data.video : [];
     onSave(formData as T & { files?: File[] });
     //
     onClose();
@@ -135,19 +125,6 @@ const AdminModal = <T extends Record<string, any>>({
       value: "",
     };
     setArrValue((prev) => [...prev, category]);
-  };
-
-  // handle video
-  // handle
-  const handleVideoUploaded = (files: File[]) => {
-    setUploadVideo(files);
-  };
-  const hanleResetUrlsVideo = () => {
-    // dataEdit.video = "";
-    setDataEdit((prev) => ({
-      ...prev,
-      video: "",
-    }));
   };
 
   return (
@@ -254,18 +231,6 @@ const AdminModal = <T extends Record<string, any>>({
             </Upload>
           </div>
         )}
-        {enableVideoUpload && (
-          <div>
-            <h3 className="text-lg mb-4">Upload Video</h3>
-            <ImageUploader
-              titleBtn="Chọn video"
-              typefile="video/*"
-              onImagesChange={handleVideoUploaded}
-              urls={data?.video ? data.video : ""}
-              onUrlsReset={hanleResetUrlsVideo}
-            />
-          </div>
-        )}
         <div className="flex justify-end space-x-4">
           <Button className="button-cancel" onClick={onClose}>
             Huỷ
@@ -279,4 +244,4 @@ const AdminModal = <T extends Record<string, any>>({
   );
 };
 
-export default AdminModal;
+export default AdminModalV2;

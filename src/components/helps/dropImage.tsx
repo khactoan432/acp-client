@@ -89,7 +89,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
               <video
                 src={URL.createObjectURL(files[0])}
                 controls
-                className="h-24 w-full object-cover rounded"
+                className="h-full w-full object-cover rounded"
               />
             )}
             <button
@@ -111,7 +111,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
               <video
                 src={URL.createObjectURL(filesParent[0])}
                 controls
-                className="h-24 w-full object-cover rounded"
+                className="h-full w-full object-cover rounded"
               />
             )}
           </div>
