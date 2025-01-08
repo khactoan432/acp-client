@@ -11,12 +11,6 @@
   --color__active-primary: #2563eb;
 
   --color__notactive-primary: #ebebeb;
-
-  --color__hover-primary: #4558b7;
-
-  --color__active-primary: #2563eb;
-
-  --color__notactive-primary: #ebebeb;
 }
 
 body {
@@ -28,11 +22,6 @@ body {
 }
 #root {
   width: 100%;
-}
-// custome antd
-
-.ant-modal-title {
-  color: var(--color__secondary) !important; /* Đổi thành màu bạn muốn */
 }
 // custome antd
 
@@ -53,12 +42,6 @@ body {
   background-color: var(--color__primary);
 }
 
-// background color
-
-.bg-primary {
-  background-color: var(--color__primary);
-}
-
 .bg-secondary {
   background-color: var(--color__secondary);
   color: white;
@@ -67,19 +50,6 @@ body {
 .primary-color-text {
   color: var(--color__secondary);
 }
-
-.primary-color-text:hover {
-  color: var(--color__hover-primary);
-}
-
-.primary-color-text.active {
-  color: var(--color__active-primary);
-}
-
-.bg-notactive-primary {
-  background-color: var(--color__notactive-primary) !important;
-  color: var(--color__primary);
-  opacity: 0.8;
 
 .primary-color-text:hover {
   color: var(--color__hover-primary);
