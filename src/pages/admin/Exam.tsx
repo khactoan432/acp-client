@@ -5,7 +5,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 // import ant
-import { Button } from "antd";
+import { Button, Select } from "antd";
 
 // import icon
 import { FaRegEdit } from "react-icons/fa";
@@ -29,6 +29,7 @@ import { postData, getData, deleteData, putData } from "../../axios";
 
 const AdminExam: React.FC = () => {
   const header = localStorage.getItem("access_token");
+  const { Option } = Select;
   const navigate = useNavigate();
   // state boolen
   const [isUpdate, setIsUpdate] = useState(false);
@@ -36,7 +37,7 @@ const AdminExam: React.FC = () => {
   const [isFetchData, setIsFetchData] = useState(false);
 
   // state string
-  const [idExamDeleted, setIdExamDeleted] = useState<string>("");
+  const [idExam, setIdExam] = useState<string>("");
   // state file
   const [uploadVideo, setUploadVideo] = useState<File[]>([]);
   const [imageExam, setImageExam] = useState<File[]>([]);
@@ -46,14 +47,18 @@ const AdminExam: React.FC = () => {
 
   // data store
   const [allExam, setAllExam] = useState([]);
+  const [selectedItems, setSelectedItems] = useState<
+    { id: string; label: string }[]
+  >([]);
   const [dataEditExam, setDataEditExam] = useState<any>(null);
+  const [categoryType, setCategoryType] = useState<any>(null);
+  const [selectedContent, setSelectedContent] = useState([]);
+  const [selectedItemsByOption, setSelectedItemsByOption] = useState<
+    Record<string, any[]>
+  >({});
+  const [currentOption, setCurrentOption] = useState<string | null>(null);
 
   // useRef input
-  //   const ExamTitleRef = useRef<HTMLInputElement>(null);
-  //   const linkExam = useRef<HTMLInputElement>(null);
-  //   const oldPrice = useRef<HTMLInputElement>(null);
-  //   const newPrice = useRef<HTMLInputElement>(null);
-  //   test ----------------------
   const ExamTitleRef = useRef<{
     focus: () => void;
     getValue: () => string;
@@ -79,15 +84,27 @@ const AdminExam: React.FC = () => {
     clear: () => void;
   }>(null);
 
-  //   const handleCheckValue = () => {
-  //     if (ExamTitleRef.current) {
-  //       alert("Value: " + ExamTitleRef.current.getValue());
-  //     }
-  //   };
-
-  //   test ----------------------
-
   // get data
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      setIsLoading(true);
+      try {
+        const res = await getData("/api/admin/categories", {
+          headers: {
+            Authorization: `Bearer ${header}`,
+          },
+        });
+        setCategoryType(res.data);
+      } catch (e) {
+        console.log("Error fetch categories", e);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchCategories();
+  }, []);
+
   useEffect(() => {
     const fetchDataExam = async () => {
       setIsLoading(true);
@@ -97,10 +114,8 @@ const AdminExam: React.FC = () => {
             Authorization: `Bearer ${header}`,
           },
         });
-        console.log("res: ", res);
         if (res) {
           setAllExam(res);
-          console.log("res exams: ", res);
         }
       } catch (err) {
         console.error(err);
@@ -193,16 +208,12 @@ const AdminExam: React.FC = () => {
         if (Array.isArray(currentRef)) {
           // Reset mỗi phần tử trong mảng ref
           currentRef.forEach((ref) => {
-            if (ref && ref.clear) {
-              ref.clear(); // Gọi phương thức clear nếu tồn tại
-            } else if (ref && ref.value !== undefined) {
-              ref.value = ""; // Reset giá trị của ref
-            }
+            ref.clear();
           });
-        } else if (currentRef.clear) {
-          currentRef.clear(); // Gọi phương thức clear nếu tồn tại
-        } else if (currentRef.value !== undefined) {
-          currentRef.value = ""; // Reset giá trị trực tiếp
+        } else {
+          if (currentRef.clear) {
+            currentRef.clear();
+          }
         }
       }
     });
@@ -219,15 +230,13 @@ const AdminExam: React.FC = () => {
       imageExam.forEach((file) => formData.append("fileImage", file));
       uploadVideo.forEach((file) => formData.append("fileVideo", file));
 
+      const allCategories = Object.values(selectedItemsByOption).flat();
       const name = ExamTitleRef.current?.getValue() || "";
       const price = oldPrice.current?.getValue() || "";
       const discount = newPrice.current?.getValue() || "";
       const link = linkExam.current?.getValue() || "";
-      //   console.log("name: ", name);
-      //   console.log("price: ", price);
-      //   console.log("discount: ", discount);
-      //   console.log("link: ", link);
 
+      formData.append("categories", JSON.stringify(allCategories));
       formData.append("name", name);
       formData.append("price", price);
       formData.append("discount", discount);
@@ -260,13 +269,31 @@ const AdminExam: React.FC = () => {
   const handleActions = (type: string, row: any) => {
     if (type === "DELETE") {
       const id = row._id;
-      setIdExamDeleted(id);
+      setIdExam(id);
       setIdModalVisible(true);
     }
-    if (type === "INTRODUCE") {
+    if (type === "EDIT") {
       const id = row._id;
-      setIdExamDeleted(id);
-      setIdModalVisible(true);
+      setIdExam(id);
+      setAddExam(true);
+      setDataEditExam(row);
+      setIsUpdate(true);
+      console.log("current: ", currentOption);
+      if (row.categories) {
+        const updatedSelectedItems: Record<string, any[]> = {};
+
+        categoryType.forEach((CT) => {
+          const matchingItems = CT.value
+            .map((item: any) => item.value)
+            .filter((value: string) => row.categories.includes(value));
+
+          if (matchingItems.length > 0) {
+            updatedSelectedItems[CT.option] = matchingItems;
+          }
+        });
+
+        setSelectedItemsByOption(updatedSelectedItems);
+      }
     }
     if (type === "INTRODUCE") {
       navigate(`/admin/exam/${row._id}/introduce`);
@@ -281,12 +308,12 @@ const AdminExam: React.FC = () => {
   };
   const handleClosePopup = () => {
     setIdModalVisible(false);
-    setIdExamDeleted("");
+    setIdExam("");
   };
   const handleDeleteExam = async () => {
     try {
       setIsLoading(true);
-      const idDeleted = JSON.parse(JSON.stringify(idExamDeleted));
+      const idDeleted = JSON.parse(JSON.stringify(idExam));
       const examDeleted = await deleteData(`/api/admin/exam/${idDeleted}`, {
         headers: {
           Authorization: `Bearer ${header}`,
@@ -298,7 +325,7 @@ const AdminExam: React.FC = () => {
     } finally {
       setIsLoading(false);
       setIdModalVisible(false);
-      setIdExamDeleted("");
+      setIdExam("");
       setIsFetchData(!isFetchData);
     }
   };
@@ -315,10 +342,12 @@ const AdminExam: React.FC = () => {
       // nếu image và video cũ sẽ là chuỗi string, nếu không nó sẽ là file và be phải chuyển qua string url để lưu
       let image = "";
       let video = "";
-      const name = ExamTitleRef.current?.value || "";
-      const price = oldPrice.current?.value || "";
-      const discount = newPrice.current?.value || "";
-      const link = linkExam.current?.value || "";
+
+      const allCategories = Object.values(selectedItemsByOption).flat();
+      const name = ExamTitleRef.current?.getValue() || "";
+      const price = oldPrice.current?.getValue() || "";
+      const discount = newPrice.current?.getValue() || "";
+      const link = linkExam.current?.getValue() || "";
 
       if (imageExam && imageExam.length > 0) {
         imageExam.forEach((file) => formData.append("fileImage", file));
@@ -335,6 +364,9 @@ const AdminExam: React.FC = () => {
         formData.append("video", video);
       }
 
+      console.log("name: ", name, "price: ", price, " discount: ", discount);
+
+      formData.append("categories", JSON.stringify(allCategories));
       formData.append("name", name);
       formData.append("link", link);
       formData.append("price", price);
@@ -369,6 +401,28 @@ const AdminExam: React.FC = () => {
     }
   };
 
+  // func other
+  const handleSelectCategoryType = (value: string, option: any) => {
+    setCurrentOption(value);
+    setSelectedContent(option.content);
+
+    if (!selectedItemsByOption[value]) {
+      setSelectedItemsByOption((prev) => ({ ...prev, [value]: [] }));
+    }
+  };
+
+  //--_-- Khi checkbox thay đổi
+  const handleCheckbox = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { checked, value } = event.target;
+    setSelectedItemsByOption((prev) => {
+      const currentItems = prev[currentOption!] || [];
+      const updatedItems = checked
+        ? [...currentItems, value]
+        : currentItems.filter((item) => item !== value);
+
+      return { ...prev, [currentOption!]: updatedItems };
+    });
+  };
   if (isLoading) {
     return <Loading message="Đang tải dữ liệu..." size="large" />;
   }
@@ -406,15 +460,6 @@ const AdminExam: React.FC = () => {
                       </h4>
                     </div>
                     <div className="flex flex-col mb-2">
-                      {/* <label className="text-[12px] text-[#5a607f]">
-                        Tên đề thi
-                      </label>
-                      <input
-                        ref={ExamTitleRef}
-                        defaultValue={dataEditExam ? dataEditExam.name : ""}
-                        placeholder="Nhập tên đề thi"
-                        className="border border-[#f3f3f3] rounded-[4px] p-1 mt-1 focus:border-[#1e2753] focus:outline-none"
-                      /> */}
                       <MSInput
                         ref={ExamTitleRef}
                         label="Tên đề thi"
@@ -425,15 +470,6 @@ const AdminExam: React.FC = () => {
                       />
                     </div>
                     <div className="flex flex-col mb-2">
-                      {/* <label className="text-[12px] text-[#5a607f]">
-                        Link đề thi
-                      </label>
-                      <input
-                        ref={linkExam}
-                        defaultValue={dataEditExam ? dataEditExam.link : ""}
-                        placeholder="Nhập đường dẫn đề thi"
-                        className="border border-[#f3f3f3] rounded-[4px] p-1 mt-1 focus:border-[#1e2753] focus:outline-none"
-                      /> */}
                       <MSInput
                         ref={linkExam}
                         label="Đường dẫn đề thi"
@@ -469,17 +505,6 @@ const AdminExam: React.FC = () => {
                       </h4>
                       <div className="flex justify-around">
                         <div className="flex flex-col">
-                          {/* <label className="text-[12px] text-[#5a607f]">
-                            Giá gốc
-                          </label>
-                          <input
-                            ref={oldPrice}
-                            defaultValue={
-                              dataEditExam ? dataEditExam.price : ""
-                            }
-                            placeholder="Nhập giá trước giảm"
-                            className="border border-[#f3f3f3] rounded-[4px] p-1 mt-1 focus:border-[#1e2753] focus:outline-none"
-                          /> */}
                           <MSInput
                             ref={oldPrice}
                             label="Giá đề thi"
@@ -493,17 +518,6 @@ const AdminExam: React.FC = () => {
                           />
                         </div>
                         <div className="flex flex-col">
-                          {/* <label className="text-[12px] text-[#5a607f]">
-                            Giá đã giảm
-                          </label>
-                          <input
-                            ref={newPrice}
-                            defaultValue={
-                              dataEditExam ? dataEditExam.discount : ""
-                            }
-                            placeholder="Nhập giá đã giảm"
-                            className="border border-[#f3f3f3] rounded-[4px] p-1 mt-1 focus:border-[#1e2753] focus:outline-none"
-                          /> */}
                           <MSInput
                             ref={newPrice}
                             label="Giá ưu đãi"
@@ -517,24 +531,6 @@ const AdminExam: React.FC = () => {
                           />
                         </div>
                       </div>
-                      {/* ---------------- test ----------------- */}
-                      {/* <div>
-                        <MSInput
-                          ref={inputRef}
-                          label="Email Address"
-                          placeholder="Enter your email"
-                          type="text"
-                          required
-                          validate="email"
-                        />
-                        <button
-                          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded"
-                          onClick={handleCheckValue}
-                        >
-                          Get Value
-                        </button>
-                      </div> */}
-                      {/* test-------------------------- */}
                     </div>
                     {/* button save */}
                     <div className="mt-4 text-center">
@@ -577,7 +573,51 @@ const AdminExam: React.FC = () => {
                     </div>
                   </div>
                   <div className="w-[35%] bg-white rounded-lg p-4">
-                    category
+                    <div className="w-full h-[400px] max-h-[400px] overflow-hidden border-line-bottom my-2 py-2">
+                      <Select
+                        placeholder="Chọn danh mục"
+                        style={{ width: 200 }}
+                        onChange={handleSelectCategoryType}
+                        className="mb-3"
+                      >
+                        {categoryType.map((CT, idex) => (
+                          <Option
+                            key={idex}
+                            value={CT.option}
+                            content={CT.value}
+                          >
+                            {CT.option}
+                          </Option>
+                        ))}
+                      </Select>
+                      <div className="w-full  h-[340px] max-h-[340px]  h-full overflow-y-auto pb-2">
+                        {selectedContent.length > 0 &&
+                          selectedContent.map((content, idex1) => (
+                            <div
+                              key={idex1}
+                              className="flex items-center ml-1 mb-1"
+                            >
+                              <label>
+                                <input
+                                  type="checkbox"
+                                  value={content.value}
+                                  onChange={handleCheckbox}
+                                  checked={
+                                    selectedItemsByOption[
+                                      currentOption!
+                                    ]?.includes(content.value) || false
+                                  }
+                                  style={{
+                                    transform: "scale(1.5)",
+                                    marginRight: "8px",
+                                  }}
+                                />
+                                {content.value}
+                              </label>
+                            </div>
+                          ))}
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
