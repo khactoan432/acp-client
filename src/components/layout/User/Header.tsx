@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Link } from 'react-router-dom';
 
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../../redux/store";
@@ -13,8 +14,9 @@ import User from "../../../assets/user3.png";
 const Header = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const link = window.location.href;
-  console.log(link);
+  const path = window.location.pathname;
+  const segments = path.split('/'); 
+  const title = segments[1]; 
 
   const { user, access_token } = useSelector((state: RootState) => state.auth);
 
@@ -44,30 +46,27 @@ const Header = () => {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex space-x-6">
-          <a href="/" className="primary-color-text hover:text-blue-600 link">
-            Trang chủ
-          </a>
-          <a
-            href="/course"
-            className="primary-color-text hover:text-blue-600 link"
-          >
-            Chương trình học
-          </a>
-          <a
-            href="/exam/all"
-            className="text-gray-500 hover:text-blue-600 font-semibold"
-          >
-            Đề thi online
-          </a>
-          <a
-            href="/about"
-            className="primary-color-text hover:text-blue-600 link"
-          >
-            Về chúng tôi
-          </a>
-          <a href="/" className="primary-color-text hover:text-blue-600 link">
-            Liên hệ
-          </a>
+          {[
+            { name: "Trang chủ", to: "/",  title: ""},
+            { name: "Chương trình học", to: "/course", title: "course" },
+            { name: "Đề thi online", to: "/exams/all", title: "exams" },
+            { name: "Về chúng tôi", to: "/about", title: "about" },
+            { name: "Liên hệ", to: "/profile", title: "profile"},
+          ].map((item, index) => (
+            item.title === title 
+              ? <Link key={index}
+                  to={item.to}
+                  className="primary-color-text active font-semibold link"
+                >
+                  {item.name}
+                </Link>
+              : <Link key={index}
+                  to={item.to}
+                  className="primary-color-text font-semibold link"
+                >
+                  {item.name}
+                </Link>
+          ))}
         </nav>
 
         {isLogin ? (
@@ -162,21 +161,27 @@ const Header = () => {
       {isOpen && (
         <nav className="md:hidden bg-white shadow-md px-8">
           <div className="flex flex-col items-start space-y-4 pb-4">
-            <a href="#" className="primary-color-text hover:text-blue-600">
-              Trang chủ
-            </a>
-            <a href="#" className="primary-color-text hover:text-blue-600">
-              Chương trình học
-            </a>
-            <a href="#" className="primary-color-text hover:text-blue-600">
-              Đề thi online
-            </a>
-            <a href="#" className="primary-color-text hover:text-blue-600">
-              Về chúng tôi
-            </a>
-            <a href="#" className="primary-color-text hover:text-blue-600">
-              Liên hệ
-            </a>
+            {[
+              { name: "Trang chủ", to: "/",  title: ""},
+              { name: "Chương trình học", to: "/course", title: "course" },
+              { name: "Đề thi online", to: "/exams/all", title: "exams" },
+              { name: "Về chúng tôi", to: "/about", title: "about" },
+              { name: "Liên hệ", to: "/profile", title: "profile"},
+            ].map((item, index) => (
+              item.title === title 
+                ? <Link key={index}
+                    to={item.to}
+                    className="primary-color-text active font-semibold link"
+                  >
+                    {item.name}
+                  </Link>
+                : <Link key={index}
+                    to={item.to}
+                    className="primary-color-text font-semibold link"
+                  >
+                    {item.name}
+                  </Link>
+            ))}
             {isLogin ? (
               <Button
                 onClick={handleLogout}

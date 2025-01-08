@@ -215,8 +215,8 @@ const UserCourseDetail = () => {
                     smooth={true}
                     offset={-140}
                     duration={500}
-                    className="cursor-pointer hover:text-blue-600 transition duration-200"
-                    activeClass="text-blue-600"
+                    className="cursor-pointer font-semibold primary-color-text transition duration-200"
+                    activeClass="active"
                   >
                     {item.name}
                   </Link>
@@ -248,36 +248,6 @@ const UserCourseDetail = () => {
                     </div>
                   </div>
                 ))}
-
-                {/* <div className="relative mt-6 rounded-lg w-full">
-                  <h2 className="text-2xl font-bold mb-6">
-                    Khoá học có gì đặc biệt?
-                  </h2>
-
-                  <div className='flex flex-col gap-2'>
-                    <p>✅ Dành các bạn mới bắt đầu học code C++</p>
-                    <p>✅ 18 giờ học video giảng bài và 54 bài tập lập trình từ chi tiết tới nâng cao</p>
-                    <p>✅ Làm bài chấm bài tự động với codeforce, các bài sẽ có lời giải chi tiết qua video</p>
-                    <p>✅ Dành các bạn mới bắt đầu học code C++</p>
-                    <p>✅ 18 giờ học video giảng bài và 54 bài tập lập trình từ chi tiết tới nâng cao</p>
-                    <p>✅ Làm bài chấm bài tự động với codeforce, các bài sẽ có lời giải chi tiết qua video</p>
-                  </div>
-                </div>
-
-                <div className="relative mt-6 rounded-lg w-full">
-                  <h2 className="text-2xl font-bold mb-6">
-                    Khóa học phù hợp với ai?
-                  </h2>
-
-                  <div className='flex flex-col gap-2'>
-                    <p>✅ Dành các bạn mới bắt đầu học code C++</p>
-                    <p>✅ 18 giờ học video giảng bài và 54 bài tập lập trình từ chi tiết tới nâng cao</p>
-                    <p>✅ Làm bài chấm bài tự động với codeforce, các bài sẽ có lời giải chi tiết qua video</p>
-                    <p>✅ Dành các bạn mới bắt đầu học code C++</p>
-                    <p>✅ 18 giờ học video giảng bài và 54 bài tập lập trình từ chi tiết tới nâng cao</p>
-                    <p>✅ Làm bài chấm bài tự động với codeforce, các bài sẽ có lời giải chi tiết qua video</p>
-                  </div>
-                </div> */}
               </div>
             </div>
 
@@ -291,7 +261,7 @@ const UserCourseDetail = () => {
 
                   {selectedCourse?.topics?.map((topic) => (
                     <div key={topic._id} className="">
-                      <p className="bg-sky-500 text-white text-lg py-1 px-2">
+                      <p className="bg-secondary text-white font-semibold text-lg py-1 px-2">
                         {topic.name}
                       </p>
 
@@ -381,7 +351,7 @@ const UserCourseDetail = () => {
                 </div>
               </div>
               <button
-                className="w-full bg-blue-600 text-white py-3 rounded-lg mt-4 hover:bg-blue-700"
+                className="w-full btn-primary text-white font-semibold py-3 rounded-lg mt-4"
                 onClick={() => payment(selectedCourse?._id)}
               >
                 MUA KHÓA HỌC NGAY
@@ -396,9 +366,9 @@ const UserCourseDetail = () => {
                 <li>📦 Khóa học có giá trị 6 tháng</li>
                 <li>💻 Có thể học trên điện thoại và máy tính</li>
               </ul>
-              <p className="text-sm primary-color-text mt-6">
+              <p className="text-sm mt-6">
                 Chưa chắc chắn khóa học này dành cho bạn?{" "}
-                <a href="#" className="text-blue-600 underline">
+                <a href="#" className="primary-color-text underline">
                   Liên hệ để nhận tư vấn miễn phí!
                 </a>
               </p>
