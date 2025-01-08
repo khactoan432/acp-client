@@ -96,7 +96,6 @@ body {
 }
 
 // btn
-// btn
 .btn-primary {
   background-color: var(--color__secondary);
   border-color: var(--color__secondary);
@@ -104,9 +103,6 @@ body {
 }
 
 .btn-primary:hover {
-  background-color: var(--color__hover-primary);
-}
-
   background-color: var(--color__hover-primary);
 }
 
@@ -175,9 +171,23 @@ body {
 }
 
 // :hover
+
+// :hover
 .hover-action:hover {
   background-color: #dedede !important;
 }
+.ant-menu-submenu-title:hover {
+  background-color: var(--color__hover-primary) !important;
+}
+// font-size text title
+.font-size-20 {
+  font-size: 20px !important;
+}
+.font-size-18 {
+  font-size: 18px !important;
+}
+
+// padding
 .ant-menu-submenu-title:hover {
   background-color: var(--color__hover-primary) !important;
 }
