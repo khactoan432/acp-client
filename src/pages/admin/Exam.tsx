@@ -229,8 +229,13 @@ const AdminExam: React.FC = () => {
       const formData = new FormData();
       imageExam.forEach((file) => formData.append("fileImage", file));
       uploadVideo.forEach((file) => formData.append("fileVideo", file));
-
-      const allCategories = Object.values(selectedItemsByOption).flat();
+      // tranfer
+      const allCategories = Object.entries(selectedItemsByOption).map(
+        ([type, value]) => ({
+          type,
+          value,
+        })
+      );
       const name = ExamTitleRef.current?.getValue() || "";
       const price = oldPrice.current?.getValue() || "";
       const discount = newPrice.current?.getValue() || "";
@@ -279,13 +284,13 @@ const AdminExam: React.FC = () => {
       setDataEditExam(row);
       setIsUpdate(true);
       console.log("current: ", currentOption);
-      if (row.categories) {
+      if (row.categories.value) {
         const updatedSelectedItems: Record<string, any[]> = {};
 
         categoryType.forEach((CT) => {
           const matchingItems = CT.value
             .map((item: any) => item.value)
-            .filter((value: string) => row.categories.includes(value));
+            .filter((value: string) => row.categories.value.includes(value));
 
           if (matchingItems.length > 0) {
             updatedSelectedItems[CT.option] = matchingItems;
@@ -343,7 +348,12 @@ const AdminExam: React.FC = () => {
       let image = "";
       let video = "";
 
-      const allCategories = Object.values(selectedItemsByOption).flat();
+      const allCategories = Object.entries(selectedItemsByOption).map(
+        ([type, value]) => ({
+          type,
+          value,
+        })
+      );
       const name = ExamTitleRef.current?.getValue() || "";
       const price = oldPrice.current?.getValue() || "";
       const discount = newPrice.current?.getValue() || "";
