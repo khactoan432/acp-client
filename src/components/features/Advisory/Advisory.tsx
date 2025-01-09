@@ -1,14 +1,21 @@
 import React, { useState } from "react";
+import { toast } from "react-toastify";
+// import component
 import Button from "../../common/Button";
+import Loading from "../../../components/loading";
+
+// import axios
+import { postData } from "../../../axios";
 
 import bg1 from "../../../assets/bg1.jpg";
 
 const Advisory: React.FC = () => {
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
-    fullName: "",
-    phone: "",
+    name: "",
+    phone_number: "",
     email: "",
-    course: "",
+    mindfulness_course: "",
   });
 
   const handleChange = (
@@ -18,11 +25,38 @@ const Advisory: React.FC = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
-    // Add logic to submit the form data to the server
+    setIsLoading(true);
+    try {
+      const res = await postData(
+        "/api/advisories",
+        {
+          name: formData.name,
+          phone_number: formData.phone_number,
+          email: formData.email,
+          mindfulness_course: formData.mindfulness_course,
+        },
+        { headers: {} }
+      );
+      toast.success("Đăng ký tư vấn thành công! Admin sẽ liên hệ sớm với bạn");
+      setFormData({
+        name: "",
+        phone_number: "",
+        email: "",
+        mindfulness_course: "",
+      });
+    } catch (e) {
+      console.error("Error submitting form:", e);
+      toast.error("Đăng ký tư vấn bị lỗi, vui lòng thử lại!");
+    } finally {
+      setIsLoading(false);
+    }
   };
+
+  if (isLoading) {
+    return <Loading message="Đang tải dữ liệu..." size="large" />;
+  }
 
   return (
     <div className="relative flex items-center justify-center">
@@ -44,18 +78,18 @@ const Advisory: React.FC = () => {
           <form onSubmit={handleSubmit} className="space-y-4">
             <input
               type="text"
-              name="fullName"
+              name="name"
               placeholder="Họ và tên"
-              value={formData.fullName}
+              value={formData.name}
               onChange={handleChange}
               required
               className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 placeholder-gray-500"
             />
             <input
               type="tel"
-              name="phone"
+              name="phone_number"
               placeholder="Số điện thoại"
-              value={formData.phone}
+              value={formData.phone_number}
               onChange={handleChange}
               required
               className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 placeholder-gray-500"
@@ -70,8 +104,8 @@ const Advisory: React.FC = () => {
               className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 placeholder-gray-500"
             />
             <select
-              name="course"
-              value={formData.course}
+              name="mindfulness_course"
+              value={formData.mindfulness_course}
               onChange={handleChange}
               required
               className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-black"

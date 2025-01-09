@@ -38,7 +38,6 @@ const AdminBanner: React.FC = () => {
   // state boolean
   const [isLoading, setIsLoading] = useState(false);
   const [isFetchData, setIsFetchData] = useState(false);
-  const [add, setAdd] = useState(false);
   const [isModalSaveOpen, setIsModalSaveOpen] = useState(false);
   const [isModelUpdateCategoryType, setIsModelUpdateCategoryType] =
     useState(false);

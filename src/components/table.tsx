@@ -20,6 +20,12 @@ const Table = <T extends Record<string, any>>({
   handleAction = () => {},
   actions,
 }: TableProps<T>) => {
+  const formatColumnName = (col) => {
+    return col
+      .replace(/([A-Z])/g, " $1") // Thêm dấu cách trước ký tự in hoa
+      .replace(/_/g, " ") // Thay "_" thành dấu cách
+      .trim(); // Loại bỏ khoảng trắng thừa ở đầu/cuối
+  };
   return (
     <div style={{ padding: "20px", width: "100%" }}>
       <table
@@ -69,7 +75,7 @@ const Table = <T extends Record<string, any>>({
                   }}
                   className="uppercase"
                 >
-                  {col}
+                  {formatColumnName(col)}
                 </th>
               ))}
             <th style={{ padding: "8px", textAlign: "center" }}>ACTIONS</th>

@@ -288,13 +288,11 @@ const AdminExam: React.FC = () => {
         const updatedSelectedItems: Record<string, any[]> = {};
 
         categoryType.forEach((CT) => {
-          // Tìm đối tượng trong row.categories có type khớp với CT.option
           const matchingCategory = row.categories.find(
             (category) => category.type === CT.option
           );
 
           if (matchingCategory) {
-            // Lọc các giá trị value khớp với giá trị trong categoryType
             const matchingItems = matchingCategory.value.filter(
               (value: string) =>
                 CT.value.map((item: any) => item.value).includes(value)

@@ -80,7 +80,7 @@ const Nav: React.FC = () => {
     "4": "/admin/teachers",
     "5": "/admin/exams",
     "6": "/admin/categories",
-    "7": "/admin/schedules",
+    "7": "/admin/advisories",
     "8": "/admin/ranks",
     "9": "/admin/orders",
     "10": "/admin/personal-setting",
