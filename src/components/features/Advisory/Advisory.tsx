@@ -54,10 +54,6 @@ const Advisory: React.FC = () => {
     }
   };
 
-  if (isLoading) {
-    return <Loading message="Đang tải dữ liệu..." size="large" />;
-  }
-
   return (
     <div className="relative flex items-center justify-center">
       {/* Background with opacity */}
@@ -118,8 +114,9 @@ const Advisory: React.FC = () => {
               <option value="fullstack">Fullstack Development</option>
               <option value="data-science">Data Science</option>
             </select>
-            <Button type="submit" className="w-full py-2">
+            <Button type="submit" className={`w-full py-2 relative`}>
               Đăng ký tư vấn miễn phí
+              {!isLoading && <Loading size="small" />}
             </Button>
           </form>
         </div>
