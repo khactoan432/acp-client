@@ -116,7 +116,7 @@ const Advisory: React.FC = () => {
             </select>
             <Button type="submit" className={`w-full py-2 relative`}>
               Đăng ký tư vấn miễn phí
-              {!isLoading && <Loading size="small" />}
+              {isLoading && <Loading size="small" />}
             </Button>
           </form>
         </div>
