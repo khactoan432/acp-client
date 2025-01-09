@@ -284,16 +284,25 @@ const AdminExam: React.FC = () => {
       setDataEditExam(row);
       setIsUpdate(true);
       console.log("current: ", currentOption);
-      if (row.categories.value) {
+      if (row.categories) {
         const updatedSelectedItems: Record<string, any[]> = {};
 
         categoryType.forEach((CT) => {
-          const matchingItems = CT.value
-            .map((item: any) => item.value)
-            .filter((value: string) => row.categories.value.includes(value));
+          // Tìm đối tượng trong row.categories có type khớp với CT.option
+          const matchingCategory = row.categories.find(
+            (category) => category.type === CT.option
+          );
 
-          if (matchingItems.length > 0) {
-            updatedSelectedItems[CT.option] = matchingItems;
+          if (matchingCategory) {
+            // Lọc các giá trị value khớp với giá trị trong categoryType
+            const matchingItems = matchingCategory.value.filter(
+              (value: string) =>
+                CT.value.map((item: any) => item.value).includes(value)
+            );
+
+            if (matchingItems.length > 0) {
+              updatedSelectedItems[CT.option] = matchingItems;
+            }
           }
         });
 
