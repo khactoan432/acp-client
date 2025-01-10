@@ -117,7 +117,6 @@ const AdminModal = <T extends Record<string, any>>({
       formData.type = selectedValue;
     }
     formData.arrayValue = refValue.current;
-    console.log("uploadVideo: ", uploadVideo);
     formData.video =
       uploadVideo.length !== 0 ? uploadVideo : data.video ? data.video : [];
     onSave(formData as T & { files?: File[] });

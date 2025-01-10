@@ -1,6 +1,14 @@
 input:focus {
-  border-width: 0.4px;
-  border-color: var(--color__primary);
+  border-color: var(--color__hover-primary);
   outline: none;
   border-style: solid;
+}
+input:hover {
+  border-color: var(--color__hover-primary);
+  outline: none;
+  border-style: solid;
+}
+.px-11px {
+  padding-right: 11px !important;
+  padding-left: 11px !important;
 }

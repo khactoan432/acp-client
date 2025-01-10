@@ -341,6 +341,16 @@ const AdminExam: React.FC = () => {
     }
   };
 
+  // get height element
+  const headerRef = useRef<HTMLDivElement>(null); // Create a ref for the header div
+  const [minHeight, setMinHeight] = useState(0); // State to store the height
+
+  useEffect(() => {
+    if (headerRef.current) {
+      setMinHeight(headerRef.current.offsetHeight + 8);
+    }
+  }, []);
+
   if (isLoading) {
     return <Loading message="Đang tải dữ liệu..." size="large" />;
   }
@@ -349,15 +359,36 @@ const AdminExam: React.FC = () => {
       <AdminHeader />
       <div className="flex flex-1">
         <Nav />
-        <div className="w-full h-full overflow-y-auto bg-primary">
-          <div className="my-3">
+        <div className="w-full m-2">
+          <div
+            ref={headerRef}
+            className="header_categories flex justify-between items-center bg-primary px-5 py-3"
+          >
+            <div className="left uppercase">
+              <h2 className="font-size-20">Khoá học</h2>
+            </div>
+            <div className="right uppercase">
+              <Button
+                className="button-save box-shadow-btn-save"
+                style={{
+                  backgroundColor: "#2d3c88",
+                  color: "white",
+                  borderColor: "#4558b7",
+                  borderWidth: "0.1px",
+                }}
+                // onClick={() => setIsModalSaveOpen(true)}
+              >
+                Thêm mới
+              </Button>
+            </div>
+          </div>
+          {/* <div className="my-3">
             <div className="px-3 md:px-5">
               <div className="w-[30%] rounded-lg bg-secondary flex justify-center">
-                <h4 className="font-size-18 text-white p-2 uppercase">
+                <h4 className="font-size-16 text-white p-2 uppercase">
                   Khoá học
                 </h4>
               </div>
-              {/* button them khoa hoc */}
               <ButtonPlus
                 content="Thêm khoá học mới"
                 icon={CiCirclePlus}
@@ -367,26 +398,15 @@ const AdminExam: React.FC = () => {
                 width="w-[17%]"
                 onClick={() => setAddCourse(!addCourse)}
               />
-              {/* add thong tin khoa hoc */}
               {addCourse && (
                 <div className="flex justify-around w-full">
-                  {/* thong tin khoa hoc */}
                   <div className="bg-white rounded-lg w-[60%] p-4">
                     <div className="mb-2">
-                      <h4 className="font-size-18 primary-color-text">
+                      <h4 className="font-size-16 primary-color-text">
                         Thông tin khoá học
                       </h4>
                     </div>
                     <div className="flex flex-col mb-2">
-                      {/* <label className="text-[12px] text-[#5a607f]">
-                        Tên khoá học
-                      </label>
-                      <input
-                        ref={courseTitleRef}
-                        defaultValue={dataEditCourse ? dataEditCourse.name : ""}
-                        placeholder="Nhập tên khoá học"
-                        className="border border-[#f3f3f3] rounded-[4px] p-1 mt-1 focus:border-[#1e2753] focus:outline-none"
-                      /> */}
                       <MSInput
                         ref={courseTitleRef}
                         label="Tên khoá học"
@@ -404,7 +424,7 @@ const AdminExam: React.FC = () => {
                       onUrlsReset={hanleResetUrlsImage}
                     />
                     <div>
-                      <h4 className="font-size-18 primary-color-text">
+                      <h4 className="font-size-16 primary-color-text">
                         Video giới thiệu khoá học
                       </h4>
                       <ImageUploader
@@ -415,24 +435,12 @@ const AdminExam: React.FC = () => {
                         onUrlsReset={hanleResetUrlsVideo}
                       />
                     </div>
-                    {/* chi phí khoá học */}
                     <div>
-                      <h4 className="font-size-18 primary-color-text">
+                      <h4 className="font-size-16 primary-color-text">
                         Giá khoá học
                       </h4>
                       <div className="flex justify-around">
                         <div className="flex flex-col">
-                          {/* <label className="text-[12px] text-[#5a607f]">
-                            Giá gốc
-                          </label>
-                          <input
-                            ref={oldPrice}
-                            defaultValue={
-                              dataEditCourse ? dataEditCourse.price : ""
-                            }
-                            placeholder="Nhập giá trước giảm"
-                            className="border border-[#f3f3f3] rounded-[4px] p-1 mt-1 focus:border-[#1e2753] focus:outline-none"
-                          /> */}
                           <MSInput
                             ref={oldPrice}
                             label="Giá khoá học"
@@ -446,17 +454,6 @@ const AdminExam: React.FC = () => {
                           />
                         </div>
                         <div className="flex flex-col">
-                          {/* <label className="text-[12px] text-[#5a607f]">
-                            Giá đã giảm
-                          </label>
-                          <input
-                            ref={newPrice}
-                            defaultValue={
-                              dataEditCourse ? dataEditCourse.discount : ""
-                            }
-                            placeholder="Nhập giá đã giảm"
-                            className="border border-[#f3f3f3] rounded-[4px] p-1 mt-1 focus:border-[#1e2753] focus:outline-none"
-                          /> */}
                           <MSInput
                             ref={newPrice}
                             label="Giá ưu đãi"
@@ -471,7 +468,6 @@ const AdminExam: React.FC = () => {
                         </div>
                       </div>
                     </div>
-                    {/* button save */}
                     <div className="mt-4 text-center">
                       <Button
                         className="mr-4 button-cancel"
@@ -517,8 +513,7 @@ const AdminExam: React.FC = () => {
                 </div>
               )}
             </div>
-          </div>
-          {/* table course */}
+          </div> */}
           {dataCourse && (
             <Table
               columns={columnsCourse}

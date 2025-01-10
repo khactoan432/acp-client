@@ -71,7 +71,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
         )}
       </div>
 
-      <div className="grid gap-2 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 mt-4">
+      <div className="grid mt-4">
         {/* Hiển thị file đã chọn */}
         {files.length > 0 ? (
           <div

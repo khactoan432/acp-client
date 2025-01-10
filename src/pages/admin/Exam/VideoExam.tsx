@@ -21,6 +21,7 @@ import ImageUploader from "../../../components/helps/dropImage";
 import Loading from "../../../components/loading";
 import PopupNotification from "../../../components/popup/notify";
 import AdminModal from "../../../components/popup/AdminModal";
+import AdminModalV2 from "../../../components/popup/AdminModalV2";
 
 // import icon react
 import { FaChevronLeft } from "react-icons/fa6";
@@ -55,17 +56,6 @@ const ExamVideo: React.FC = () => {
   const [idDeleted, setIdDeleted] = useState<string>("");
   // store
   const [data, setData] = useState<VideoExam[]>([]);
-  const [editVideoExam, setEditVideoExam] = useState<VideoExam>();
-
-  // struct data
-  const fieldVideoExam = [
-    {
-      name: "describe",
-      placeholder: "Nhập mô tả video",
-      label: "Mô tả video",
-    },
-  ];
-
   // fetch data
   useEffect(() => {
     const fetchData = async () => {
@@ -88,6 +78,55 @@ const ExamVideo: React.FC = () => {
 
   // define table header
   let columnsCourse = ["describe", "video"];
+
+  const [structData, setStructData] = useState([
+    {
+      name: "describe",
+      placeholder: "Nhập mô tả video",
+      label: "Mô tả video",
+      value: "",
+      type: "INPUT",
+    },
+    {
+      name: "video",
+      label: "Video",
+      value: [],
+      type: "VIDEO",
+    },
+
+    // {
+    //   name: "price",
+    //   placeholder: "Enter the price",
+    //   label: "Price",
+    //   type: "INPUT",
+    //   value: "",
+    // },
+    // {
+    //   name: "email",
+    //   placeholder: "Enter your email",
+    //   label: "Email",
+    //   type: "INPUT",
+    //   value: "",
+    // },
+    // {
+    //   name: "selected",
+    //   label: "Type",
+    //   type: "OPTION",
+    //   value: ["Option 1", "Option 2", "Option 3"],
+    // },
+    // {
+    //   name: "categories",
+    //   label: "Categories",
+    //   type: "ARRAY",
+    //   value: [],
+    // },
+    // {
+    //   name: "images",
+    //   label: "Images",
+    //   type: "IMAGE",
+    //   value: [],
+    // },
+  ]);
 
   const styleAction = {
     marginRight: "8px",
@@ -169,15 +208,13 @@ const ExamVideo: React.FC = () => {
   };
   // update
   const updateVideoExam = async (data: any) => {
-    console.log(data);
+    console.log("data update: ", data);
     const id = idUpdated;
     const describe = data.describe;
     const formData = new FormData();
     // append form data
     let video = "";
-    console.log(data.video.length);
     if (Array.isArray(data.video) && data.video.length > 0) {
-      console.log(data.video);
       data.video.forEach((file) => formData.append("fileVideo", file));
     } else {
       console.log(data.video);
@@ -244,13 +281,22 @@ const ExamVideo: React.FC = () => {
   const handleActions = (type: string, row: any) => {
     if (type === "EDIT") {
       const id = row._id;
-      setIdUpdated(id);
-      setIsModalUpdateVideoExam(true);
       const dataEdit = {
         describe: row.describe,
         video: row.video,
       };
-      setEditVideoExam(dataEdit);
+      const updatedStructData = structData.map((field) => {
+        if (dataEdit.hasOwnProperty(field.name)) {
+          return {
+            ...field,
+            value: dataEdit[field.name],
+          };
+        }
+        return field;
+      });
+      setStructData(updatedStructData);
+      setIdUpdated(id);
+      setIsModalUpdateVideoExam(true);
     }
     if (type === "DELETE") {
       const id = row._id;
@@ -325,27 +371,23 @@ const ExamVideo: React.FC = () => {
         />
       )}
       {isModalCreateVideoExam && (
-        <AdminModal
+        <AdminModalV2
+          action="CREATE"
           isOpen={isModalCreateVideoExam}
-          multiple={false}
           onClose={() => setIsModalCreateVideoExam(false)}
-          fields={fieldVideoExam}
-          enableImageUpload={false}
-          enableVideoUpload={true}
-          data={{}}
+          structData={structData}
           onSave={createVideo}
           title="Tạo mới video"
         />
       )}
       {isModalUpdateVideoExam && (
-        <AdminModal
+        <AdminModalV2
+          action="UPDATE"
           isOpen={isModalUpdateVideoExam}
-          multiple={false}
           onClose={() => setIsModalUpdateVideoExam(false)}
-          fields={fieldVideoExam}
+          structData={structData}
           enableImageUpload={false}
           enableVideoUpload={true}
-          data={editVideoExam}
           onSave={updateVideoExam}
           title="Cập nhật video"
         />

@@ -452,7 +452,7 @@ const AdminExam: React.FC = () => {
           <div className="my-3">
             <div className="px-3 md:px-5">
               <div className="w-[30%] rounded-lg bg-secondary flex justify-center">
-                <h4 className="font-size-18 text-white p-2 uppercase">
+                <h4 className="font-size-16 text-white p-2 uppercase">
                   Đề thi
                 </h4>
               </div>
@@ -472,7 +472,7 @@ const AdminExam: React.FC = () => {
                   {/* thong tin khoa hoc */}
                   <div className="bg-white rounded-lg w-[60%] p-4">
                     <div className="mb-2">
-                      <h4 className="font-size-18 primary-color-text">
+                      <h4 className="font-size-16 primary-color-text">
                         Thông tin đề thi
                       </h4>
                     </div>
@@ -504,7 +504,7 @@ const AdminExam: React.FC = () => {
                       onUrlsReset={hanleResetUrlsImage}
                     />
                     <div>
-                      <h4 className="font-size-18 primary-color-text">
+                      <h4 className="font-size-16 primary-color-text">
                         Video chữa đề thi
                       </h4>
                       <ImageUploader
@@ -517,7 +517,7 @@ const AdminExam: React.FC = () => {
                     </div>
                     {/* chi phí khoá học */}
                     <div>
-                      <h4 className="font-size-18 primary-color-text">
+                      <h4 className="font-size-16 primary-color-text">
                         Giá đề thi
                       </h4>
                       <div className="flex justify-around">

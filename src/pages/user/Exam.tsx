@@ -27,27 +27,29 @@ const UserExam: React.FC = () => {
   const [examsFilter, setExamsFilter] = useState(exams);
 
   const [filter, setFilter] = useState(() => {
-    const categoryExists = categories.some(cat => cat.values.includes(currentCategory));
-  
+    const categoryExists = categories.some((cat) =>
+      cat.values.includes(currentCategory)
+    );
+
     return categoryExists ? [{ type: "Danh mục", value: currentCategory }] : [];
   });
-  
+
   useEffect(() => {
     const categoryExists = categories.some((cat) =>
       cat.values.includes(currentCategory)
     );
-  
+
     setFilter((prevFilter) => {
       // Lọc các bộ lọc không phải "Danh mục"
       const nonCategoryFilters = prevFilter.filter(
         (filter) => filter.type !== "Danh mục"
       );
-  
+
       // Tạo bộ lọc "Danh mục" mới (nếu hợp lệ)
       const categoryFilter = categoryExists
         ? [{ type: "Danh mục", value: currentCategory }]
         : [];
-  
+
       // Kết hợp các bộ lọc
       return [...categoryFilter, ...nonCategoryFilters];
     });
@@ -141,68 +143,93 @@ const UserExam: React.FC = () => {
 
         <div className="flex pt-14">
           <div className="w-full max-w-[20%] lg:w-1/3 px-4 rounded-lg sticky top-[80px] h-max">
-            {categories?.map((category, categoryId)=>(
-              category.type==="Danh mục"
-                ? <div className="mb-6" key={categoryId}>
-                    <h3 className="font-bold text-lg mb-2">Tất Cả Danh Mục</h3>
-                    <ul className="space-y-2 text-sm text-gray-700">
-                      {category?.values?.map((value, index) => (
-                        value === currentCategory ? 
-                          <li className="text-red-500 font-medium cursor-pointer" key={index}>{value}</li>
-                          : 
-                          <li className="hover:text-blue-500 font-medium cursor-pointer" key={index} onClick={() => navigate(`/exams/${value}`)}>{value}</li>
-                      ))}
-                      {showMoreCategories && (
-                        <li className="hover:text-blue-500 cursor-pointer">Danh Mục Khác</li>
-                      )}
-                      <li
-                        className="text-blue-500 cursor-pointer"
-                        onClick={() => setShowMoreCategories(!showMoreCategories)}
-                      >
-                        {showMoreCategories ? "Thu gọn" : "Thêm"}
+            {categories?.map((category, categoryId) =>
+              category.type === "Danh mục" ? (
+                <div className="mb-6" key={categoryId}>
+                  <h3 className="font-bold text-lg mb-2">Tất Cả Danh Mục</h3>
+                  <ul className="space-y-2 text-sm text-gray-700">
+                    {category?.values?.map((value, index) =>
+                      value === currentCategory ? (
+                        <li
+                          className="text-red-500 font-medium cursor-pointer"
+                          key={index}
+                        >
+                          {value}
+                        </li>
+                      ) : (
+                        <li
+                          className="hover:text-blue-500 font-medium cursor-pointer"
+                          key={index}
+                          onClick={() => navigate(`/exams/${value}`)}
+                        >
+                          {value}
+                        </li>
+                      )
+                    )}
+                    {showMoreCategories && (
+                      <li className="hover:text-blue-500 cursor-pointer">
+                        Danh Mục Khác
                       </li>
-                    </ul>
-                  </div>
-                : ""
-            ))}
+                    )}
+                    <li
+                      className="text-blue-500 cursor-pointer"
+                      onClick={() => setShowMoreCategories(!showMoreCategories)}
+                    >
+                      {showMoreCategories ? "Thu gọn" : "Thêm"}
+                    </li>
+                  </ul>
+                </div>
+              ) : (
+                ""
+              )
+            )}
             <div className="mb-6">
               <h3 className="font-bold text-lg mb-2">Bộ Lọc Tìm Kiếm</h3>
-              {categories?.map((category, categoryId)=>(
-                category.type==="Danh mục"
-                  ? ""
-                  : <div className="mb-4" key={categoryId}>
-                      {/* Category Filter */}
-                      <h4 className="text-sm font-medium mb-2">Theo Độ Khó</h4>
-                      <ul className="space-y-2 text-sm text-gray-700">
-                        {category?.values?.map((value, i)=>(
-                          <li key={i}>
-                            <label className="flex items-center">
-                              <input 
-                                type="checkbox" className="mr-2" 
-                                checked={isChecked(category.type, value)}
-                                onChange={(e)=>changeFilter(category.type, value, e.target.checked)}
-                              />
-                              {value}
-                            </label>
-                          </li>
-                        ))}
-                        {showMoreFilters && (
-                          <li>
-                            <label className="flex items-center">
-                              <input type="checkbox" className="mr-2" />
-                              Đề siêu khó
-                            </label>
-                          </li>
-                        )}
-                      </ul>
-                      <p
-                        className="text-blue-500 cursor-pointer mt-2 text-sm"
-                        onClick={() => setShowMoreFilters(!showMoreFilters)}
-                      >
-                        {showMoreFilters ? "Thu gọn" : "Thêm"}
-                      </p>
-                    </div>
-              ))}
+              {categories?.map((category, categoryId) =>
+                category.type === "Danh mục" ? (
+                  ""
+                ) : (
+                  <div className="mb-4" key={categoryId}>
+                    {/* Category Filter */}
+                    <h4 className="text-sm font-medium mb-2">Theo Độ Khó</h4>
+                    <ul className="space-y-2 text-sm text-gray-700">
+                      {category?.values?.map((value, i) => (
+                        <li key={i}>
+                          <label className="flex items-center">
+                            <input
+                              type="checkbox"
+                              className="mr-2"
+                              checked={isChecked(category.type, value)}
+                              onChange={(e) =>
+                                changeFilter(
+                                  category.type,
+                                  value,
+                                  e.target.checked
+                                )
+                              }
+                            />
+                            {value}
+                          </label>
+                        </li>
+                      ))}
+                      {showMoreFilters && (
+                        <li>
+                          <label className="flex items-center">
+                            <input type="checkbox" className="mr-2" />
+                            Đề siêu khó
+                          </label>
+                        </li>
+                      )}
+                    </ul>
+                    <p
+                      className="text-blue-500 cursor-pointer mt-2 text-sm"
+                      onClick={() => setShowMoreFilters(!showMoreFilters)}
+                    >
+                      {showMoreFilters ? "Thu gọn" : "Thêm"}
+                    </p>
+                  </div>
+                )
+              )}
             </div>
             {/* <div className="mb-6">
               <h3 className="font-bold text-lg mb-2">Tất Cả Danh Mục</h3>
@@ -278,7 +305,7 @@ const UserExam: React.FC = () => {
               </div>
 
               <div>
-                <h4 className="font-size-18 text-sm font-medium mb-2">
+                <h4 className="font-size-16 text-sm font-medium mb-2">
                   Theo khu vực
                 </h4>
                 <ul className="space-y-2 text-sm text-gray-700">

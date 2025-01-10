@@ -5,19 +5,18 @@ import React, { useState, useRef, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 // import ant
-import { Button } from "antd";
+import { Button, Select } from "antd";
 
 // import components
-import ButtonPlus from "../../../components/button/plus";
-import MSInput from "../../../components/input/MsInput";
+import AdminModalV2 from "../../../components/popup/AdminModalV2";
 import PopupNotification from "../../../components/popup/notify";
 import Loading from "../../../components/loading";
 
 //icon react
-import { MdDeleteOutline } from "react-icons/md";
-import { MdEditSquare } from "react-icons/md";
-import { CiCirclePlus } from "react-icons/ci";
+import { FiTrash } from "react-icons/fi";
+import { CiEdit } from "react-icons/ci";
 import { FaCheck } from "react-icons/fa";
+import { HiDotsVertical } from "react-icons/hi";
 import { FaChevronLeft } from "react-icons/fa6";
 
 // import axios
@@ -45,45 +44,59 @@ interface Overview {
   type: string;
 }
 
+const { Option } = Select;
+
+type CheckboxState = {
+  lv1: boolean;
+  lv2: { _id: string; status: boolean }[];
+  lv3: { _id: string; status: boolean }[];
+  lv4: { _idParent?: string; child: { _id?: string; status?: boolean }[] }[];
+};
+interface Deleted {
+  describes: string[];
+  overviews: string[];
+}
 const IntroduceExam: React.FC = () => {
   const header = localStorage.getItem("access_token");
   const navigate = useNavigate();
   const { idExam } = useParams();
   // state string
-  const [idDeleted, setIdDeleted] = useState<string>("");
+  const [idDeleted, setIdDeleted] = useState<Deleted>({
+    describes: [],
+    overviews: [],
+  });
+  const [idUpdate, setIdUpdate] = useState<string>("");
   const [nameDeleted, setNameDeleted] = useState<string>("");
 
   //state boolean
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [isUpdate, setIsUpdate] = useState(false);
-  const [addIntroduce, setAddIntroduce] = useState(false);
+  const [isModalUpdate, setIsModalUpdate] = useState(false);
   const [isFetchData, setIsFetchData] = useState(false);
+  const [isModalCreate, setIsModalCreate] = useState(false);
   //state file []
 
   //state array (store)
   const [listDesc, setListDesc] = useState<Desc[]>([]);
   const [dataDesc, setDataDesc] = useState<DataDesc[]>([]);
-  const [dataEditDesc, setDataEditDesc] = useState<DataDesc>();
 
-  //useRef
-  // const introTitleRef = useRef<HTMLInputElement>(null);
-  // const descInputRefs = useRef<(HTMLInputElement | null)[]>([]);
-
-  const introTitleRef = useRef<{
-    focus: () => void;
-    getValue: () => string;
-    setValue: (value: string) => void;
-    clear: () => void;
-  }>(null);
-  const descInputRefs = useRef<
+  // structure
+  const [structData, setStructData] = useState([
     {
-      focus: () => void;
-      getValue: () => string;
-      setValue: (value: string) => void;
-      clear: () => void;
-    }[]
-  >([]);
+      name: "desc",
+      placeholder: "Nhập tiêu đề mô tả",
+      label: "Mô tả video",
+      value: "",
+      type: "INPUT",
+    },
+    {
+      name: "overviews",
+      placeholder: "Nhập mô tả",
+      label: "Thêm mô tả đề thi",
+      type: "ARRAY",
+      value: [],
+    },
+  ]);
 
   // get data
   useEffect(() => {
@@ -95,9 +108,7 @@ const IntroduceExam: React.FC = () => {
             Authorization: `Bearer ${header}`,
           },
         });
-        console.log("data intro: ", res);
         const describes = res.data;
-        console.log("desc: ", describes);
         setDataDesc(describes);
       } catch (error) {
         console.error("Error fetching data: ", error);
@@ -140,34 +151,11 @@ const IntroduceExam: React.FC = () => {
     });
   };
 
-  // handle cancel
-
-  const handleCancel = () => {
-    setIsUpdate(false);
-    setAddIntroduce(false);
-    resetInputRefs([
-      { state: listDesc, setState: setListDesc },
-      { state: dataEditDesc, setState: setDataEditDesc },
-      { ref: introTitleRef },
-      { ref: descInputRefs },
-    ]);
-  };
-
-  // handle add
-  const hanleAddDesc = (): void => {
-    const addDesc: Desc = {
-      id: listDesc.length + 1,
-      _id: "",
-      desc: "",
-    };
-    setListDesc([...listDesc, addDesc]);
-  };
-
   //handle save
-  const createSaveIntroduce = async () => {
+  const createIntro = async (data: any) => {
     setIsLoading(true);
-    const introTitle = introTitleRef.current?.getValue() || "";
-    const dataList = descInputRefs.current.map((cur) => cur?.getValue());
+    const introTitle = data.desc;
+    const dataList = data.overviews;
     try {
       const resDescribe = await postData(
         "/api/admin/describe",
@@ -182,17 +170,17 @@ const IntroduceExam: React.FC = () => {
       );
 
       const id_describe = resDescribe.data._id;
-      console.log("dataList", dataList);
 
-      dataList.forEach(async (data) => {
-        console.log("data", data);
+      dataList.forEach(async (data: { _id?: string; value?: string }) => {
+        const value = data.value;
+        console.log(value);
         try {
           await postData(
             "/api/admin/overview",
             {
               id_material: id_describe,
               type: "EXAM",
-              desc: data,
+              desc: value,
             },
             {
               headers: { Authorization: `Bearer ${header}` },
@@ -206,30 +194,17 @@ const IntroduceExam: React.FC = () => {
       console.error(`Error saving describe/describe`, error);
     } finally {
       setIsLoading(false);
-      resetInputRefs([
-        { state: listDesc, setState: setListDesc },
-        {
-          ref: introTitleRef,
-        },
-        { ref: descInputRefs },
-      ]);
-      setAddIntroduce(false);
+      resetInputRefs([{ state: listDesc, setState: setListDesc }]);
       setIsFetchData(!isFetchData);
     }
   };
-  const handleUpdate = async () => {
-    const dataUpdate = dataEditDesc;
-    const idIntro = dataUpdate?._id;
+  const updateIntro = async (data: any) => {
+    console.log("all data: ", data);
+    const idIntro = idUpdate;
 
+    const introTitle = data.desc;
+    const dataList = data.overviews; // _id , value
     setIsLoading(true);
-    const introTitle = introTitleRef.current?.getValue() || "";
-    const dataList = descInputRefs.current.map((cur, id) => ({
-      id:
-        dataUpdate && dataUpdate.overviews
-          ? dataUpdate?.overviews[id]?._id
-          : null,
-      desc: cur?.getValue(),
-    }));
 
     try {
       const resDescribe = await putData(
@@ -243,49 +218,48 @@ const IntroduceExam: React.FC = () => {
       );
       console.log("resDescribe update: ", resDescribe);
 
-      dataList.forEach(async (data) => {
-        console.log("data", data);
-        if (data.id && data.desc) {
+      dataList.forEach(async (data: { _id?: string; value?: string }) => {
+        const id = data._id || "";
+        console.log("id: ", id);
+        const value = data.value;
+        if (id && value) {
           try {
             const update = await putData(
-              `/api/admin/overview/${data.id}`,
+              `/api/admin/overview/${id}`,
               {
-                desc: data.desc,
+                desc: value,
               },
               {
                 headers: { Authorization: `Bearer ${header}` },
               }
             );
-            console.log("update: ", update);
+            console.log("update overview: ", update);
           } catch (error) {
             console.error(`Error saving describe/overview}`, error);
           }
-        } else if (!data.id && data.desc) {
+        } else if (!id && value) {
+          console.log("check");
           try {
             const res = await postData(
               "/api/admin/overview",
               {
                 id_material: idIntro,
                 type: "COURSE",
-                desc: data.desc,
+                desc: value,
               },
               {
                 headers: { Authorization: `Bearer ${header}` },
               }
             );
-            console.log("res: ", res);
           } catch (error) {
             console.error(`Error saving describe/overview}`, error);
           }
-        } else if (data.id && !data.desc) {
+        } else if (id && !value) {
           try {
-            const deleteRes = await deleteData(
-              `/api/admin/overview/${data.id}`,
-              {
-                headers: { Authorization: `Bearer ${header}` },
-              }
-            );
-            console.log("deleteRes: ", deleteRes);
+            const deleteRes = await deleteData(`/api/admin/overview/${id}`, {
+              headers: { Authorization: `Bearer ${header}` },
+            });
+            console.log("deleteRes overview when not value: ", deleteRes);
           } catch (error) {
             console.error(`Error saving describe/overview}`, error);
           }
@@ -295,125 +269,284 @@ const IntroduceExam: React.FC = () => {
       console.error(`Error saving describe/describe`, error);
     } finally {
       setIsLoading(false);
-      resetInputRefs([
-        { state: listDesc, setState: setListDesc },
-        {
-          ref: introTitleRef,
-        },
-        { ref: descInputRefs },
-      ]);
-      setAddIntroduce(false);
+      resetInputRefs([{ state: listDesc, setState: setListDesc }]);
       setIsFetchData(!isFetchData);
     }
   };
   // hanle edit
   const handleEditIntroduce = async (descs: any) => {
-    console.log("describe", descs);
-    setIsUpdate(true);
-    setAddIntroduce(true);
-    setDataEditDesc(descs);
+    setIsModalUpdate(true);
+    setIdUpdate(descs._id);
 
-    const dataOverview = descs.overviews || [];
-    const descsIntro: Desc[] = dataOverview.map((item: any, index: number) => ({
-      id: listDesc.length + index + 1,
-      _id: item?._id || "",
-      desc: item?.desc || "",
-    }));
+    const updatedStructData = structData.map((field) => {
+      if (descs.hasOwnProperty(field.name)) {
+        if (Array.isArray(descs[field.name])) {
+          return {
+            ...field,
+            value: descs[field.name].map((item: any) => ({
+              desc: item.desc,
+              _id: item._id,
+            })),
+          };
+        }
+        return {
+          ...field,
+          value: descs[field.name],
+        };
+      }
+      return field;
+    });
 
-    setListDesc([...listDesc, ...descsIntro]);
+    console.log("updatedStructData: ", updatedStructData);
+
+    setStructData(updatedStructData);
   };
 
   // hanle delete
 
-  const deleteFunc = () => {
-    if (nameDeleted === "overview") {
-      console.log("ID deleted overview: ", idDeleted);
-      handleDeleteOverview();
-    } else if (nameDeleted === "describe") {
-      console.log("ID deleted describe: ", idDeleted);
-      deleteIntro();
-    }
-  };
+  // const deleteFunc = () => {
+  //   if (nameDeleted === "overview") {
+  //     console.log("ID deleted overview: ", idDeleted);
+  //     handleDeleteOverview();
+  //   } else if (nameDeleted === "describe") {
+  //     console.log("ID deleted describe: ", idDeleted);
+  //     deleteIntro();
+  //   }
+  // };
 
-  const notifyDelete = (id: string, name: string) => {
-    const idDeleted = id;
-    const nameDeleted = name;
+  // const notifyDelete = (id: string, name: string) => {
+  //   const idDeleted = id;
+  //   const nameDeleted = name;
 
-    setNameDeleted(nameDeleted);
-    setIdDeleted(idDeleted);
-    setIsModalVisible(true);
-  };
-  const handleClosePopup = () => {
-    setIsModalVisible(false);
-    setIdDeleted("");
-  };
+  //   setNameDeleted(nameDeleted);
+  //   setIdDeleted(idDeleted);
+  //   setIsModalVisible(true);
+  // };
+  // const handleClosePopup = () => {
+  //   setIsModalVisible(false);
+  //   setIdDeleted();
+  // };
 
-  const deleteIntro = async () => {
-    setIsLoading(true);
-    const id = idDeleted;
-    try {
-      const res = await deleteData(`/api/admin/describe/${id}`, {
-        headers: {
-          Authorization: `Bearer ${header}`,
-        },
+  // const deleteIntro = async () => {
+  //   setIsLoading(true);
+  //   const id = idDeleted;
+  //   try {
+  //     const res = await deleteData(`/api/admin/describe/${id}`, {
+  //       headers: {
+  //         Authorization: `Bearer ${header}`,
+  //       },
+  //     });
+  //     console.log("res: ", res);
+  //   } catch (err) {
+  //     console.error(`Error deleting describe`, err);
+  //   } finally {
+  //     setIsLoading(false);
+  //     setIsFetchData(!isFetchData);
+  //     setIsModalVisible(false);
+  //   }
+  // };
+
+  // const handleDeleteOverview = async () => {
+  //   const id_Deleted = idDeleted;
+  //   if (!id_Deleted) {
+  //     console.error("idDeleted is undefined");
+  //     return;
+  //   }
+
+  //   setIsLoading(true);
+
+  //   try {
+  //     const deleteRes = await deleteData(`/api/admin/overview/${idDeleted}`, {
+  //       headers: { Authorization: `Bearer ${header}` },
+  //     });
+  //     console.log("deleteRes: ", deleteRes);
+  //   } catch (error) {
+  //     console.error(`Error deleting overview`, error);
+  //   } finally {
+  //     setIsLoading(false);
+  //     setIsModalVisible(false);
+  //     setIsFetchData(!isFetchData);
+
+  //     setListDesc((prevListDesc) =>
+  //       prevListDesc.filter((item) => item._id !== idDeleted)
+  //     );
+  //   }
+  // };
+
+  // func handle checkbox
+  // struct checkbox
+  const [checkboxState, setCheckboxState] = useState<CheckboxState>();
+  useEffect(() => {
+    if (dataDesc && dataDesc.length > 0) {
+      setCheckboxState({
+        lv1: false,
+        lv2: dataDesc.map((item) => ({
+          _id: item._id || "",
+          status: false,
+        })),
+        lv3: dataDesc.map((item) => ({
+          _id: item._id || "",
+          status: false,
+        })),
+        lv4: dataDesc.map((item) => ({
+          _idParent: item._id || "",
+          child:
+            item.overviews?.map((it) => ({
+              _id: it._id || "",
+              status: false,
+            })) || [],
+        })),
       });
-      console.log("res: ", res);
-    } catch (err) {
-      console.error(`Error deleting describe`, err);
-    } finally {
-      setIdDeleted("");
-      setIsLoading(false);
-      setIsFetchData(!isFetchData);
-      setIsModalVisible(false);
     }
+  }, [dataDesc]);
+
+  const handleCheckboxChange = (
+    level: "lv1" | "lv2" | "lv3" | "lv4",
+    curStatus: boolean,
+    _id?: string
+  ) => {
+    console.log("lv: ", level, "_id: ", _id, "curStatus: ", curStatus);
+    setCheckboxState((prev) => {
+      const newState = { ...prev };
+      if (level === "lv1") {
+        const allIdDelete = { ...idDeleted };
+
+        // Duyệt qua dataDesc để lấy _id của từng describe và overview
+        dataDesc.forEach((descs: any) => {
+          // Thêm _id vào mảng describes nếu chưa có
+          if (!allIdDelete.describes.includes(descs._id)) {
+            allIdDelete.describes.push(descs._id);
+          }
+
+          // Duyệt qua mỗi overview và thêm _id vào mảng overviews nếu chưa có
+          descs.overviews.forEach((overviews: any) => {
+            if (!allIdDelete.overviews.includes(overviews._id)) {
+              allIdDelete.overviews.push(overviews._id);
+            }
+          });
+        });
+
+        // Cập nhật lại state idDeleted
+        setIdDeleted(allIdDelete);
+
+        // Set lv1 to true
+        newState.lv1 = !curStatus;
+
+        // Set all lv2 to true
+        console.log("newState.lv2: ", newState.lv2);
+        newState.lv2 =
+          newState.lv2 &&
+          newState.lv2.map((item) => ({
+            ...item,
+            status: !curStatus,
+          }));
+
+        // Set lv3 to true
+        newState.lv3 =
+          newState.lv3 &&
+          newState.lv3.map((item) => ({
+            ...item,
+            status: !curStatus,
+          }));
+
+        // Set all lv4 child status to true
+        newState.lv4 =
+          newState.lv4 &&
+          newState.lv4.map((item) => ({
+            ...item,
+            child: item.child.map((child) => ({
+              ...child,
+              status: !curStatus,
+            })),
+          }));
+      }
+      if (level === "lv2" && _id) {
+        // Update only the selected lv2 item
+        newState.lv2 =
+          newState.lv2 &&
+          newState.lv2.map((item) =>
+            item._id === _id ? { ...item, status: !curStatus } : item
+          );
+      }
+      if (level === "lv3" && _id) {
+        // Update lv3 status
+        newState.lv3 =
+          newState.lv3 &&
+          newState.lv3.map(
+            (item) =>
+              item._id === _id
+                ? { ...item, status: !curStatus } // Toggle the selected lv3 item
+                : item // Keep the rest of the lv3 items unchanged
+          );
+
+        // Set all lv4 items with the same _idParent to the same status
+        newState.lv4 =
+          newState.lv4 &&
+          newState.lv4.map((item) => {
+            if (item._idParent === _id) {
+              // Update the status of lv3 for this parent
+              newState.lv3 =
+                newState.lv3 &&
+                newState.lv3.map((lv3Item) =>
+                  lv3Item._id === _id
+                    ? { ...lv3Item, status: !curStatus }
+                    : lv3Item
+                );
+              return {
+                ...item,
+                child: item.child.map((child) => ({
+                  ...child,
+                  status: !curStatus, // Update status of each child
+                })),
+              };
+            }
+            return item; // Don't modify lv4 items with different _idParent
+          });
+      }
+      if (level === "lv4" && _id) {
+        newState.lv4 =
+          newState.lv4 &&
+          newState.lv4.map((item) => {
+            const updatedChild = item.child.map((child) =>
+              child._id === _id
+                ? {
+                    ...child,
+                    status: !curStatus, // Toggle the status of the matched child
+                  }
+                : child
+            );
+
+            // Check if all lv4 child are checked
+            const allChecked = updatedChild.every((child) => child.status);
+
+            // If all lv4 child are checked, set the lv3 status to true
+            if (allChecked) {
+              newState.lv3 = newState.lv3.map((lv3Item) => {
+                if (lv3Item._id === item._idParent) {
+                  return { ...lv3Item, status: true }; // Check the parent lv3
+                }
+                return lv3Item;
+              });
+            }
+
+            // If any lv4 child is unchecked, set the lv3 status to false
+            if (!allChecked) {
+              newState.lv3 = newState.lv3.map((lv3Item) => {
+                if (lv3Item._id === item._idParent) {
+                  return { ...lv3Item, status: false }; // Uncheck the parent lv3
+                }
+                return lv3Item;
+              });
+            }
+
+            return { ...item, child: updatedChild };
+          });
+      }
+      return newState;
+    });
   };
-  const handleDeleteOverview = async () => {
-    const id_Deleted = idDeleted;
-    if (!id_Deleted) {
-      console.error("idDeleted is undefined");
-      return;
-    }
 
-    setIsLoading(true);
-
-    try {
-      const deleteRes = await deleteData(`/api/admin/overview/${idDeleted}`, {
-        headers: { Authorization: `Bearer ${header}` },
-      });
-      console.log("deleteRes: ", deleteRes);
-    } catch (error) {
-      console.error(`Error deleting overview`, error);
-    } finally {
-      setIsLoading(false);
-      setIsModalVisible(false);
-      setIsFetchData(!isFetchData);
-
-      setListDesc((prevListDesc) =>
-        prevListDesc.filter((item) => item._id !== idDeleted)
-      );
-
-      resetInputRefs([
-        {
-          ref: descInputRefs,
-        },
-      ]);
-
-      // Cập nhật dataEditDesc
-      setDataEditDesc((prevDataEditDesc) => {
-        const prevDesc = prevDataEditDesc || { overviews: [] };
-
-        const updatedOverviews = prevDesc?.overviews?.filter(
-          (overview) => overview._id !== idDeleted
-        );
-
-        return {
-          ...prevDesc,
-          overviews: updatedOverviews,
-        };
-      });
-    }
-  };
-
+  console.log("idDeleted: ", idDeleted);
   if (isLoading) {
     return <Loading message="Đang tải dữ liệu..." size="large" />;
   }
@@ -423,177 +556,203 @@ const IntroduceExam: React.FC = () => {
       <div className="flex flex-1">
         <Nav />
         <div className="w-full h-full bg-white">
-          <div className="mx-2 my-2 bg-primary rounded-lg h-full">
-            <Button
-              className="mr-4 button-cancel mb-6"
-              style={{
-                backgroundColor: "white",
-                color: "#1e2753",
-                borderColor: "#1e2753",
-              }}
-              ghost
-              onClick={() => navigate(`/admin/exams`)}
-            >
-              <FaChevronLeft />
-              Back
-            </Button>
-            <h4 className="font-size-18 primary-color-text uppercase pb-2">
-              Giới thiệu đề thi
-            </h4>
-            <ButtonPlus
-              content="Thêm giới thiệu"
-              icon={CiCirclePlus}
-              iconSize="text-[30px]"
-              textSize="text-[14px"
-              height="h-[32px]"
-              width="w-[16%]"
-              onClick={() => setAddIntroduce(!addIntroduce)}
-            />
-            {addIntroduce && (
-              <div className="pr-8">
-                <div className="flex flex-col mb-2 relative">
-                  {/* <label className="text-[12px] text-[#5a607f]">Tiêu đề</label>
+          <div className="m-2 h-full">
+            <div className="bg-primary px-5 py-3 mb-2">
+              <Button
+                className="button-cancel px-5 py-3"
+                style={{
+                  backgroundColor: "white",
+                  color: "#1e2753",
+                  borderColor: "#1e2753",
+                }}
+                ghost
+                onClick={() => navigate(`/admin/exams`)}
+              >
+                <FaChevronLeft />
+                Back
+              </Button>
+            </div>
+            <div className="header_categories flex justify-between items-center bg-primary px-5 py-3 mb-2">
+              <div className="left uppercase">
+                <h2 className="font-size-20">Giới thiệu đề thi</h2>
+              </div>
+              <div className="right uppercase">
+                <Button
+                  className="button-save box-shadow-btn-save"
+                  style={{
+                    backgroundColor: "#2d3c88",
+                    color: "white",
+                    borderColor: "#4558b7",
+                    borderWidth: "0.1px",
+                  }}
+                  onClick={() => setIsModalCreate(true)}
+                >
+                  Thêm mới
+                </Button>
+              </div>
+            </div>
+            <div className="bg-primary">
+              <div className="flex items-center justify-between border-line-bottom px-5 py-3">
+                <div className="flex items-center">
                   <input
-                    ref={introTitleRef}
-                    defaultValue={
-                      dataEditDesc && dataEditDesc.desc ? dataEditDesc.desc : ""
+                    type="checkbox"
+                    className="cursor-pointer w-4 h-4 mr-2"
+                    checked={
+                      checkboxState && checkboxState.lv1
+                        ? checkboxState.lv1
+                        : false
                     }
-                    placeholder="Bạn sẽ học được gì khi tham gia khoá học"
-                    className="border border-[#f3f3f3] rounded-[4px] p-1 mt-1 focus:border-[#1e2753] focus:outline-none"
-                  /> */}
-                  <MSInput
-                    ref={introTitleRef}
-                    label="Tiêu đề"
-                    placeholder="Bạn sẽ học được gì khi tham gia khoá học"
-                    type="text"
-                    required
-                    defaultValue={
-                      dataEditDesc && dataEditDesc.desc ? dataEditDesc.desc : ""
+                    onChange={() =>
+                      handleCheckboxChange(
+                        "lv1",
+                        (checkboxState && checkboxState.lv1) || false
+                      )
                     }
                   />
-                </div>
-                <div className="mb-2 pl-6 relative">
-                  <div className="absolute left-4 top-1/2 transform -translate-y-1/2 h-[100%] w-[0.2px] bg-[#1e2753]"></div>{" "}
-                  {/* Đường line màu đỏ */}
-                  <h4 className="font-size-18 primary-color-text">
-                    Thêm mô tả
-                  </h4>
-                  <ButtonPlus
-                    content="Thêm mô tả"
-                    icon={CiCirclePlus}
-                    iconSize="text-[22px]"
-                    textSize="text-[12px]"
-                    height="h-[24px]"
-                    width="w-[11%]"
-                    paddingLeft="pl-6"
-                    paddingRight="pr-4"
-                    onClick={() => hanleAddDesc()}
-                  />
-                  {listDesc.length >= 1 &&
-                    listDesc.map((desc, id) => (
-                      <div key={id} className="flex flex-col mb-2 relative">
-                        <MdDeleteOutline
-                          onClick={() =>
-                            isUpdate && desc.desc
-                              ? notifyDelete(desc?._id, "overview")
-                              : setListDesc(
-                                  listDesc.filter((_, idx) => idx !== id)
-                                )
-                          }
-                          className="absolute cursor-pointer top-1 right-2 text-red-500 hover:text-red-700"
-                          title="Xoá mô tả"
-                        />
-                        <MSInput
-                          ref={(el) => {
-                            descInputRefs.current[id] = el!;
-                          }}
-                          label={`Mô tả ${id + 1}`}
-                          placeholder="Thành thạo ngôn ngữ lập trình c#"
-                          type="text"
-                          required
-                          defaultValue={
-                            dataEditDesc?.overviews
-                              ? dataEditDesc?.overviews[id]?.desc
-                              : ""
-                          }
-                        />
-                      </div>
-                    ))}
-                </div>
-                {/* button save */}
-                <div className="mt-2">
-                  <Button
-                    className="mr-4 button-cancel"
-                    style={{
-                      backgroundColor: "white",
-                      color: "#1e2753",
-                      borderColor: "#1e2753",
-                    }}
-                    ghost
-                    onClick={handleCancel}
+                  <Select
+                    defaultValue="Thực hiện hàng loạt"
+                    style={{ width: 180 }}
                   >
-                    Cancel
-                  </Button>
-                  {isUpdate === true ? (
-                    <Button
-                      className="button-save"
-                      style={{
-                        backgroundColor: "#00095b",
-                        color: "white",
-                        borderColor: "#00095b",
-                      }}
-                      onClick={handleUpdate}
-                    >
-                      Save update
-                    </Button>
-                  ) : (
-                    <Button
-                      className="button-save"
-                      style={{
-                        backgroundColor: "#00095b",
-                        color: "white",
-                        borderColor: "#00095b",
-                      }}
-                      onClick={createSaveIntroduce}
-                    >
-                      Save describe
-                    </Button>
-                  )}
+                    <Option value="value1">Xoá tất cả mô tả</Option>
+                    <Option value="value2">Xoá tất cả overviews</Option>
+                  </Select>
                 </div>
               </div>
-            )}
-            {/* show list desc */}
-            <div className="py-2 my-8 px-4 mx-12 bg-white rounded-lg">
               {dataDesc && dataDesc.length > 0 ? (
-                dataDesc.map((descs, id) => (
+                dataDesc.map((descs) => (
                   <div
-                    key={id}
-                    className="pl-6 my-6 pb-2 pt-6 pr-2 rounded-lg border-[0.4px] border-[#1e2753] relative"
+                    key={descs._id}
+                    className="border-[0.4px] border-line-bottom px-5 py-3"
                   >
-                    <MdDeleteOutline
-                      onClick={() =>
-                        notifyDelete(
-                          descs._id ? descs._id : "undefined",
-                          "describe"
-                        )
-                      }
-                      className="absolute cursor-pointer top-[4px] left-[24px] text-red-500 hover:text-red-700"
-                      title="Xoá mô tả"
-                    />
-                    <MdEditSquare
-                      onClick={() => handleEditIntroduce(descs)}
-                      className="absolute cursor-pointer top-[4px] left-[42px] text-red-500 hover:text-red-700"
-                      title="Chỉnh sửa mô tả"
-                    />
-                    <div className="mb-2 bg-secondary px-4 py-2 rounded-lg inline-block">
-                      <h4 className="font-size-18 text-white">{descs?.desc}</h4>
+                    <div className="flex justify-between border-line-bottom">
+                      <div className="flex items-center mb-2">
+                        <input
+                          type="checkbox"
+                          className="cursor-pointer w-4 h-4 mr-2"
+                          checked={
+                            (checkboxState &&
+                              checkboxState.lv2.find(
+                                (item) => item._id === descs._id
+                              )?.status) ||
+                            false
+                          }
+                          onChange={() =>
+                            handleCheckboxChange(
+                              "lv2",
+                              (checkboxState &&
+                                checkboxState.lv2.find(
+                                  (item) => item._id === descs._id
+                                )?.status) ||
+                                false,
+                              descs._id
+                            )
+                          }
+                        />
+                        <div>
+                          <h4 className="bg-secondary px-4 py-2 rounded-lg inline-block leading-[normal] font-size-16 text-white">
+                            {descs?.desc}
+                          </h4>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-around bg-white min-w-[96px] mb-2 rounded-lg px-4">
+                        <div className="flex justify-between items-center">
+                          <input
+                            type="checkbox"
+                            className="cursor-pointer w-4 h-4 mr-2"
+                            checked={
+                              (checkboxState &&
+                                checkboxState.lv3.find(
+                                  (item) => item._id === descs._id
+                                )?.status) ||
+                              false
+                            }
+                            onChange={() =>
+                              handleCheckboxChange(
+                                "lv3",
+                                (checkboxState &&
+                                  checkboxState.lv3.find(
+                                    (item) => item._id === descs._id
+                                  )?.status) ||
+                                  false,
+                                descs._id
+                              )
+                            }
+                          />
+                        </div>
+                      </div>
                     </div>
                     <div className="mb-2">
                       {descs.overviews &&
-                        descs?.overviews.map((desc, index) => (
-                          <div key={index} className="flex items-center">
-                            <FaCheck className="primary-color-text mr-2" />
-                            <p>{desc.desc}</p>
+                        descs?.overviews.map((overview) => (
+                          <div
+                            key={overview._id}
+                            className="flex items-center justify-between"
+                          >
+                            <div className="flex">
+                              <FaCheck className="primary-color-text mr-2 invisible" />
+                              <p>{overview.desc}</p>
+                            </div>
+                            <div className="flex items-center justify-around min-w-[96px] mb-2 px-4">
+                              <div className="flex justify-between items-center">
+                                <input
+                                  type="checkbox"
+                                  className="cursor-pointer w-4 h-4 mr-2"
+                                  checked={
+                                    (checkboxState &&
+                                      checkboxState.lv4
+                                        .find(
+                                          (item) => item._idParent === descs._id
+                                        )
+                                        ?.child.find(
+                                          (child) => child._id === overview._id
+                                        )?.status) ||
+                                    false
+                                  }
+                                  onChange={() =>
+                                    handleCheckboxChange(
+                                      "lv4",
+                                      (checkboxState &&
+                                        checkboxState.lv4
+                                          .find(
+                                            (item) =>
+                                              item._idParent === descs._id
+                                          )
+                                          ?.child.find(
+                                            (child) =>
+                                              child._id === overview._id
+                                          )?.status) ||
+                                        false,
+                                      overview._id
+                                    )
+                                  }
+                                />
+                                <div className="relative group p-2 icon-dots invisible">
+                                  <HiDotsVertical className="cursor-pointer" />
+                                  <div
+                                    className="absolute hidden group-hover:flex flex-col bg-white shadow-lg rounded-md p-2 z-10"
+                                    style={{
+                                      top: "100%",
+                                      right: 0,
+                                    }}
+                                  >
+                                    <div
+                                      className="flex items-center justify-between px-2 py-1 hover:bg-gray-100 cursor-pointer rounded"
+                                      style={{ color: "red" }}
+                                    >
+                                      <FiTrash className="mr-2" />
+                                      <span
+                                        style={{
+                                          fontSize: "12px",
+                                          minWidth: "32px",
+                                        }}
+                                      >
+                                        Delete
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
                           </div>
                         ))}
                     </div>
@@ -606,6 +765,26 @@ const IntroduceExam: React.FC = () => {
           </div>
         </div>
       </div>
+      {isModalCreate && (
+        <AdminModalV2
+          action="CREATE"
+          isOpen={isModalCreate}
+          onClose={() => setIsModalCreate(false)}
+          structData={structData}
+          onSave={createIntro}
+          title="Tạo mới giới thiệu đề thi"
+        />
+      )}
+      {isModalUpdate && (
+        <AdminModalV2
+          action="UPDATE"
+          isOpen={isModalUpdate}
+          onClose={() => setIsModalUpdate(false)}
+          structData={structData}
+          onSave={updateIntro}
+          title="Cập nhât giới thiệu đề thi"
+        />
+      )}
       {isModalVisible && (
         <PopupNotification
           title="Bạn có chắc chắn muốn xoá?"

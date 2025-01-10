@@ -125,7 +125,7 @@ const MSInput = forwardRef<MSInputHandle, MSInputProps>(
             value={value}
             onChange={handleChange}
             disabled={disabled}
-            className={`w-full px-4 py-2 border rounded-md ${
+            className={`w-full px-11px py-1 border rounded-md ${
               LeftIcon ? "pl-10" : ""
             } ${RightIcon ? "pr-10" : ""} ${
               error ? "border-red-500" : "border-gray-300"

@@ -735,7 +735,7 @@ const Content: React.FC = () => {
               <FaChevronLeft />
               Back
             </Button>
-            <h4 className="font-size-18 primary-color-text uppercase pb-2">
+            <h4 className="font-size-16 primary-color-text uppercase pb-2">
               Nội dung khoá học
             </h4>
             <ButtonPlus
@@ -755,29 +755,6 @@ const Content: React.FC = () => {
             {addCourseContent && (
               <div className="pr-8">
                 <div className="flex flex-col mb-2 relative">
-                  {/* <label className="text-[12px] text-[#5a607f]">
-                    Tiêu đề chương học
-                  </label> */}
-                  {/* {isUpdateLesson && !isOnlyTopicTitle && (
-                    <MdEditSquare
-                      onClick={() => {
-                        setIsUpdateTitleTopic(true);
-                        setAddLesson(false);
-                        setIsUpdateLesson(false);
-                      }}
-                      className="absolute cursor-pointer top-[4px] right-8 text-red-500 hover:text-red-700"
-                      title="Chỉnh sửa chương học"
-                    />
-                  )} */}
-                  {/* <input
-                    ref={topicTitleRef}
-                    defaultValue={editNameTopic ? editNameTopic : ""}
-                    disabled={!isUpdateTitleTopic}
-                    placeholder="Kiểu dữ liệu, biến, vòng lặp"
-                    className={`border border-[#f3f3f3] rounded-[4px] p-1 mt-1 focus:border-[#1e2753] focus:outline-none ${
-                      !isUpdateTitleTopic ? "blurred-input" : ""
-                    }`}
-                  /> */}
                   <MSInput
                     ref={topicTitleRef}
                     label="Tiêu đề chương học"
@@ -811,28 +788,6 @@ const Content: React.FC = () => {
                     <div>
                       <div className="flex flex-col mb-2  pl-6 relative ml-6">
                         <div className="absolute left-4 top-1/2 transform -translate-y-1/2 h-[100%] w-[0.2px] bg-[#1e2753]"></div>{" "}
-                        {/* <MdDeleteOutline
-                          onClick={() =>
-                            isUpdateLesson && lesson.name
-                              ? notifyDelete(
-                                  lesson._id ? lesson._id : "undifined"
-                                )
-                              : setLessons(
-                                  lessons.filter((_, idx) => idx !== id)
-                                )
-                          }
-                          className="absolute cursor-pointer top-1 right-2 text-red-500 hover:text-red-700"
-                          title="Xoá mô tả"
-                        /> */}
-                        {/* <label className="text-[12px] text-[#5a607f]">
-                          Tiêu đề bài học
-                        </label>
-                        <input
-                          ref={lessonTitleRef}
-                          defaultValue={editLesson?.name ? editLesson.name : ""}
-                          placeholder="Hướng dẫn cài đặt vsCode"
-                          className="border border-[#f3f3f3] rounded-[4px] p-1 mt-1 focus:border-[#1e2753] focus:outline-none"
-                        /> */}
                         <MSInput
                           ref={lessonTitleRef}
                           label="Tiêu đề bài học"
@@ -898,23 +853,6 @@ const Content: React.FC = () => {
                                 className="absolute cursor-pointer top-1 right-2 text-red-500 hover:text-red-700"
                                 title="Xoá mô tả"
                               />
-                              {/* <label className="text-[12px] text-[#5a607f]">
-                                Bài {id + 1}: Tên và link bài tập
-                              </label>
-                              <input
-                                ref={(el) => (nameExerciseRef.current[id] = el)}
-                                defaultValue={
-                                  editLesson?.exercise
-                                    ? editLesson.exercise[id]?.name
-                                      ? editLesson.exercise[id].name
-                                      : ""
-                                    : dataLinkCodeFource[id]?.name
-                                    ? dataLinkCodeFource[id].name
-                                    : ""
-                                }
-                                placeholder="Nhập tên bài tập"
-                                className="border border-[#f3f3f3] rounded-[4px] p-1 mt-1 focus:border-[#1e2753] focus:outline-none"
-                              /> */}
                               <MSInput
                                 ref={(el) => {
                                   linkExerciseRef.current[id] = el!;
@@ -933,20 +871,7 @@ const Content: React.FC = () => {
                                     : ""
                                 }
                               />
-                              {/* <input
-                                ref={(el) => (linkExerciseRef.current[id] = el)}
-                                defaultValue={
-                                  editLesson?.exercise
-                                    ? editLesson.exercise[id]?.link
-                                      ? editLesson.exercise[id].link
-                                      : ""
-                                    : dataLinkCodeFource[id]?.link
-                                    ? dataLinkCodeFource[id].link
-                                    : ""
-                                }
-                                placeholder="Nhập link bài tập"
-                                className="border border-[#f3f3f3] rounded-[4px] p-1 mt-1 focus:border-[#1e2753] focus:outline-none"
-                              /> */}
+
                               <MSInput
                                 ref={(el) => {
                                   linkExerciseRef.current[id] = el!;
@@ -968,11 +893,6 @@ const Content: React.FC = () => {
                             </div>
                           ))}
                       </div>
-                      {/* button save */}
-
-                      {/* setIsUpdateTitleTopic(true);
-                        setAddLesson(false);
-                        setIsUpdateLesson(false); */}
                       {(isUpdateTitleTopic === false ||
                         addLesson === true ||
                         isUpdateLesson === true) && (
@@ -1067,21 +987,6 @@ const Content: React.FC = () => {
                                     className="object-cover w-full h-full"
                                   />
                                 ) : (
-                                  // cmt for test image when internet low
-                                  // <img
-                                  //   src={URL.createObjectURL(lesson.video[0])}
-                                  //   alt="test image"
-                                  //   className="object-cover w-full h-full"
-                                  // />
-                                  // <img
-                                  //   src={
-                                  //     editLesson && editLesson[0].video
-                                  //       ? editLesson.video
-                                  //       : ""
-                                  //   }
-                                  //   alt="test image"
-                                  //   className="object-cover w-full h-full"
-                                  // />
                                   <video
                                     src={
                                       editLesson && editLesson[0].video
@@ -1098,7 +1003,7 @@ const Content: React.FC = () => {
                               lesson.exercise.map((data) => (
                                 <div>
                                   <div className="mb-2 bg-secondary px-4 py-1 rounded-lg inline-block">
-                                    <h4 className="font-size-18 text-white">
+                                    <h4 className="font-size-16 text-white">
                                       {data.name}
                                     </h4>
                                   </div>
@@ -1119,7 +1024,6 @@ const Content: React.FC = () => {
                 </div>
               </div>
             )}
-            {/* button save */}
             {((addCourseContent === true && isUpdateTitleTopic === true) ||
               (isUpdateLesson === true && isUpdateTitleTopic === true)) && (
               <div className="mt-8">
@@ -1160,7 +1064,6 @@ const Content: React.FC = () => {
                   <div
                     key={topicId}
                     className="my-6 px-4 pb-2 pt-6 pr-2 border-[0.4px] border-black rounded-lg max-h-[400px] overflow-y-auto relative"
-                    // style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
                   >
                     <MdDeleteOutline
                       className="absolute cursor-pointer top-[4px] left-[24px] text-red-500 hover:text-red-700"
@@ -1183,12 +1086,10 @@ const Content: React.FC = () => {
                       title="Tạo mới bài học"
                       onClick={() => handleShowAddLesson(topic)}
                     />
-                    {/* Hiển thị tiêu đề topic */}
                     <div className="mb-2 bg-secondary px-4 py-2 rounded-lg inline-block">
-                      <h4 className="font-size-18 text-white">{topic.name}</h4>
+                      <h4 className="font-size-16 text-white">{topic.name}</h4>
                     </div>
 
-                    {/* Hiển thị danh sách các lesson trong topic */}
                     {topic.lessons &&
                       topic.lessons.length > 0 &&
                       topic.lessons.map((lesson, lessonId) => (
@@ -1248,28 +1149,10 @@ const Content: React.FC = () => {
                                           controls
                                           className="object-cover w-full h-full"
                                         />
-                                        {/* <img
-                                          src={video}
-                                          alt="test image"
-                                          className="object-cover w-full h-full"
-                                        /> */}
                                       </div>
                                     ))
                                   : lesson?.video && (
-                                      // <div className="relative w-full h-32 overflow-hidden rounded-lg border">
-                                      //   <video
-                                      //     src={lesson.video}
-                                      //     controls
-                                      //     className="object-cover w-full h-full"
-                                      //   />
-                                      // </div>
-                                      // cmt for tes internet low
                                       <div className="relative w-full h-32 overflow-hidden rounded-lg border">
-                                        {/* <img
-                                          src={lesson.video}
-                                          alt="test image"
-                                          className="object-cover w-full h-full"
-                                        /> */}
                                         <video
                                           src={lesson.video}
                                           controls
@@ -1282,7 +1165,7 @@ const Content: React.FC = () => {
                                 lesson.exercise.map((data) => (
                                   <div>
                                     <div className="mb-2 bg-secondary px-4 py-1 rounded-lg inline-block">
-                                      <h4 className="font-size-18 text-white">
+                                      <h4 className="font-size-16 text-white">
                                         {data.name}
                                       </h4>
                                     </div>

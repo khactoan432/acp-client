@@ -2,9 +2,9 @@ import React, { useState, useEffect, useRef } from "react";
 import AdminHeader from "../../../components/layout/Admin/header";
 import Nav from "../../../components/layout/Admin/nav";
 import Loading from "../../../components/loading";
-import { HiDotsVertical } from "react-icons/hi";
 
 // import icon react
+import { HiDotsVertical } from "react-icons/hi";
 import { CiCirclePlus } from "react-icons/ci";
 import { FiTrash } from "react-icons/fi";
 import { CiEdit } from "react-icons/ci";
