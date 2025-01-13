@@ -31,7 +31,7 @@ const Course: React.FC<CourseProps> = ({
   rating,
 }) => {
   const navigate = useNavigate();
-  const payment = async (id_material: string) => {
+  const payment = async (id_material: string, amount: number) => {
     try {
       console.log("Payment initiated for:", id_material);
 
@@ -42,6 +42,7 @@ const Course: React.FC<CourseProps> = ({
           id_user: "6756abc20424abb76abb1eb0", // ID người dùng
           id_material: id_material, // ID khóa học
           type: "COURSE", // Loại thanh toán
+          amount: amount
         },
         {}
       );
@@ -97,7 +98,7 @@ const Course: React.FC<CourseProps> = ({
           <Button onClick={() => navigate("/course/" + id)} className="w-[45%]">
             Chi tiết
           </Button>
-          <Button onClick={() => payment(id)} className="w-[45%]">
+          <Button onClick={() => payment(id, price - discount)} className="w-[45%]">
             Mua ngay
           </Button>
         </div>

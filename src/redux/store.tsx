@@ -6,6 +6,8 @@ import achievementReducer from './slices/achievementSlice';
 import teacherReducer from './slices/teacherSlice';
 import courseReducer from './slices/courseSlice';
 import examReducer from './slices/examSlice';
+import orderReducer from './slices/orderSlice';
+import categoryReducer from './slices/categorySlice';
 
 const store = configureStore({
   reducer: {
@@ -15,6 +17,8 @@ const store = configureStore({
     teachers: teacherReducer,
     courses: courseReducer,
     exams: examReducer,
+    orders: orderReducer,
+    categories: categoryReducer,
   },
 })
 

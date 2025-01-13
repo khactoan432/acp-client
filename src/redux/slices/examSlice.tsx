@@ -37,9 +37,20 @@ const initialState: UserState = {
 
 export const fetchUserExams = createAsyncThunk(
   'exams/fetchUserExams',
-  async ({page, limit}: {page: number, limit: number}, { rejectWithValue }) => {
+  async (
+    { page, limit, filters }: { page: number; limit: number; filters: { type: string; value: string[]}[] },
+    { rejectWithValue }
+  ) => {
     try {
-      const response = await getData(`api/exams?page=${page}&limit=${limit}`, {});
+      // Encode filters dưới dạng JSON string
+      const filterParams = `filters=${encodeURIComponent(JSON.stringify(filters))}`;
+
+      // Gọi API với các tham số cần thiết
+      const response = await getData(
+        `api/exams?page=${page}&limit=${limit}&${filterParams}`,
+        {}
+      );
+
       return response;
     } catch (error: any) {
       return rejectWithValue(error.message || 'Failed to fetch Exams');
