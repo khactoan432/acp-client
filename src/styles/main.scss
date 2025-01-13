@@ -11,6 +11,10 @@
   --color__active-primary: #2563eb;
 
   --color__notactive-primary: #ebebeb;
+
+  --color__edit: #eda22e;
+
+  --color__text-primary: #454649;
 }
 
 body {
@@ -86,6 +90,18 @@ body {
   background-color: var(--color__notactive-primary) !important;
   color: var(--color__primary);
   opacity: 0.8;
+}
+// color:
+
+.text-color-primary {
+  color: var(--color__text-primary);
+}
+.text-primary-hover:hover {
+  color: var(--color__hover-primary);
+}
+
+.color-edit {
+  color: var(--color__edit);
 }
 
 // btn
@@ -235,11 +251,16 @@ input:focus {
 
 .icon-dots {
   color: var(--color__secondary);
+  transition: all 0.3s ease;
 }
+
 .icon-dots:hover {
-  background-color: var(--color__primary);
-  border-radius: 100%;
+  cursor: pointer;
+  background-color: #d4d3d3;
+  border-radius: 50%;
   color: var(--color__hover-primary);
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(192, 190, 190, 0.2);
 }
 
 // margin
@@ -279,17 +300,6 @@ input:focus {
   border-radius: 4px; /* Bo góc track */
 }
 
-// icon
-
-.icon-dots {
-  color: var(--color__secondary);
-}
-.icon-dots:hover {
-  background-color: var(--color__primary);
-  border-radius: 100%;
-  color: var(--color__hover-primary);
-}
-
 // margin
 
 input:focus {
@@ -325,4 +335,26 @@ input:focus {
 ::-webkit-scrollbar-track {
   background-color: #f1f1f1; /* Màu nền của track thanh cuộn */
   border-radius: 4px; /* Bo góc track */
+}
+
+// animations
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-2px);
+  }
+  50% {
+    transform: translateX(2px);
+  }
+  75% {
+    transform: translateX(-2px);
+  }
+}
+
+.shake-animation {
+  animation: shake 0.3s ease-in-out;
 }

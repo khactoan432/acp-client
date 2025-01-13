@@ -27,7 +27,7 @@ const PopupNotification: React.FC<PopupNotificationProps> = ({
 
   return (
     <Modal
-      visible={true}
+      open={true}
       title={title}
       footer={null} // Không cần footer mặc định
       closable={false} // Không cho phép đóng modal bằng nút X

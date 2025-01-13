@@ -58,22 +58,23 @@ const AdminModalV2: React.FC<AdminModalProps> = ({
     if (isOpen) {
       const initialData: Record<string, any> = {};
       structData.forEach((field) => {
-        initialData[field.name] =
-          field.type === "ARRAY" ? [] : field.value || "";
+        const keyName = `old_${field.name}`;
+        initialData[keyName] = field.type === "ARRAY" ? [] : field.value || "";
       });
       setFormData(initialData);
-
       if (structData) {
-        setFormData((prev) => ({
-          ...prev,
-          ...structData,
-        }));
+        setFormData((prev) => {
+          const updatedData: Record<string, any> = {};
+          structData.forEach((field) => {
+            const keyName = `old_${field.name}`;
+            updatedData[keyName] = field;
+          });
+          return { ...prev, ...updatedData };
+        });
       }
       if (action === "UPDATE") {
         const arrayFields = structData.filter((item) => item.type === "ARRAY");
-        console.log("Array fields: ", arrayFields);
         arrayFields.forEach((field) => {
-          console.log("Field: ", field.value);
           if (field.value && Array.isArray(field.value)) {
             const updatedArrayValues = field.value.map((val, index) => ({
               _id: val._id ? val._id : "",
@@ -86,6 +87,8 @@ const AdminModalV2: React.FC<AdminModalProps> = ({
       }
     }
   }, [isOpen, structData, action]);
+
+  console.log("formData: ", formData);
 
   const handleSelectChange = (value: any, name: string) => {
     setFormData((prev) => ({
@@ -119,6 +122,8 @@ const AdminModalV2: React.FC<AdminModalProps> = ({
   };
 
   const handleSave = () => {
+    const finalData = { ...formData };
+
     // video
     const videoUpdate = structData.filter((item) => item.type === "VIDEO")[0];
     const imageUpdate = structData.filter((item) => item.type === "IMAGE")[0];
@@ -133,7 +138,7 @@ const AdminModalV2: React.FC<AdminModalProps> = ({
         uploadImage.length !== 0 ? uploadImage : imageUpdate?.value;
     }
 
-    const finalData = { ...formData };
+    console.log(finalData);
 
     structData.forEach((field) => {
       if (field.type === "INPUT" && refValue.current[field.name]) {
