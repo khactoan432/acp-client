@@ -6,6 +6,8 @@ import { toast } from "react-toastify";
 import { Button, Select } from "antd";
 
 // import components
+import SearchInput from "../../../components/input/SeachInput";
+import MSInput from "../../../components/input/MsInput";
 import AdminHeader from "../../../components/layout/Admin/header";
 import Nav from "../../../components/layout/Admin/nav";
 import AdminModalV2 from "../../../components/popup/AdminModalV2";
@@ -18,34 +20,27 @@ import { HiDotsVertical } from "react-icons/hi";
 import { FaChevronLeft } from "react-icons/fa6";
 import { FiTrash2 } from "react-icons/fi";
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
+import { HiOutlineSearch } from "react-icons/hi";
 
 // import axios
 import { postData, getData, deleteData, putData } from "../../../axios";
 
 // interface
-interface Desc {
-  id: number;
-  _id: string;
-  desc: string;
-}
-
 interface DataDesc {
   _id?: string;
-  desc?: string;
+  desc: string;
   id_material?: string;
-  overviews?: Overview[];
+  overviews: Overview[];
   type?: string;
+  createdAt: string;
 }
-
 interface Overview {
   _id: string;
   desc: string;
   id_material: string;
   type: string;
+  createdAt: string;
 }
-
-const { Option } = Select;
-
 type CheckboxState = {
   lv1: boolean;
   lv2: { _id: string; status: boolean }[];
@@ -57,14 +52,42 @@ interface Deleted {
     overviews: { _id: string }[];
   }[];
 }
+const { Option } = Select;
 const IntroduceExam: React.FC = () => {
-  const screenHeight = window.innerHeight - 56; // đã trừ đi header
   const header = localStorage.getItem("access_token");
+  const [screenHeight, setScreenHeight] = useState(window.innerHeight - 56);
+  const updateScreenHeight = () => {
+    setScreenHeight(window.innerHeight - 56);
+  };
+  useEffect(() => {
+    window.addEventListener("resize", updateScreenHeight);
+    return () => {
+      window.removeEventListener("resize", updateScreenHeight);
+    };
+  }, []);
+  // get height element
+  const firstDivRef = useRef<HTMLDivElement>(null);
+  const secondDivRef = useRef<HTMLDivElement>(null);
+  const thirdDivRef = useRef<HTMLDivElement>(null);
+  const [firstHeight, setFirstHeight] = useState<number>(0);
+  const [secondHeight, setSecondHeight] = useState<number>(0);
+  const [thirdHeight, setThirdHeight] = useState<number>(0);
+
+  useEffect(() => {
+    if (firstDivRef.current) {
+      setFirstHeight(firstDivRef.current.offsetHeight);
+    }
+    if (secondDivRef.current) {
+      setSecondHeight(secondDivRef.current.offsetHeight);
+    }
+    if (thirdDivRef.current) {
+      setThirdHeight(thirdDivRef.current.offsetHeight);
+    }
+  }, []);
   const navigate = useNavigate();
   const { idExam } = useParams();
   // state string
   const [idUpdate, setIdUpdate] = useState<string>("");
-  const [idOpenUpdate, setIdOpenUpdate] = useState<string>("");
   const [idDeleted, setIdDeleted] = useState<Deleted>();
   const [nameDeleted, setNameDeleted] = useState<string>("");
 
@@ -78,14 +101,19 @@ const IntroduceExam: React.FC = () => {
   const [isUpdateOverview, setIsUpdateOverview] = useState<
     Record<string, boolean>
   >({});
-  //state file []
-
   //state array (store)
-  const [listDesc, setListDesc] = useState<Desc[]>([]);
   const [dataDesc, setDataDesc] = useState<DataDesc[]>([]);
   const [dataIdDeleted, setDataIdDeleted] = useState<Deleted>({
     describes: [],
   });
+
+  // state ref:
+  const refValue = useRef<{
+    focus: () => void;
+    getValue: () => string;
+    setValue: (value: string) => void;
+    clear: () => void;
+  }>(null);
 
   // structure
   const [structData, setStructData] = useState([
@@ -136,38 +164,6 @@ const IntroduceExam: React.FC = () => {
     fetchDataIntroduce();
   }, [isFetchData]);
 
-  // reset input refs
-  const resetInputRefs = (
-    items: Array<{
-      state?: any;
-      setState?: (value: any) => void;
-      ref?: React.RefObject<any>;
-    }>
-  ) => {
-    items.forEach((item) => {
-      if (item.state && item.setState) {
-        // Reset state
-        if (Array.isArray(item.state)) {
-          item.setState([]); // Reset mảng về rỗng
-        } else {
-          item.setState(null); // Reset giá trị khác về null
-        }
-      } else if (item.ref) {
-        // Reset ref
-        const currentRef = item.ref.current;
-        if (Array.isArray(currentRef)) {
-          // Reset mỗi phần tử trong mảng ref
-          currentRef.forEach((ref) => {
-            if (ref && ref.value !== undefined) ref.value = "";
-          });
-        } else if (currentRef && currentRef.value !== undefined) {
-          // Reset giá trị của input ref
-          currentRef.value = "";
-        }
-      }
-    });
-  };
-
   //handle save
   const createIntro = async (data: any) => {
     setIsLoading(true);
@@ -214,7 +210,6 @@ const IntroduceExam: React.FC = () => {
       console.error(`Error saving describe/describe`, error);
     } finally {
       setIsLoading(false);
-      resetInputRefs([{ state: listDesc, setState: setListDesc }]);
       setIsFetchData(!isFetchData);
     }
   };
@@ -377,7 +372,6 @@ const IntroduceExam: React.FC = () => {
 
   const notifyDelete = (name: string, id: any) => {
     const id_deleted = id;
-    console.log("deleteId: ", id_deleted);
     const nameDeleted = name;
     setNameDeleted(nameDeleted);
     setIdDeleted(id_deleted);
@@ -398,9 +392,20 @@ const IntroduceExam: React.FC = () => {
     try {
       if (Array.isArray(id_Deleted) && id_Deleted.length > 0) {
         for (const id of id_Deleted) {
-          const deleteRes = await deleteData(`/api/admin/describe/${id._id}`, {
-            headers: { Authorization: `Bearer ${header}` },
-          });
+          if (id._id) {
+            const deleteRes = await deleteData(
+              `/api/admin/describe/${id._id}`,
+              {
+                headers: { Authorization: `Bearer ${header}` },
+              }
+            );
+          } else if (typeof id === "string") {
+            const deleteRes = await deleteData(`/api/admin/describe/${id}`, {
+              headers: { Authorization: `Bearer ${header}` },
+            });
+          } else {
+            toast.warning("Xảy ra lỗi khi xoá mô tả!");
+          }
         }
         toast.success("Xoá các mô tả thành công!");
       } else {
@@ -708,33 +713,96 @@ const IntroduceExam: React.FC = () => {
       return newState;
     });
   };
-  console.log("idDeleted: ", dataIdDeleted);
-
-  // get height element
-  const firstDivRef = useRef<HTMLDivElement>(null);
-  const secondDivRef = useRef<HTMLDivElement>(null);
-  const thirdDivRef = useRef<HTMLDivElement>(null);
-  const [firstHeight, setFirstHeight] = useState<number>(0);
-  const [secondHeight, setSecondHeight] = useState<number>(0);
-  const [thirdHeight, setThirdHeight] = useState<number>(0);
-
-  useEffect(() => {
-    if (firstDivRef.current) {
-      setFirstHeight(firstDivRef.current.offsetHeight);
-    }
-    if (secondDivRef.current) {
-      setSecondHeight(secondDivRef.current.offsetHeight);
-    }
-    if (thirdDivRef.current) {
-      setThirdHeight(thirdDivRef.current.offsetHeight);
-    }
-  }, []);
 
   const toggleUpdateOverview = (id: string) => {
     setIsUpdateOverview((prevState) => ({
       ...prevState,
       [id]: !prevState[id],
     }));
+  };
+
+  // hanle search
+
+  const [filteredData, setFilteredData] = useState<DataDesc[]>([]);
+  useEffect(() => {
+    setFilteredData(dataDesc);
+  }, [dataDesc]);
+
+  const handleSearch = (e) => {
+    const term = e.target.value;
+
+    // Gọi hàm search
+    const results = SearchInput(dataDesc, term, ["desc", "overviews.desc"]);
+    setFilteredData(results);
+  };
+
+  // filter
+  const [isAZDesc, setIsAZDesc] = useState(true);
+  const [isAZOverviews, setIsAZOverviews] = useState(true);
+  const [isTimeDesc, setIsTimeDesc] = useState(true);
+  const [isTimeOverviews, setIsTimeOverviews] = useState(true);
+
+  const handleSort = (order: string) => {
+    const sortedData = [...filteredData].sort((a, b) => {
+      if (order === "asc_descs") {
+        setIsAZDesc(false);
+        return a.desc.localeCompare(b.desc);
+      } else if (order === "desc_descs") {
+        setIsAZDesc(true);
+
+        return b.desc.localeCompare(a.desc);
+      } else if (order === "asc_overviews") {
+        setIsAZOverviews(false);
+        const minOverviewA = a.overviews.length
+          ? Math.min(...a.overviews.map((ov) => ov.desc.localeCompare("")))
+          : Infinity;
+        const minOverviewB = b.overviews.length
+          ? Math.min(...b.overviews.map((ov) => ov.desc.localeCompare("")))
+          : Infinity;
+        return minOverviewA - minOverviewB;
+      } else if (order === "desc_overviews") {
+        setIsAZOverviews(true);
+
+        const maxOverviewA = a.overviews.length
+          ? Math.max(...a.overviews.map((ov) => ov.desc.localeCompare("")))
+          : -Infinity;
+        const maxOverviewB = b.overviews.length
+          ? Math.max(...b.overviews.map((ov) => ov.desc.localeCompare("")))
+          : -Infinity;
+        return maxOverviewB - maxOverviewA;
+      } else if (order === "asc_timedescribe") {
+        setIsTimeDesc(false);
+        return (
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        );
+      } else if (order === "desc_timedescribe") {
+        setIsTimeDesc(true);
+        return (
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+      } else if (order === "asc_timeoverviews") {
+        setIsTimeOverviews(false);
+        const minTimeA = Math.min(
+          ...a.overviews.map((ov) => new Date(ov.createdAt).getTime())
+        );
+        const minTimeB = Math.min(
+          ...b.overviews.map((ov) => new Date(ov.createdAt).getTime())
+        );
+        return minTimeA - minTimeB;
+      } else if (order === "desc_timeoverviews") {
+        setIsTimeOverviews(true);
+        const maxTimeA = Math.max(
+          ...a.overviews.map((ov) => new Date(ov.createdAt).getTime())
+        );
+        const maxTimeB = Math.max(
+          ...b.overviews.map((ov) => new Date(ov.createdAt).getTime())
+        );
+        return maxTimeB - maxTimeA;
+      }
+      return 0;
+    });
+
+    setFilteredData(sortedData);
   };
 
   if (isLoading) {
@@ -829,6 +897,43 @@ const IntroduceExam: React.FC = () => {
                       )}
                   </Select>
                 </div>
+                {/* bộ lọc và tìm kiếm */}
+                <div className="flex items-center gap-2">
+                  <MSInput
+                    ref={refValue}
+                    placeholder="Tìm kiếm..."
+                    type="text"
+                    leftIcon={HiOutlineSearch}
+                    onChangeInput={handleSearch}
+                  />
+                  {/* bộ lọc filter */}
+                  <Select
+                    defaultValue="Lọc tìm kiếm"
+                    onChange={handleSort}
+                    style={{ width: 200 }}
+                  >
+                    {isAZDesc ? (
+                      <Option value="asc_descs">A-Z (D)</Option>
+                    ) : (
+                      <Option value="desc_descs">Z-A (D)</Option>
+                    )}
+                    {isAZOverviews ? (
+                      <Option value="asc_overviews">A-Z (O)</Option>
+                    ) : (
+                      <Option value="desc_overviews">Z-A (O)</Option>
+                    )}
+                    {isTimeDesc ? (
+                      <Option value="asc_timedescribe">sớm(D)</Option>
+                    ) : (
+                      <Option value="desc_timedescribe">muộn((D))</Option>
+                    )}
+                    {isTimeOverviews ? (
+                      <Option value="asc_timeoverviews">sớm(O)</Option>
+                    ) : (
+                      <Option value="desc_timeoverviews">muộn((O))</Option>
+                    )}
+                  </Select>
+                </div>
               </div>
               <div
                 style={{
@@ -836,8 +941,8 @@ const IntroduceExam: React.FC = () => {
                 }}
                 className="overflow-y-auto"
               >
-                {dataDesc && dataDesc.length > 0 ? (
-                  dataDesc.map((descs) => (
+                {filteredData && filteredData.length > 0 ? (
+                  filteredData.map((descs) => (
                     <div
                       key={descs._id}
                       className="border-[0.4px] border-line-bottom px-5 py-3"
@@ -889,7 +994,7 @@ const IntroduceExam: React.FC = () => {
                                 >
                                   <CiEdit className="mr-2 color-edit" />
                                   <span
-                                    className="text-color-primary text-primary-hover"
+                                    className="text-color-primary "
                                     style={{
                                       fontSize: "12px",
                                       minWidth: "100px",
@@ -906,7 +1011,7 @@ const IntroduceExam: React.FC = () => {
                                 >
                                   <CiEdit className="mr-2 color-edit" />
                                   <span
-                                    className="text-color-primary text-primary-hover"
+                                    className="text-color-primary "
                                     style={{
                                       fontSize: "12px",
                                       minWidth: "100px",
@@ -930,7 +1035,7 @@ const IntroduceExam: React.FC = () => {
                                     style={{ color: "red" }}
                                   />
                                   <span
-                                    className="text-color-primary text-primary-hover"
+                                    className="text-color-primary "
                                     style={{
                                       fontSize: "12px",
                                       minWidth: "100px",
@@ -959,7 +1064,7 @@ const IntroduceExam: React.FC = () => {
                                       style={{ color: "red" }}
                                     />
                                     <span
-                                      className="text-color-primary text-primary-hover"
+                                      className="text-color-primary "
                                       style={{
                                         fontSize: "12px",
                                         minWidth: "100px",
@@ -1014,7 +1119,7 @@ const IntroduceExam: React.FC = () => {
                                       height: "16px",
                                       flexShrink: 0,
                                     }}
-                                    className="primary-color-text mt-1 mr-2"
+                                    className="text-color-secondary mt-1 mr-2"
                                   />
                                 )}
                                 <p>{overview.desc}</p>
@@ -1102,7 +1207,7 @@ const IntroduceExam: React.FC = () => {
       )}
       {isModalVisible && (
         <PopupNotification
-          title="Bạn có chắc chắn muốn xoá?"
+          title="Bạn có chắc chắn muốn xoá giới thiệu của đề thi này?"
           status="error"
           buttonText="Xoá ngay"
           onButtonClick={deleteFunc}

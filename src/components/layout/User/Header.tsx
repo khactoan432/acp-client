@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
 
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../../redux/store";
@@ -15,8 +15,8 @@ const Header = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const path = window.location.pathname;
-  const segments = path.split('/'); 
-  const title = segments[1]; 
+  const segments = path.split("/");
+  const title = segments[1];
 
   const { user, access_token } = useSelector((state: RootState) => state.auth);
 
@@ -47,26 +47,30 @@ const Header = () => {
         {/* Desktop Navigation */}
         <nav className="hidden md:flex space-x-6">
           {[
-            { name: "Trang chủ", to: "/",  title: ""},
+            { name: "Trang chủ", to: "/", title: "" },
             { name: "Chương trình học", to: "/course", title: "course" },
             { name: "Đề thi online", to: "/exams/all", title: "exams" },
             { name: "Về chúng tôi", to: "/about", title: "about" },
-            { name: "Liên hệ", to: "/profile", title: "profile"},
-          ].map((item, index) => (
-            item.title === title 
-              ? <Link key={index}
-                  to={item.to}
-                  className="primary-color-text active font-semibold link"
-                >
-                  {item.name}
-                </Link>
-              : <Link key={index}
-                  to={item.to}
-                  className="primary-color-text font-semibold link"
-                >
-                  {item.name}
-                </Link>
-          ))}
+            { name: "Liên hệ", to: "/profile", title: "profile" },
+          ].map((item, index) =>
+            item.title === title ? (
+              <Link
+                key={index}
+                to={item.to}
+                className="text-color-secondary active font-semibold link"
+              >
+                {item.name}
+              </Link>
+            ) : (
+              <Link
+                key={index}
+                to={item.to}
+                className="text-color-secondary font-semibold link"
+              >
+                {item.name}
+              </Link>
+            )
+          )}
         </nav>
 
         {isLogin ? (
@@ -94,7 +98,7 @@ const Header = () => {
                 {/* Notification Section */}
                 <div className="p-4 border-b border-gray-300">
                   <h3 className="text-gray-700">Thông báo</h3>
-                  <p className="primary-color-text text-sm mt-1">
+                  <p className="text-color-secondary text-sm mt-1">
                     Bạn chưa có thông báo mới.
                   </p>
                   <a href="#" className="text-blue-500 text-sm mt-1 block">
@@ -162,26 +166,30 @@ const Header = () => {
         <nav className="md:hidden bg-white shadow-md px-8">
           <div className="flex flex-col items-start space-y-4 pb-4">
             {[
-              { name: "Trang chủ", to: "/",  title: ""},
+              { name: "Trang chủ", to: "/", title: "" },
               { name: "Chương trình học", to: "/course", title: "course" },
               { name: "Đề thi online", to: "/exams/all", title: "exams" },
               { name: "Về chúng tôi", to: "/about", title: "about" },
-              { name: "Liên hệ", to: "/profile", title: "profile"},
-            ].map((item, index) => (
-              item.title === title 
-                ? <Link key={index}
-                    to={item.to}
-                    className="primary-color-text active font-semibold link"
-                  >
-                    {item.name}
-                  </Link>
-                : <Link key={index}
-                    to={item.to}
-                    className="primary-color-text font-semibold link"
-                  >
-                    {item.name}
-                  </Link>
-            ))}
+              { name: "Liên hệ", to: "/profile", title: "profile" },
+            ].map((item, index) =>
+              item.title === title ? (
+                <Link
+                  key={index}
+                  to={item.to}
+                  className="text-color-secondary active font-semibold link"
+                >
+                  {item.name}
+                </Link>
+              ) : (
+                <Link
+                  key={index}
+                  to={item.to}
+                  className="text-color-secondary font-semibold link"
+                >
+                  {item.name}
+                </Link>
+              )
+            )}
             {isLogin ? (
               <Button
                 onClick={handleLogout}

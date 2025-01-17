@@ -71,7 +71,7 @@ const Login: React.FC = () => {
   return (
     <div style={{ width: "100%", padding: "62px 0px" }}>
       <div style={styles.container}>
-        <h1 className="primary-color-text m-2" style={styles.title}>
+        <h1 className="text-color-secondary m-2" style={styles.title}>
           Sign In
         </h1>
         <div className="flex mb-4">
@@ -86,7 +86,7 @@ const Login: React.FC = () => {
         <form onSubmit={handleSubmit} style={styles.form}>
           {error && <p style={styles.error}>{error}</p>}
 
-          <label className="primary-color-text">Email</label>
+          <label className="text-color-secondary">Email</label>
           <input
             type="text"
             placeholder="Username"
@@ -95,7 +95,7 @@ const Login: React.FC = () => {
             style={styles.input}
           />
 
-          <label className="primary-color-text">Password</label>
+          <label className="text-color-secondary">Password</label>
           <div style={styles.passwordWrapper}>
             <input
               type={showPassword ? "text" : "password"}

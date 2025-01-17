@@ -79,7 +79,7 @@ const ProfileTabs: React.FC = () => {
           className={`px-4 py-2 ${
             activeTab === "courses"
               ? "border-b-2 border-blue-600 text-blue-600"
-              : "primary-color-text"
+              : "text-color-secondary"
           }`}
         >
           Khóa học
@@ -89,7 +89,7 @@ const ProfileTabs: React.FC = () => {
           className={`px-4 py-2 ${
             activeTab === "results"
               ? "border-b-2 border-blue-600 text-blue-600"
-              : "primary-color-text"
+              : "text-color-secondary"
           }`}
         >
           Kết quả luyện thi

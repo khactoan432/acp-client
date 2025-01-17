@@ -1,76 +1,122 @@
-import AdminHeader from "../../components/layout/Admin/header";
-import Nav from "../../components/layout/Admin/nav";
-
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-
+import { toast } from "react-toastify";
 // import ant
 import { Button } from "antd";
-
 // import icon
 import { FaRegEdit } from "react-icons/fa";
 import { MdOutlineDeleteOutline } from "react-icons/md";
 import { MdContentPaste } from "react-icons/md";
 import { MdAttractions } from "react-icons/md";
-
 // import components
-import ButtonPlus from "../../components/button/plus";
-import MSInput from "../../components/input/MsInput";
-import ImageUploader from "../../components/helps/dropImage";
+import AdminHeader from "../../components/layout/Admin/header";
+import Nav from "../../components/layout/Admin/nav";
 import Loading from "../../components/loading";
 import Table from "../../components/table";
 import PopupNotification from "../../components/popup/notify";
-
-// icon react
-import { CiCirclePlus } from "react-icons/ci";
-
+import AdminModalV2 from "../../components/popup/AdminModalV2";
 //axios
 import { postData, getData, deleteData, putData } from "../../axios";
 
 const AdminExam: React.FC = () => {
   const header = localStorage.getItem("access_token");
+
+  const [screenHeight, setScreenHeight] = useState(window.innerHeight - 56);
+  const updateScreenHeight = () => {
+    setScreenHeight(window.innerHeight - 56);
+  };
+  useEffect(() => {
+    window.addEventListener("resize", updateScreenHeight);
+    return () => {
+      window.removeEventListener("resize", updateScreenHeight);
+    };
+  }, []);
+  const [firstHeight, setFirstHeight] = useState<number>(0);
+  const firstDivRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (firstDivRef.current) {
+      setFirstHeight(firstDivRef.current.offsetHeight);
+    }
+  }, []);
   const navigate = useNavigate();
   // state boolen
-  const [isUpdate, setIsUpdate] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isFetchData, setIsFetchData] = useState(false);
-
-  // state string
-  const [idCourseDeleted, setIdCourseDeleted] = useState<string>("");
-  // state file
-  const [uploadVideo, setUploadVideoIntro] = useState<File[]>([]);
-  const [imageIntroCourse, setImageIntroCourse] = useState<File[]>([]);
-  // state boolean
-  const [addCourse, setAddCourse] = useState(false);
+  const [isModalCreate, setIsModalCreate] = useState(false);
+  const [isModalUpdate, setIsModalUpdate] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
 
+  // state string
+  const [idCourse, setIdCourse] = useState<string>("");
   // data store
   const [allCourse, setAllCourse] = useState([]);
-  const [dataEditCourse, setDataEditCourse] = useState<any>(null);
+  const [selectedContent, setSelectedContent] = useState(null);
+  // structure
+  const [structData, setStructData] = useState([]);
+  useEffect(() => {
+    let arrStruct = [
+      {
+        name: "name",
+        placeholder: "Nhập tên của khoá học",
+        label: "Tên khoá học",
+        value: "",
+        type: "INPUT",
+      },
+      {
+        name: "price",
+        placeholder: "Nhập giá",
+        label: "Giá khoá học",
+        value: "",
+        type: "INPUT",
+        typeText: "number",
+      },
+      {
+        name: "discount",
+        placeholder: "Nhập giá ưu đãi",
+        label: "Giá ưu đãi",
+        value: "",
+        type: "INPUT",
+        typeText: "number",
+      },
+      {
+        name: "image",
+        label: "Image",
+        type: "IMAGE",
+        value: [],
+      },
+      {
+        name: "video",
+        label: "Video",
+        type: "VIDEO",
+        value: [],
+      },
+    ];
+    if (selectedContent) {
+      arrStruct = structData.map((field) => {
+        if (selectedContent.hasOwnProperty(field.name)) {
+          return {
+            ...field,
+            value: selectedContent[field.name],
+          };
+        }
+        if (field.name === "type") {
+          const arrValue: Record<string, any> = {};
+          selectedContent.categories.forEach((element) => {
+            arrValue[element.type] = element.value;
+          });
 
-  // useRef input
-  // const courseTitleRef = useRef<HTMLInputElement>(null);
-  // const oldPrice = useRef<HTMLInputElement>(null);
-  // const newPrice = useRef<HTMLInputElement>(null);
-
-  const courseTitleRef = useRef<{
-    focus: () => void;
-    getValue: () => string;
-    setValue: (value: string) => void;
-    clear: () => void;
-  }>(null);
-  const oldPrice = useRef<{
-    focus: () => void;
-    getValue: () => string;
-    setValue: (value: string) => void;
-    clear: () => void;
-  }>(null);
-  const newPrice = useRef<{
-    focus: () => void;
-    getValue: () => string;
-    setValue: (value: string) => void;
-    clear: () => void;
-  }>(null);
+          return {
+            ...field,
+            value: arrValue,
+          };
+        }
+        return field;
+      });
+      setIsModalUpdate(true);
+    }
+    setStructData(arrStruct);
+  }, [isModalCreate, selectedContent]);
 
   // get data
   useEffect(() => {
@@ -83,8 +129,8 @@ const AdminExam: React.FC = () => {
           },
         });
         if (res) {
+          console.log("data course: ", res);
           setAllCourse(res);
-          console.log("res exam: ", res);
         }
       } catch (err) {
         console.error(err);
@@ -95,27 +141,24 @@ const AdminExam: React.FC = () => {
     fetchDataCourse();
   }, [isFetchData]);
   // fake frame course
-  let columnsCourse = ["name", "image", "video", "price", "discount"];
+  let columnsCourse = ["name", "price", "discount", "image", "video"];
+  const fieldSearch = ["name"];
   let dataCourse = allCourse;
-
+  // styles and action table
   const styleAction = {
     marginRight: "8px",
     padding: "4px 8px",
-    color: "black",
-    backgroundColor: "white",
     borderRadius: "4px",
-    cursor: "pointer",
   };
-
   const actions = [
     {
-      title: "Giới thiệu khoá học",
+      title: "Giới thiệu",
       action: "INTRODUCE",
       icon: <MdAttractions />,
       style: styleAction,
     },
     {
-      title: "Sửa nội dung",
+      title: "Chương học",
       action: "CONTENT",
       icon: <MdContentPaste />,
       style: styleAction,
@@ -134,222 +177,121 @@ const AdminExam: React.FC = () => {
     },
   ];
 
-  // handle
-  const handleVideoIntroChange = (files: File[]) => {
-    setUploadVideoIntro(files);
-  };
-  const hanleResetUrlsImage = () => {
-    setDataEditCourse((prev) => ({
-      ...prev,
-      image: "",
-    }));
-  };
-  const hanleResetUrlsVideo = () => {
-    // dataEditCourse.video = "";
-    setDataEditCourse((prev) => ({
-      ...prev,
-      video: "",
-    }));
-  };
-  const handleImageIntroCourse = (files: File[]) => {
-    setImageIntroCourse(files);
-  };
+  // hanle create
 
-  // reset text inputRef
-  const resetInputRefs = (
-    items: Array<{
-      state?: any;
-      setState?: (value: any) => void;
-      ref?: React.RefObject<any>;
-    }>
-  ) => {
-    items.forEach((item) => {
-      if (item.state && item.setState) {
-        // Reset state
-        if (Array.isArray(item.state)) {
-          item.setState([]); // Reset mảng về rỗng
-        } else {
-          item.setState(null); // Reset giá trị khác về null
-        }
-      } else if (item.ref) {
-        // Reset ref
-        const currentRef = item.ref.current;
-        if (Array.isArray(currentRef)) {
-          // Reset mỗi phần tử trong mảng ref
-          currentRef.forEach((ref) => {
-            if (ref && ref.clear) {
-              ref.clear(); // Gọi phương thức clear nếu tồn tại
-            } else if (ref && ref.value !== undefined) {
-              ref.value = ""; // Reset giá trị của ref
-            }
-          });
-        } else if (currentRef.clear) {
-          currentRef.clear(); // Gọi phương thức clear nếu tồn tại
-        } else if (currentRef.value !== undefined) {
-          currentRef.value = ""; // Reset giá trị trực tiếp
-        }
-      }
-    });
-  };
-
-  // hanle save
-
-  const handleSaveAll = async () => {
+  const createCourse = async (data: any) => {
+    const { name, price, discount, video, image } = data;
     setIsLoading(true);
-
     try {
-      // 1. Upload course information
       const formData = new FormData();
-      imageIntroCourse.forEach((file) => formData.append("fileImage", file));
-      uploadVideo.forEach((file) => formData.append("fileVideo", file));
+      image.forEach((file) => formData.append("fileImage", file));
+      video.forEach((file) => formData.append("fileVideo", file));
 
-      formData.append("name", courseTitleRef.current?.value || "");
-      formData.append("price", oldPrice.current?.value || "");
-      formData.append("discount", newPrice.current?.value || "");
+      formData.append("name", name);
+      formData.append("price", price);
+      formData.append("discount", discount);
 
-      const resCourse = await postData("/api/admin/course", formData, {
+      const res = await postData("/api/admin/course", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${header}`,
         },
       });
 
-      console.log("Course saved successfully.", resCourse);
-      resetInputRefs([
-        { state: imageIntroCourse, setState: setImageIntroCourse },
-        { state: uploadVideo, setState: setUploadVideoIntro },
-        { ref: courseTitleRef },
-        { ref: oldPrice },
-        { ref: newPrice },
-      ]);
+      toast.success("Tạo mới khoá học thành công.");
     } catch (err) {
+      toast.error("Tạo mới khóa học thất bại!", err.message);
       console.error("Error saving course:", err);
     } finally {
       setIsLoading(false);
       setIsFetchData(!isFetchData);
     }
   };
-  // handle edit
 
+  // hanle update
+  const updateCourse = async (data: any) => {
+    const { name, price, discount, video, image } = data;
+    const id = idCourse;
+    setIsLoading(true);
+    try {
+      const formData = new FormData();
+
+      if (video !== data.old_video.value) {
+        video.forEach((file) => formData.append("fileVideo", file));
+      } else {
+        formData.append("video", video);
+      }
+      if (image !== data.old_image.value) {
+        image.forEach((file) => formData.append("fileImage", file));
+      } else {
+        formData.append("image", image);
+      }
+
+      formData.append("name", name);
+      formData.append("price", price);
+      formData.append("discount", discount);
+
+      const res = await putData(`/api/admin/course/${id}`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${header}`,
+        },
+      });
+
+      toast.success("Cập nhật khoá học thành công.");
+    } catch (err) {
+      toast.error("Cập nhật khoá học thất bại!", err.message);
+      console.error("Error saving course:", err);
+    } finally {
+      setIsLoading(false);
+      setIsFetchData(!isFetchData);
+      setIdCourse("");
+    }
+  };
+  // hanle delete
+  const handleDeleteCourse = async () => {
+    setIsLoading(true);
+    const id = idCourse;
+    try {
+      const res = await deleteData(`/api/admin/course/${id}`, {
+        headers: {
+          Authorization: `Bearer ${header}`,
+        },
+      });
+      toast.success("Xóa khoá học thành công.");
+    } catch (err) {
+      toast.error("Xóa khoá học thất bại!", err.message);
+      console.log("Error deleting: ", err);
+    } finally {
+      setIsLoading(false);
+      setIsModalVisible(false);
+      setIdCourse("");
+      setIsFetchData(!isFetchData);
+    }
+  };
+  // handle action
   const handleActions = (type: string, row: any) => {
-    console.log("type: ", type);
-    console.log("row: ", row);
     if (type === "EDIT") {
-      setAddCourse(true);
-      setIsUpdate(true);
-      setDataEditCourse(row);
+      const id = row._id;
+      setIdCourse(id);
+      setSelectedContent(row);
     }
     if (type === "DELETE") {
       const id = row._id;
-      setIdCourseDeleted(id);
+      setIdCourse(id);
       setIsModalVisible(true);
     }
     if (type === "INTRODUCE") {
       navigate(`/admin/course/${row._id}/introduce`);
     }
     if (type === "CONTENT") {
-      navigate(`/admin/course/${row._id}/content`);
+      navigate(`/admin/course/${row._id}/topics`);
     }
   };
-
-  // hanle delete
-
   const handleClosePopup = () => {
     setIsModalVisible(false);
-    setIdCourseDeleted("");
+    setIdCourse("");
   };
-  const handleDeleteCourse = async () => {
-    try {
-      setIsLoading(true);
-      const idDeleted = JSON.parse(JSON.stringify(idCourseDeleted));
-      const courseDeleted = await deleteData(`/api/admin/course/${idDeleted}`, {
-        headers: {
-          Authorization: `Bearer ${header}`,
-        },
-      });
-      console.log(courseDeleted, "course deleted");
-    } catch (err) {
-      console.log("Error deleting: ", err);
-    } finally {
-      setIsLoading(false);
-      setIsModalVisible(false);
-      setIdCourseDeleted("");
-      setIsFetchData(!isFetchData);
-    }
-  };
-
-  // hanle update
-  const handleUpdate = async () => {
-    setIsLoading(true);
-    const idCourse = dataEditCourse._id;
-    try {
-      // 1. Upload course information
-      const formData = new FormData();
-
-      // imageIntroCourse || uploadVideo == [] thì lấy image và video cũ trong dataEditCourse
-      // nếu image và video cũ sẽ là chuỗi string, nếu không nó sẽ là file và be phải chuyển qua string url để lưu
-      let image = "";
-      let video = "";
-
-      if (imageIntroCourse && imageIntroCourse.length > 0) {
-        imageIntroCourse.forEach((file) => formData.append("fileImage", file));
-      } else {
-        console.log("check image here");
-        image = dataEditCourse.image;
-        formData.append("image", image);
-      }
-
-      if (uploadVideo && uploadVideo.length > 0) {
-        uploadVideo.forEach((file) => formData.append("fileVideo", file));
-      } else {
-        video = dataEditCourse.video;
-        formData.append("video", video);
-      }
-
-      formData.append("name", courseTitleRef.current?.value || "");
-      formData.append("price", oldPrice.current?.value || "");
-      formData.append("discount", newPrice.current?.value || "");
-
-      const resCourse = await putData(
-        `/api/admin/course/${idCourse}`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${header}`,
-          },
-        }
-      );
-
-      console.log("Course update successfully.", resCourse);
-      resetInputRefs([
-        { state: imageIntroCourse, setState: setImageIntroCourse },
-        { state: uploadVideo, setState: setUploadVideoIntro },
-        { state: dataEditCourse, setState: setDataEditCourse },
-        { ref: courseTitleRef },
-        { ref: oldPrice },
-        { ref: newPrice },
-      ]);
-      setIsUpdate(false);
-      setAddCourse(false);
-      hanleResetUrlsVideo();
-      hanleResetUrlsImage();
-    } catch (err) {
-      console.error("Error saving course:", err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // get height element
-  const headerRef = useRef<HTMLDivElement>(null); // Create a ref for the header div
-  const [minHeight, setMinHeight] = useState(0); // State to store the height
-
-  useEffect(() => {
-    if (headerRef.current) {
-      setMinHeight(headerRef.current.offsetHeight + 8);
-    }
-  }, []);
 
   if (isLoading) {
     return <Loading message="Đang tải dữ liệu..." size="large" />;
@@ -359,174 +301,77 @@ const AdminExam: React.FC = () => {
       <AdminHeader />
       <div className="flex flex-1">
         <Nav />
-        <div className="w-full m-2">
-          <div
-            ref={headerRef}
-            className="header_categories flex justify-between items-center bg-primary px-5 py-3"
-          >
-            <div className="left uppercase">
-              <h2 className="font-size-20">Khoá học</h2>
-            </div>
-            <div className="right uppercase">
-              <Button
-                className="button-save box-shadow-btn-save"
-                style={{
-                  backgroundColor: "#2d3c88",
-                  color: "white",
-                  borderColor: "#4558b7",
-                  borderWidth: "0.1px",
-                }}
-                // onClick={() => setIsModalSaveOpen(true)}
-              >
-                Thêm mới
-              </Button>
-            </div>
-          </div>
-          {/* <div className="my-3">
-            <div className="px-3 md:px-5">
-              <div className="w-[30%] rounded-lg bg-secondary flex justify-center">
-                <h4 className="font-size-16 text-white p-2 uppercase">
-                  Khoá học
-                </h4>
+        <div className="w-full h-full bg-white">
+          <div style={{ height: `calc(100% - 8px)` }} className="m-2">
+            <div
+              ref={firstDivRef}
+              className="flex justify-between items-center bg-primary px-5 py-3 mb-2"
+            >
+              <div className="left uppercase">
+                <h2 className="font-size-20">Khoá học</h2>
               </div>
-              <ButtonPlus
-                content="Thêm khoá học mới"
-                icon={CiCirclePlus}
-                iconSize="text-[30px]"
-                textSize="text-[14px"
-                height="h-[32px]"
-                width="w-[17%]"
-                onClick={() => setAddCourse(!addCourse)}
-              />
-              {addCourse && (
-                <div className="flex justify-around w-full">
-                  <div className="bg-white rounded-lg w-[60%] p-4">
-                    <div className="mb-2">
-                      <h4 className="font-size-16 primary-color-text">
-                        Thông tin khoá học
-                      </h4>
-                    </div>
-                    <div className="flex flex-col mb-2">
-                      <MSInput
-                        ref={courseTitleRef}
-                        label="Tên khoá học"
-                        placeholder="Nhập tên khoá học"
-                        type="text"
-                        required
-                        defaultValue={dataEditCourse ? dataEditCourse.name : ""}
-                      />
-                    </div>
-                    <ImageUploader
-                      titleBtn="Chọn ảnh đại diện khoá học"
-                      typefile="image/*"
-                      onImagesChange={handleImageIntroCourse}
-                      urls={dataEditCourse?.image ? dataEditCourse.image : ""}
-                      onUrlsReset={hanleResetUrlsImage}
-                    />
-                    <div>
-                      <h4 className="font-size-16 primary-color-text">
-                        Video giới thiệu khoá học
-                      </h4>
-                      <ImageUploader
-                        titleBtn="Chọn video"
-                        typefile="video/*"
-                        onImagesChange={handleVideoIntroChange}
-                        urls={dataEditCourse?.video ? dataEditCourse.video : ""}
-                        onUrlsReset={hanleResetUrlsVideo}
-                      />
-                    </div>
-                    <div>
-                      <h4 className="font-size-16 primary-color-text">
-                        Giá khoá học
-                      </h4>
-                      <div className="flex justify-around">
-                        <div className="flex flex-col">
-                          <MSInput
-                            ref={oldPrice}
-                            label="Giá khoá học"
-                            placeholder="Nhập giá khoá học"
-                            type="number"
-                            validate="number"
-                            required
-                            defaultValue={
-                              dataEditCourse ? dataEditCourse.price : ""
-                            }
-                          />
-                        </div>
-                        <div className="flex flex-col">
-                          <MSInput
-                            ref={newPrice}
-                            label="Giá ưu đãi"
-                            placeholder="Nhập ưu đãi"
-                            type="number"
-                            validate="number"
-                            required
-                            defaultValue={
-                              dataEditCourse ? dataEditCourse.discount : ""
-                            }
-                          />
-                        </div>
-                      </div>
-                    </div>
-                    <div className="mt-4 text-center">
-                      <Button
-                        className="mr-4 button-cancel"
-                        style={{
-                          backgroundColor: "white",
-                          color: "#1e2753",
-                          borderColor: "#1e2753",
-                        }}
-                        ghost
-                      >
-                        Huỷ
-                      </Button>
-                      {isUpdate === true ? (
-                        <Button
-                          className="button-save"
-                          style={{
-                            backgroundColor: "#00095b",
-                            color: "white",
-                            borderColor: "#00095b",
-                          }}
-                          onClick={handleUpdate}
-                        >
-                          Cập nhật
-                        </Button>
-                      ) : (
-                        <Button
-                          className="button-save"
-                          style={{
-                            backgroundColor: "#00095b",
-                            color: "white",
-                            borderColor: "#00095b",
-                          }}
-                          onClick={handleSaveAll}
-                        >
-                          Tạo mới
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                  <div className="w-[35%] bg-white rounded-lg p-4">
-                    category
-                  </div>
-                </div>
+              <div className="right uppercase">
+                <Button
+                  className="button-save box-shadow-btn-save"
+                  style={{
+                    backgroundColor: "#2d3c88",
+                    color: "white",
+                    borderColor: "#4558b7",
+                    borderWidth: "0.1px",
+                  }}
+                  onClick={() => setIsModalCreate(true)}
+                >
+                  Thêm mới
+                </Button>
+              </div>
+            </div>
+            <div
+              className="bg-primary"
+              style={{
+                height: `calc(${screenHeight}px - ${firstHeight}px - 24px)`,
+              }}
+            >
+              {dataCourse && (
+                <Table
+                  columns={columnsCourse}
+                  fieldSearch={fieldSearch}
+                  data={dataCourse}
+                  handleAction={handleActions}
+                  actions={actions}
+                  filterPrice={true}
+                  isAllowEpand={true}
+                />
               )}
             </div>
-          </div> */}
-          {dataCourse && (
-            <Table
-              columns={columnsCourse}
-              data={dataCourse}
-              handleAction={handleActions}
-              actions={actions}
-            />
-          )}
+          </div>
         </div>
       </div>
+      {isModalCreate && (
+        <AdminModalV2
+          action="CREATE"
+          isOpen={isModalCreate}
+          onClose={() => setIsModalCreate(false)}
+          structData={structData}
+          onSave={createCourse}
+          title="Tạo mới khoá học"
+        />
+      )}
+      {isModalUpdate && (
+        <AdminModalV2
+          action="UPDATE"
+          isOpen={isModalUpdate}
+          onClose={() => {
+            setIsModalUpdate(false);
+            setSelectedContent(null);
+          }}
+          structData={structData}
+          onSave={updateCourse}
+          title="Cập nhật khoá học"
+        />
+      )}
       {isModalVisible && (
         <PopupNotification
-          title="Bạn có chắc chắn muốn xoá?"
+          title="Bạn có chắc chắn muốn xoá xoá học này?"
           status="error"
           buttonText="Xoá ngay"
           onButtonClick={handleDeleteCourse}

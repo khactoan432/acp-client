@@ -55,28 +55,31 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
   });
 
   return (
-    <div className="w-full p-4">
+    <div className="w-full h-32 relative">
       <div
-        {...getRootProps()}
-        className={`border-2 border-dashed rounded-lg p-4 cursor-pointer text-center ${
+        className={`w-full h-full border-2 border-dashed rounded-lg p-4 text-center ${
           isDragActive ? "border-blue-500" : "border-gray-300"
         }`}
       >
         <input {...getInputProps()} />
-        <Button>{titleBtn}</Button>
+        <Button className="z-10 relative bg-transparent" {...getRootProps()}>
+          {titleBtn}
+        </Button>
         {isDragActive ? (
-          <p className="text-blue-500">Thả file vào đây...</p>
+          <p className="text-blue-500 z-10 relative">Thả file vào đây...</p>
         ) : (
-          <p>Kéo thả file vào đây, hoặc bấm để chọn file</p>
+          <p className="z-10 relative">
+            Kéo thả file vào đây, hoặc bấm để chọn file
+          </p>
         )}
       </div>
 
-      <div className="grid mt-4">
+      <div className="grid absolute top-0 w-full h-full">
         {/* Hiển thị file đã chọn */}
         {files.length > 0 ? (
           <div
             key="uploaded-file"
-            className="relative w-full h-32 overflow-hidden rounded-lg border"
+            className="relative w-full h-full overflow-hidden rounded-lg border"
           >
             {files[0].type.startsWith("image/") && (
               <img
@@ -115,35 +118,36 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
               />
             )}
           </div>
-        ) : urls && urls.length > 0 ? (
-          <div
-            key="uploaded-url"
-            className="relative w-full h-32 overflow-hidden rounded-lg border"
-          >
-            {typefile === "image/*" ? (
-              <img
-                src={urls}
-                alt="uploaded-url"
-                className="object-cover w-full h-full"
-              />
-            ) : (
-              <video
-                src={urls}
-                controls
-                className="object-cover w-full h-full"
-              />
-            )}
-            <button
-              onClick={() => {
-                onUrlsReset?.(); // Reset URL
-              }}
-              className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1"
-            >
-              <TiDelete className="text-base" />
-            </button>
-          </div>
         ) : (
-          <div>Chưa có ảnh/video</div>
+          urls &&
+          urls.length > 0 && (
+            <div
+              key="uploaded-url"
+              className="relative w-full h-32 overflow-hidden rounded-lg border"
+            >
+              {typefile === "image/*" ? (
+                <img
+                  src={urls}
+                  alt="uploaded-url"
+                  className="object-cover w-full h-full"
+                />
+              ) : (
+                <video
+                  src={urls}
+                  controls
+                  className="object-cover w-full h-full"
+                />
+              )}
+              <button
+                onClick={() => {
+                  onUrlsReset?.(); // Reset URL
+                }}
+                className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1"
+              >
+                <TiDelete className="text-base" />
+              </button>
+            </div>
+          )
         )}
 
         {/* Hiển thị URL nếu có */}

@@ -5,6 +5,7 @@ import { Button } from "antd";
 // import icon
 import { FaRegEdit } from "react-icons/fa";
 import { MdOutlineDeleteOutline } from "react-icons/md";
+import { FaPhotoVideo } from "react-icons/fa";
 // import components
 import AdminHeader from "../../../components/layout/Admin/header";
 import Nav from "../../../components/layout/Admin/nav";
@@ -18,10 +19,9 @@ import { FaChevronLeft } from "react-icons/fa6";
 import { postData, getData, deleteData, putData } from "../../../axios";
 import { toast } from "react-toastify";
 
-interface VideoExam {
+interface Topic {
   _id?: string;
   describe?: string;
-  video?: File[];
 }
 
 const ExamVideo: React.FC = () => {
@@ -52,29 +52,30 @@ const ExamVideo: React.FC = () => {
   }, []);
 
   const navigate = useNavigate();
-  const { idExam } = useParams();
+  const { idCourse } = useParams();
 
   const [isLoading, setIsLoading] = useState(false);
   const [isFetchData, setIsFetchData] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [isModalCreateVideoExam, setIsModalCreateVideoExam] = useState(false);
-  const [isModalUpdateVideoExam, setIsModalUpdateVideoExam] = useState(false);
+  const [isModalCreateTopic, setIsModalCreateTopic] = useState(false);
+  const [isModalUpdateTopic, setIsModalUpdateTopic] = useState(false);
 
   //string
   const [idVideo, setIdVideo] = useState<string>("");
   // store
-  const [data, setData] = useState<VideoExam[]>([]);
+  const [data, setData] = useState<Topic[]>([]);
   const [selectedContent, setSelectedContent] = useState(null);
   // fetch data
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const res = await getData(`/api/admin/exam/videos/${idExam}`, {
+        const res = await getData(`/api/admin/topics/${idCourse}`, {
           headers: {
             Authorization: `Bearer ${header}`,
           },
         });
+        console.log("res.data:", res.data);
         setData(res.data);
       } catch (error) {
         console.error("Error fetching data: ", error);
@@ -86,28 +87,21 @@ const ExamVideo: React.FC = () => {
   }, [isFetchData]);
 
   // define table header
-  let columnsCourse = ["describe", "video"];
-  let fieldSearch = ["describe"];
+  let columnsCourse = ["name"];
+  let fieldSearch = ["name"];
 
   const [structData, setStructData] = useState([]);
   useEffect(() => {
     let arrStruct = [
       {
-        name: "describe",
-        placeholder: "Nhập mô tả video",
-        label: "Mô tả video",
+        name: "name",
+        placeholder: "Nhập tên chương học",
+        label: "Tên chương học",
         value: "",
         type: "INPUT",
       },
-      {
-        name: "video",
-        label: "Video",
-        type: "VIDEO",
-        value: [],
-      },
     ];
     if (selectedContent) {
-      console.log("selectedContent", selectedContent);
       arrStruct = structData.map((field) => {
         if (selectedContent.hasOwnProperty(field.name)) {
           return {
@@ -117,11 +111,10 @@ const ExamVideo: React.FC = () => {
         }
         return field;
       });
-      setIsModalUpdateVideoExam(true);
+      setIsModalUpdateTopic(true);
     }
     setStructData(arrStruct);
-  }, [isModalCreateVideoExam, selectedContent]);
-  console.log("struct: ", structData);
+  }, [isModalCreateTopic, selectedContent]);
   const styleAction = {
     marginRight: "8px",
     padding: "4px 8px",
@@ -129,6 +122,12 @@ const ExamVideo: React.FC = () => {
   };
 
   const actions = [
+    {
+      title: "Nội dung",
+      action: "CONTENT",
+      icon: <FaPhotoVideo />,
+      style: styleAction,
+    },
     {
       title: "Chỉnh sửa",
       action: "EDIT",
@@ -144,35 +143,31 @@ const ExamVideo: React.FC = () => {
   ];
 
   // structure data video exam
-  let dataExamVideo = data;
+  let dataTopic = data;
 
-  const createVideo = async (data: any) => {
-    // data: video : [File], describe: string
+  const createTopic = async (data: any) => {
+    // data: name: string
     setIsLoading(true);
-    const id = idExam;
-    const { describe, video } = data;
+    const id = idCourse;
+    const { name } = data;
 
     const formData = new FormData();
-    if (!id || !video || !describe) {
+    if (!id || !name) {
       console.error("Missing data");
-      alert("Thiếu thông tin id || describe || video ");
+      alert("Thiếu thông tin id || name");
       return;
     }
-    // append form
-    video.forEach((file) => formData.append("fileVideo", file));
-    formData.append("describe", describe);
+    formData.append("name", name);
 
     try {
-      const res = await postData(`/api/admin/exam/video/${id}`, formData, {
+      const res = await postData(`/api/admin/topic/${id}`, formData, {
         headers: {
-          "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${header}`,
         },
       });
-      toast.success("Tạo mới video đề thi thành công!");
+      toast.success("Tạo mới chươgn học thành công!");
     } catch (error) {
-      toast.error("Tạo mới video đề thi thất bại!", e.message);
-      console.error("Error saving data: ", error);
+      toast.error("Tạo mới chương học thất bại!", e.message);
     } finally {
       setIsFetchData(!isFetchData);
       setIsLoading(false);
@@ -180,35 +175,27 @@ const ExamVideo: React.FC = () => {
     }
   };
   // update
-  const updateVideoExam = async (data: any) => {
-    //video: string | file, describe: string
+  const updateTopic = async (data: any) => {
+    // name: string
     const id = idVideo;
-    const { video, describe } = data;
-    console.log("video: ", video);
-    if (!id || !describe || !video) {
-      alert("Thiếu thông tin id || describe || video ");
+    const { name } = data;
+    if (!id || !name) {
+      alert("Thiếu thông tin id || name");
       return;
     }
     setIsLoading(true);
     try {
       const formData = new FormData();
-      if (video !== data.old_video.value) {
-        video.forEach((file) => formData.append("fileVideo", file));
-      } else {
-        formData.append("video", video);
-      }
-      formData.append("describe", describe);
+      formData.append("name", name);
 
-      const res = await putData(`/api/admin/exam/video/${id}`, formData, {
+      const res = await putData(`/api/admin/topic/${id}`, formData, {
         headers: {
-          "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${header}`,
         },
       });
-      toast.success("Cập nhật video đề thi thành công!");
+      toast.success("Cập nhật tên chương học thành công!");
     } catch (e) {
-      toast.error("Cập nhật video đề thi thất bại!", e.message);
-      console.error(`Error updating video`, e);
+      toast.error("Cập nhật tên chương học thất bại!", e.message);
     } finally {
       setIsLoading(false);
       setIsFetchData(!isFetchData);
@@ -216,19 +203,18 @@ const ExamVideo: React.FC = () => {
     }
   };
   // delete
-  const deleteVideo = async () => {
+  const deleteTopic = async () => {
     setIsLoading(true);
     const id = idVideo;
     try {
-      const res = await deleteData(`/api/admin/exam/video/${id}`, {
+      const res = await deleteData(`/api/admin/topic/${id}`, {
         headers: {
           Authorization: `Bearer ${header}`,
         },
       });
-      toast.success("Xóa video đề thi thành công!");
+      toast.success("Xóa chương học thành công!");
     } catch (e) {
-      toast.error("Xóa video đề thi thất bại!", e.message);
-      console.error("Error deleting data: ", e);
+      toast.error("Xóa chương học thất bại!", e.message);
     } finally {
       setIsFetchData(!isFetchData);
       setIsLoading(false);
@@ -255,6 +241,9 @@ const ExamVideo: React.FC = () => {
       setIdVideo(id);
       setIsModalVisible(true);
     }
+    if (type === "CONTENT") {
+      navigate(`/admin/course/${idCourse}/topic/${row._id}/content`);
+    }
   };
 
   if (isLoading) {
@@ -277,7 +266,7 @@ const ExamVideo: React.FC = () => {
                   borderColor: "#1e2753",
                 }}
                 ghost
-                onClick={() => navigate(`/admin/exams`)}
+                onClick={() => navigate(`/admin/courses`)}
               >
                 <FaChevronLeft />
                 Back
@@ -288,7 +277,7 @@ const ExamVideo: React.FC = () => {
               className="header_categories flex justify-between items-center bg-primary px-5 py-3 mb-2"
             >
               <div className="left uppercase">
-                <h2 className="font-size-20">Video đề thi</h2>
+                <h2 className="font-size-20">Chương học: tên khoá học</h2>
               </div>
               <div className="right uppercase">
                 <Button
@@ -299,7 +288,7 @@ const ExamVideo: React.FC = () => {
                     borderColor: "#4558b7",
                     borderWidth: "0.1px",
                   }}
-                  onClick={() => setIsModalCreateVideoExam(true)}
+                  onClick={() => setIsModalCreateTopic(true)}
                 >
                   Thêm mới
                 </Button>
@@ -311,10 +300,10 @@ const ExamVideo: React.FC = () => {
                 height: `calc(${screenHeight}px - ${firstHeight}px - ${secondHeight}px - 32px)`,
               }}
             >
-              {dataExamVideo && (
+              {dataTopic && (
                 <Table
                   columns={columnsCourse}
-                  data={dataExamVideo}
+                  data={dataTopic}
                   handleAction={handleActions}
                   actions={actions}
                   fieldSearch={fieldSearch}
@@ -324,37 +313,37 @@ const ExamVideo: React.FC = () => {
           </div>
         </div>
       </div>
-      {isModalCreateVideoExam && (
+      {isModalCreateTopic && (
         <AdminModalV2
           action="CREATE"
-          isOpen={isModalCreateVideoExam}
+          isOpen={isModalCreateTopic}
           onClose={() => {
-            setIsModalCreateVideoExam(false);
+            setIsModalCreateTopic(false);
           }}
           structData={structData}
-          onSave={createVideo}
-          title="Tạo mới video"
+          onSave={createTopic}
+          title="Tạo mới chương học"
         />
       )}
-      {isModalUpdateVideoExam && (
+      {isModalUpdateTopic && (
         <AdminModalV2
           action="UPDATE"
-          isOpen={isModalUpdateVideoExam}
+          isOpen={isModalUpdateTopic}
           onClose={() => {
-            setIsModalUpdateVideoExam(false);
+            setIsModalUpdateTopic(false);
             setSelectedContent(null);
           }}
           structData={structData}
-          onSave={updateVideoExam}
-          title="Cập nhật video"
+          onSave={updateTopic}
+          title="Cập nhật chương học"
         />
       )}
       {isModalVisible && (
         <PopupNotification
-          title="Bạn có chắc chắn muốn xoá video đề thi này?"
+          title="Bạn có chắc chắn muốn xoá chương học này không?"
           status="error"
           buttonText="Xoá ngay"
-          onButtonClick={deleteVideo}
+          onButtonClick={deleteTopic}
           buttonClose={handleClosePopup}
         />
       )}

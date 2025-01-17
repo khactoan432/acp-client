@@ -190,7 +190,7 @@ const AdminDashboard = () => {
                   </div>
                 </div>
                 <div className="bg-[#ECF2FF] rounded-full p-2">
-                  <MdAttachMoney className="primary-color-text" />
+                  <MdAttachMoney className="text-color-secondary" />
                 </div>
               </div>
               <div className="w-full sm:w-[45%] lg:w-[208px] bg-white rounded-lg flex p-2 items-center justify-around">
@@ -206,7 +206,7 @@ const AdminDashboard = () => {
                 </div>
                 <div className="right">
                   <div className="bg-[#ECF2FF] rounded-full p-2">
-                    <IoCartOutline className="primary-color-text" />
+                    <IoCartOutline className="text-color-secondary" />
                   </div>
                 </div>
               </div>
@@ -223,7 +223,7 @@ const AdminDashboard = () => {
                 </div>
                 <div className="right">
                   <div className="bg-[#ECF2FF] rounded-full p-2">
-                    <IoCartOutline className="primary-color-text" />
+                    <IoCartOutline className="text-color-secondary" />
                   </div>
                 </div>
               </div>
@@ -257,7 +257,7 @@ const AdminDashboard = () => {
                 </div>
                 <div className="right">
                   <div className="bg-[#ECF2FF] rounded-full p-2">
-                    <TbChartInfographic className="primary-color-text" />
+                    <TbChartInfographic className="text-color-secondary" />
                   </div>
                 </div>
               </div>
@@ -285,7 +285,7 @@ const AdminDashboard = () => {
             </div>
 
             {/* Table */}
-            <div className="flex flex-col lg:flex-row gap-4 my-3 justify-around">
+            {/* <div className="flex flex-col lg:flex-row gap-4 my-3 justify-around">
               <div className="w-full lg:w-[49%] h-[400px] bg-white rounded-lg overflow-auto">
                 <h2 className="px-5 py-4 text-[rgba(30,39,83,1)]">
                   Những khoá học bán chạy
@@ -298,7 +298,7 @@ const AdminDashboard = () => {
                 </h2>
                 <Table columns={columnsExam} data={dataExam} />
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

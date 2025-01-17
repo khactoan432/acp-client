@@ -1,7 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import AdminHeader from "../../../components/layout/Admin/header";
-import Nav from "../../../components/layout/Admin/nav";
-import Loading from "../../../components/loading";
+import { toast } from "react-toastify";
 
 // import icon react
 import { HiDotsVertical } from "react-icons/hi";
@@ -14,9 +12,12 @@ import { FaHandMiddleFinger } from "react-icons/fa6";
 import { Button } from "antd";
 
 // impoprt component
+import AdminHeader from "../../../components/layout/Admin/header";
+import Nav from "../../../components/layout/Admin/nav";
+import Loading from "../../../components/loading";
 import MSInput from "../../../components/input/MsInput";
 import ButtonPlus from "../../../components/button/plus";
-import AdminModal from "../../../components/popup/AdminModal";
+import AdminModalV2 from "../../../components/popup/AdminModalV2";
 
 import { getData, postData, putData, deleteData } from "../../../axios";
 
@@ -24,7 +25,7 @@ interface CategoryType {
   _id?: string;
   option?: string;
   type?: string;
-  value?: Category[];
+  categories?: Category[];
 }
 interface Category {
   id?: number;
@@ -38,10 +39,11 @@ const AdminBanner: React.FC = () => {
   // state boolean
   const [isLoading, setIsLoading] = useState(false);
   const [isFetchData, setIsFetchData] = useState(false);
-  const [isModalSaveOpen, setIsModalSaveOpen] = useState(false);
-  const [isModelUpdateCategoryType, setIsModelUpdateCategoryType] =
+  const [isModalCreateCategoryType, setIsModalCreateCategoryType] =
     useState(false);
-  const [isModelUpdateCategory, setIsModelUpdateCategory] = useState(false);
+  const [isModalUpdateCategoryType, setIsModalUpdateCategoryType] =
+    useState(false);
+  const [isModalUpdateCategory, setIsModalUpdateCategory] = useState(false);
 
   // string state
   const [idCategoryType, setIdCategoryType] = useState<string>("");
@@ -50,8 +52,6 @@ const AdminBanner: React.FC = () => {
   // state store
   const [categoryType, setCategoryType] = useState<CategoryType[]>([]);
   const [categories, setCategories] = useState<Record<string, Category[]>>({});
-  const [editCategoryType, setEditCategoryType] = useState<CategoryType>();
-  const [editCategory, setEditCategory] = useState<Category>();
 
   // state ref
   const refCategories: React.MutableRefObject<
@@ -66,26 +66,38 @@ const AdminBanner: React.FC = () => {
     >
   > = useRef({});
   // structure store
-  const fieldCategories = [
+  const [structCategoryType, setStructCategoryType] = useState([
     {
       name: "option",
       placeholder: "Nhập danh mục tìm kiếm.",
       label: "Danh mục tìm kiếm.",
+      value: "",
+      type: "INPUT",
     },
-    { type: "OPTION", value: ["CHECKBOX", "STRING"], label: "Chọn" },
-    { type: "ARRAY", placeholder: "List value ..." },
-  ];
-  const fieldCategoryType = [
     {
-      name: "option",
-      placeholder: "Nhập danh mục tìm kiếm.",
-      label: "Danh mục tìm kiếm.",
+      name: "type",
+      label: "Chọn",
+      options: [{ option: "CHECKBOX" }, { option: "STRING" }],
+      value: "",
+      type: "OPTION",
     },
-    { type: "OPTION", value: ["CHECKBOX", "STRING"], label: "Chọn" },
-  ];
-  const fileCategory = [
-    { name: "value", placeholder: "Nhập vào danh mục", label: "Danh mục" },
-  ];
+    {
+      name: "categories",
+      placeholder: "Nhập danh mục",
+      label: "Thêm danh mục",
+      value: [],
+      type: "ARRAY",
+    },
+  ]);
+  const [structCategory, setStructCategory] = useState([
+    {
+      name: "value",
+      placeholder: "Nhập vào danh mục",
+      label: "Danh mục",
+      value: "",
+      type: "INPUT",
+    },
+  ]);
 
   // fetch data
 
@@ -98,7 +110,6 @@ const AdminBanner: React.FC = () => {
             Authorization: `Bearer ${header}`,
           },
         });
-        console.log("res: ", res);
         setCategoryType(res.data);
       } catch (e) {
         console.log("Error fetch categories", e);
@@ -127,18 +138,25 @@ const AdminBanner: React.FC = () => {
   // handle save
 
   const createCategories = async (data: any) => {
-    console.log("create categories: ", data);
     setIsLoading(true);
     try {
+      console.log("data: ", data);
       const option = data.option || "";
-      const type = data.type || "";
-      const value = data.arrayValue.map((d) => d.getValue());
+      const type = data.type[0].type || "";
+      const categories = data.categories.map((d) => ({
+        _id: "",
+        value: d.value,
+      }));
+      if (!option || !type || !categories[0].value) {
+        toast.warning("Invalid input");
+        return;
+      }
       const res = await postData(
         "/api/admin/categories",
         {
           option,
           type,
-          value,
+          categories,
         },
         {
           headers: {
@@ -146,8 +164,9 @@ const AdminBanner: React.FC = () => {
           },
         }
       );
-      console.log("res: ", res);
+      toast.success("Tạo mới loại danh mục thành công");
     } catch (e) {
+      toast.error("Tạo mới danh mục thất bại, kiểm tra lại!", e.message);
       console.log("Error create categories", e);
     } finally {
       setIsFetchData(!isFetchData);
@@ -156,21 +175,33 @@ const AdminBanner: React.FC = () => {
   };
 
   const createCategory = async (idex: string) => {
-    const value = refCategories.current[idex].map((d) => d.getValue()); //vscode ngu:)
+    const value = refCategories.current[idex].map((d) => d.getValue());
+
+    const category = value.map((val) => ({
+      _id: "",
+      value: val,
+    }));
     const id = idCategoryType;
+    const check = !category.some((cate) => !cate.value);
+
+    if (!id || !check) {
+      toast.warning("Invalid input");
+      return;
+    }
     try {
       setIsLoading(true);
       const res = await putData(
         `/api/admin/categories/${id}`,
         {
-          value: value,
+          categories: category,
         },
         {
           headers: { Authorization: `Bearer ${header}` },
         }
       );
-      console.log("res: ", res);
+      toast.success("Tạo mới danh mục thành công");
     } catch (e) {
+      toast.error("Tạo mới danh mục thất bại, kiểm tra lại!", e.message);
       console.log("Error update categoryType", e);
     } finally {
       setIsFetchData(!isFetchData);
@@ -183,20 +214,40 @@ const AdminBanner: React.FC = () => {
 
   // handle update
   const handleUpdateCategoryType = (categoryType: CategoryType) => {
+    console.log("categoryType", categoryType);
     const id = categoryType._id ? categoryType._id : "";
+
     setIdCategoryType(id);
-    const dataEdit = { option: categoryType.option, type: categoryType.type };
-    setEditCategoryType(dataEdit);
-    setIsModelUpdateCategoryType(true);
+    setIsModalUpdateCategoryType(true);
+    const updatedStructData = structCategoryType.map((field) => {
+      if (categoryType.hasOwnProperty(field.name)) {
+        if (Array.isArray(categoryType[field.name])) {
+          return {
+            ...field,
+            value: categoryType[field.name].map((item: any) => ({
+              desc: item.value,
+              _id: item._id,
+            })),
+          };
+        }
+        return {
+          ...field,
+          value: categoryType[field.name],
+        };
+      }
+      return field;
+    });
+    setStructCategoryType(updatedStructData);
   };
 
   const updateCategoryType = async (data: any) => {
     const id = idCategoryType;
-    console.log("update: ", data);
+    const type = data.allSelectedOption[0].type;
     const option = data.option;
-    const type = data.type;
+    const value = data.categories;
+
     if (!type || !option) {
-      alert("Missing option || type");
+      toast.warning("Missing option || type");
       return;
     }
     try {
@@ -204,37 +255,45 @@ const AdminBanner: React.FC = () => {
       const res = await putData(
         `/api/admin/categories/${id}`,
         {
-          option: data.option,
-          type: data.type,
+          option: option,
+          type: type,
+          categories: value,
         },
         {
           headers: { Authorization: `Bearer ${header}` },
         }
       );
-      console.log("res: ", res);
+      toast.success("Cập nhật loại danh mục thành công");
     } catch (e) {
+      toast.error("Cập nhật loại danh mục thất bại, kiểm tra lại!", e.message);
       console.log("Error update categoryType", e);
     } finally {
       setIsFetchData(!isFetchData);
       setIsLoading(false);
       setIdCategoryType("");
-      setEditCategoryType({});
     }
   };
 
-  const handleUpdateCategory = (value: Category) => {
-    const _id = value._id;
+  const handleUpdateCategory = (category: Category) => {
+    const _id = category._id;
     setIdCategory(_id);
-    setIsModelUpdateCategory(true);
-    console.log("val: ", value.value);
-    setEditCategory({ value: value.value });
+
+    setIsModalUpdateCategory(true);
+    const updatedStructData = structCategory.map((field) => {
+      if (category.hasOwnProperty(field.name)) {
+        return {
+          ...field,
+          value: category[field.name],
+        };
+      }
+      return field;
+    });
+    setStructCategory(updatedStructData);
   };
 
   const updateCategory = async (data: any) => {
     const id = idCategory;
     const value = data.value;
-    console.log("value input: ", data);
-
     setIsLoading(true);
     try {
       const res = await putData(
@@ -242,14 +301,14 @@ const AdminBanner: React.FC = () => {
         { value },
         { headers: { Authorization: `Bearer ${header}` } }
       );
-      console.log("res: ", res);
+      toast.success("Cập nhật danh mục thành công");
     } catch (e) {
+      toast.error("Cập nhật danh mục thất bại, kiểm tra lại!", e.message);
       console.log("Error update category", e);
     } finally {
       setIsFetchData(!isFetchData);
       setIsLoading(false);
       setIdCategory("");
-      setEditCategory({});
     }
   };
 
@@ -260,8 +319,9 @@ const AdminBanner: React.FC = () => {
       const res = await deleteData(`/api/admin/categoryType/${id}`, {
         headers: { Authorization: `Bearer ${header}` },
       });
-      console.log("res: ", res);
+      toast.success("Xoá loại danh mục thành công");
     } catch (e) {
+      toast.error("Xoá loại danh mục thất bại, kiểm tra lại!", e.message);
       console.log("Error delete categoryType", e);
     } finally {
       setIsLoading(false);
@@ -275,21 +335,17 @@ const AdminBanner: React.FC = () => {
       const res = await deleteData(`/api/admin/category/${id}`, {
         headers: { Authorization: `Bearer ${header}` },
       });
-      console.log("res delete category: ", res);
+      toast.success("Xoá danh mục thành công");
     } catch (e) {
+      toast.error("Xoá danh mục thất bại, kiểm tra lại!", e.message);
       console.log("Error delete category", e);
     } finally {
       setIsLoading(false);
       setIsFetchData(!isFetchData);
     }
   };
-  // func reset input
 
   // func other
-  // const checkTextInput = () => {
-  //   console.log("check", refCategories.current);
-  //   return refCategories.current.some((input) => input.getValue() === "");
-  // };
 
   // get height element
   const headerRef = useRef<HTMLDivElement>(null); // Create a ref for the header div
@@ -300,7 +356,7 @@ const AdminBanner: React.FC = () => {
       setMinHeight(headerRef.current.offsetHeight + 8);
     }
   }, []);
-  console.log("minHeight: ", minHeight);
+  console.log("categoryType: ", categoryType);
   if (isLoading) {
     return <Loading message="Đang tải dữ liệu..." size="large" />;
   }
@@ -326,7 +382,7 @@ const AdminBanner: React.FC = () => {
                   borderColor: "#4558b7",
                   borderWidth: "0.1px",
                 }}
-                onClick={() => setIsModalSaveOpen(true)}
+                onClick={() => setIsModalCreateCategoryType(true)}
               >
                 Thêm mới
               </Button>
@@ -369,7 +425,7 @@ const AdminBanner: React.FC = () => {
                           <div
                             className="absolute hidden group-hover:flex flex-col bg-white shadow-lg rounded-md p-2 z-10"
                             style={{
-                              top: "100%",
+                              top: "32px",
                               right: 0,
                             }}
                           >
@@ -466,8 +522,8 @@ const AdminBanner: React.FC = () => {
                         </div>
                       </div>
                       <div className="wrap-value pt-4">
-                        {CT.value && CT.value.length > 0 ? (
-                          CT.value.map((value, idex) => (
+                        {CT.categories && CT.categories.length > 0 ? (
+                          CT.categories.map((value, idex) => (
                             <div
                               key={idex}
                               className="flex justify-center items-center"
@@ -493,14 +549,14 @@ const AdminBanner: React.FC = () => {
                                 disabled
                               />
                               <div
-                                className="relative group p-2 icon-dots"
+                                className="relative group p-2 icon-dots mb-2"
                                 style={{ width: "32px", flexShrink: 0 }}
                               >
                                 <HiDotsVertical className="cursor-pointer" />
                                 <div
                                   className="absolute hidden group-hover:flex flex-col bg-white shadow-lg rounded-md p-2 z-10"
                                   style={{
-                                    top: "100%",
+                                    top: "32px",
                                     right: 0,
                                   }}
                                 >
@@ -553,40 +609,34 @@ const AdminBanner: React.FC = () => {
           </div>
         </div>
       </div>
-      {isModalSaveOpen && (
-        <AdminModal
-          isOpen={isModalSaveOpen}
-          multiple={false}
-          onClose={() => setIsModalSaveOpen(false)}
-          fields={fieldCategories}
-          enableImageUpload={false}
+      {isModalCreateCategoryType && (
+        <AdminModalV2
+          action="CREATE"
+          isOpen={isModalCreateCategoryType}
+          onClose={() => setIsModalCreateCategoryType(false)}
+          structData={structCategoryType}
           onSave={createCategories}
-          data={{}}
-          title="Create Categories"
+          title="Tạo mới loại danh mục lọc"
         />
       )}
-      {isModelUpdateCategoryType && (
-        <AdminModal
-          isOpen={isModelUpdateCategoryType}
-          multiple={false}
-          onClose={() => setIsModelUpdateCategoryType(false)}
-          fields={fieldCategoryType}
-          enableImageUpload={false}
+      {isModalUpdateCategoryType && (
+        <AdminModalV2
+          action="UPDATE"
+          isOpen={isModalUpdateCategoryType}
+          onClose={() => setIsModalUpdateCategoryType(false)}
+          structData={structCategoryType}
           onSave={updateCategoryType}
-          data={editCategoryType}
-          title="Update CategoryType"
+          title="Cập nhật loại danh mục lọc"
         />
       )}
-      {isModelUpdateCategory && (
-        <AdminModal
-          isOpen={isModelUpdateCategory}
-          multiple={false}
-          onClose={() => setIsModelUpdateCategory(false)}
-          fields={fileCategory}
-          enableImageUpload={false}
+      {isModalUpdateCategory && (
+        <AdminModalV2
+          action="UPDATE"
+          isOpen={isModalUpdateCategory}
+          onClose={() => setIsModalUpdateCategory(false)}
+          structData={structCategory}
           onSave={updateCategory}
-          data={editCategory}
-          title="Update Category"
+          title="Cập nhật danh mục lọc"
         />
       )}
     </div>

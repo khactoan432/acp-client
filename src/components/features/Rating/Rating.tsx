@@ -225,7 +225,7 @@ const RatingPage: React.FC = () => {
                 <div className="text-yellow-500">
                   {"★".repeat(rating.stars)}
                 </div>
-                <p className="text-sm primary-color-text">{rating.timeAgo}</p>
+                <p className="text-sm text-color-secondary">{rating.timeAgo}</p>
                 <p className="mt-2 text-gray-700">{rating.comment}</p>
                 <button className="text-blue-500 text-sm mt-2 hover:underline">
                   1 Trả lời
