@@ -4,15 +4,18 @@ import {
   UnorderedListOutlined,
   TagOutlined,
   FolderOutlined,
-  MenuFoldOutlined,
-  MenuUnfoldOutlined,
   HomeOutlined,
 } from "@ant-design/icons";
+import logo from "../../../../public/logoacp.jpg";
+
+import { useSelector } from "react-redux";
+import { RootState } from "../../../redux/store";
+
 import { GiTeacher } from "react-icons/gi";
 import { PiExamLight } from "react-icons/pi";
 import { GrSchedule } from "react-icons/gr";
 import type { MenuProps } from "antd";
-import { Button, Menu } from "antd";
+import { Menu } from "antd";
 import { PiRankingThin } from "react-icons/pi";
 import { PiShoppingBagOpenLight } from "react-icons/pi";
 import { TbSettingsCode } from "react-icons/tb";
@@ -66,7 +69,10 @@ const items: MenuItem[] = [
 ];
 
 const Nav: React.FC = () => {
-  const [collapsed, setCollapsed] = useState(false);
+  const collapsed = useSelector(
+    (state: RootState) => state.collapsed.collapsed
+  );
+
   const [selectedKey, setSelectedKey] = useState<string>("");
   const navigate = useNavigate();
   const location = useLocation(); // Lấy location hiện tại
@@ -88,19 +94,18 @@ const Nav: React.FC = () => {
   };
 
   useEffect(() => {
-    // Cập nhật selectedKey khi location thay đổi
     const currentKey = Object.keys(routes).find(
       (key) => routes[key] === location.pathname
     );
     if (currentKey) {
       setSelectedKey(currentKey);
     }
-  }, [location.pathname]); // Chạy lại mỗi khi location thay đổi
+  }, [location.pathname]);
 
   const handleNavigation = (key: string) => {
     const route = routes[key];
     if (route) {
-      navigate(route); // Điều hướng tới route
+      navigate(route);
     }
   };
 
@@ -110,21 +115,28 @@ const Nav: React.FC = () => {
         collapsed ? "collapsed" : ""
       }`}
     >
-      <Button
-        className="rounded-none rounded-br-lg flex items-center justify-center"
-        onClick={() => setCollapsed((prev) => !prev)}
-      >
-        {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-      </Button>
-
+      <div className="flex items-center justify-center border-line-bottom px-5 py-2 mb-2">
+        <img
+          src={logo}
+          alt="Logo"
+          style={{ borderWidth: "0.5px", cursor: "pointer" }}
+          className="h-10 w-auto rounded-full border-[#1e2753] mx-2"
+        />
+        {!collapsed && (
+          <div className="flex">
+            <p style={{ color: "#00FF66", fontSize: "24px" }}>A</p>
+            <p style={{ color: "#00FF66", fontSize: "24px" }}>C</p>
+            <p style={{ color: "#FFDD00", fontSize: "24px" }}>P</p>
+          </div>
+        )}
+      </div>
       <Menu
-        selectedKeys={[selectedKey]} // Chọn mục theo selectedKey
-        defaultOpenKeys={["sub1"]}
+        selectedKeys={[selectedKey]}
         mode="inline"
         className="bg-secondary"
         inlineCollapsed={collapsed}
         items={items}
-        onClick={({ key }) => handleNavigation(key)} // Điều hướng khi click vào menu
+        onClick={({ key }) => handleNavigation(key)}
       />
     </div>
   );

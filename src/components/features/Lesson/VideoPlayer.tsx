@@ -20,7 +20,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ currentLesson }) => {
 
       <div className=" mx-auto pt-5 p-4 bg-white">
         <h1 className="text-3xl font-bold">{currentLesson?.name}</h1>
-        <p className="primary-color-text mt-2">Cập nhật tháng 11 năm 2022</p>
+        <p className="text-color-secondary mt-2">Cập nhật tháng 11 năm 2022</p>
         <p className="mt-4">Bài tập:</p>
 
         <ul className="mt-4 list-disc pl-6">

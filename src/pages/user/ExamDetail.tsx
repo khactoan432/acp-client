@@ -179,7 +179,7 @@ const UserExamDetail: React.FC = () => {
                 { name: "Đánh giá", to: "rate" },
                 { name: "Bình luận", to: "comment" },
               ].map((item, index) => (
-                <li key={index} className="primary-color-text">
+                <li key={index} className="text-color-secondary">
                   <Link
                     to={item.to}
                     spy={true}

@@ -4,6 +4,7 @@ import Dashboard from "../pages/admin/Dashboard";
 import GlobalSetting from "../pages/admin/GlobalSetting";
 import PersonalSetting from "../pages/admin/PersonalSetting";
 import Courses from "../pages/admin/Courses";
+import Topic from "../pages/admin/course/Topic";
 import Content from "../pages/admin/course/Content";
 import Introduce from "../pages/admin/course/Introduce";
 
@@ -49,7 +50,15 @@ const AdminRoutes: React.FC = () => {
         }
       />
       <Route
-        path="/course/:idCourse/content"
+        path="/course/:idCourse/topics"
+        element={
+          <ProtectedRoute allowedRoles={["ADMIN"]}>
+            <Topic />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/course/:idCourse/topic/:idTopic/content"
         element={
           <ProtectedRoute allowedRoles={["ADMIN"]}>
             <Content />

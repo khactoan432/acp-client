@@ -63,6 +63,10 @@ body {
   color: white !important;
 }
 
+:where(.css-dev-only-do-not-override-1x0dypw).ant-input-number-outlined:hover {
+  border-color: var(--color__hover-primary);
+}
+
 // background color
 
 .bg-primary {
@@ -72,18 +76,6 @@ body {
 .bg-secondary {
   background-color: var(--color__secondary);
   color: white;
-}
-
-.primary-color-text {
-  color: var(--color__secondary);
-}
-
-.primary-color-text:hover {
-  color: var(--color__hover-primary);
-}
-
-.primary-color-text.active {
-  color: var(--color__active-primary);
 }
 
 .bg-notactive-primary {
@@ -96,8 +88,21 @@ body {
 .text-color-primary {
   color: var(--color__text-primary);
 }
-.text-primary-hover:hover {
+
+.text-color-secondary {
+  color: var(--color__secondary);
+}
+.hover-primary:hover {
+  cursor: pointer;
   color: var(--color__hover-primary);
+}
+
+.text-color-primary:hover {
+  color: var(--color__hover-primary);
+}
+
+.text-color-primary.active {
+  color: var(--color__active-primary);
 }
 
 .color-edit {
@@ -259,7 +264,6 @@ input:focus {
   background-color: #d4d3d3;
   border-radius: 50%;
   color: var(--color__hover-primary);
-  transform: scale(1.05);
   box-shadow: 0 4px 8px rgba(192, 190, 190, 0.2);
 }
 

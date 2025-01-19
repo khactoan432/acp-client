@@ -1,10 +1,16 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Modal, Button, Select } from "antd";
+import { toast } from "react-toastify";
+
+// imprort react icon
 import { CiCirclePlus } from "react-icons/ci";
 
 // import component
 import MSInput from "../input/MsInput";
 import ImageUploader from "../helps/dropImage";
+// import validation
+import validateInput from "../../HOC/validateInput";
+import ValidateFiles from "../../HOC/validateFiles";
 
 const { Option } = Select;
 
@@ -17,8 +23,10 @@ type StructData = {
   name: string;
   placeholder?: string;
   label?: string;
+  options?: { option: string; value?: string[] }[];
   value?: any;
   type: "IMAGE" | "VIDEO" | "OPTION" | "INPUT" | "ARRAY"; // Các loại dữ liệu
+  typeText?: "text" | "email" | "number" | "tel";
 };
 
 type AdminModalProps = {
@@ -43,7 +51,6 @@ const AdminModalV2: React.FC<AdminModalProps> = ({
 
   const [uploadVideo, setUploadVideo] = useState<File[]>([]);
   const [uploadImage, setUploadImage] = useState<File[]>([]);
-  const [dataEdit, setDataEdit] = useState<any>(null);
 
   const refValue = useRef<
     {
@@ -87,43 +94,45 @@ const AdminModalV2: React.FC<AdminModalProps> = ({
       }
     }
   }, [isOpen, structData, action]);
-
-  console.log("formData: ", formData);
-
-  const handleSelectChange = (value: any, name: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
   const handleVideoUploaded = (files: File[]) => {
     setUploadVideo(files);
   };
   const handleImageUploaded = (files: File[]) => {
     setUploadImage(files);
   };
-  const hanleResetUrlsVideo = () => {
-    // dataEdit.video = "";
-    setDataEdit((prev) => ({
-      ...prev,
-      video: "",
-    }));
-  };
-  const hanleResetUrlsImage = () => {
-    setDataEdit((prev) => ({
-      ...prev,
-      images: "",
-    }));
-  };
 
   const handleAddArrayField = () => {
     setArrValue((prev) => [...prev, { id: prev.length + 1, value: "" }]);
   };
+  const [currentOption, setCurrentOption] = useState<string | null>(null);
+
+  const [selectedContent, setSelectedContent] = useState([]);
+  const [selectedItemsByOption, setSelectedItemsByOption] = useState<
+    Record<string, any[]>
+  >(structData.filter((item) => item.name === "type")[0]?.value || {});
+
+  const handleSelectCategoryType = (value: string, option: any) => {
+    setCurrentOption(value);
+    setSelectedContent(option.content);
+
+    if (!selectedItemsByOption[value]) {
+      setSelectedItemsByOption((prev) => ({ ...prev, [value]: [] }));
+    }
+  };
+  //--_-- Khi checkbox thay đổi
+  const handleCheckbox = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { checked, value } = event.target;
+    setSelectedItemsByOption((prev) => {
+      const currentItems = prev[currentOption!] || [];
+      const updatedItems = checked
+        ? [...currentItems, value]
+        : currentItems.filter((item) => item !== value);
+
+      return { ...prev, [currentOption!]: updatedItems };
+    });
+  };
 
   const handleSave = () => {
-    const finalData = { ...formData };
-
     // video
     const videoUpdate = structData.filter((item) => item.type === "VIDEO")[0];
     const imageUpdate = structData.filter((item) => item.type === "IMAGE")[0];
@@ -133,12 +142,33 @@ const AdminModalV2: React.FC<AdminModalProps> = ({
         uploadVideo.length !== 0 ? uploadVideo : videoUpdate.value;
     }
     if (imageUpdate) {
-      // image
-      formData.images =
+      formData.image =
         uploadImage.length !== 0 ? uploadImage : imageUpdate?.value;
     }
 
-    console.log(finalData);
+    const isType = structData.filter((item) => item.name === "type")[0];
+    if (isType) {
+      const allSelectedOption = Object.entries(selectedItemsByOption).map(
+        ([type, value]) => ({
+          type,
+          value,
+        })
+      );
+      if (allSelectedOption.length > 0) {
+        formData.type = allSelectedOption;
+      } else {
+        const defaultOption = [
+          {
+            type:
+              structData.filter((item) => item.name === "type")[0]?.value || "",
+            value: [],
+          },
+        ];
+        formData.type = defaultOption;
+      }
+    }
+
+    const finalData = { ...formData };
 
     structData.forEach((field) => {
       if (field.type === "INPUT" && refValue.current[field.name]) {
@@ -150,7 +180,6 @@ const AdminModalV2: React.FC<AdminModalProps> = ({
     const arrayFields = structData.filter((item) => item.type === "ARRAY");
     // arrayFields hiện tại chỉ có 1 phần tử
     arrayFields.forEach((field) => {
-      console.log("field: ", field);
       const arrayValues = arrValue.map((item, id) => ({
         _id:
           field.value.length > 0 && field.value[id]?._id
@@ -160,6 +189,34 @@ const AdminModalV2: React.FC<AdminModalProps> = ({
       }));
       finalData[field.name] = arrayValues;
     });
+
+    const validateForm = Object.keys(finalData)
+      .filter((item) => !item.startsWith("old_"))
+      .reduce((acc, key) => {
+        acc[key] = finalData[key];
+        return acc;
+      }, {} as Record<string, any>);
+
+    if (validateForm.image && typeof validateForm.image !== "string") {
+      if (!ValidateFiles([validateForm.image])) {
+        toast.warning("Hình ảnh là bắt buộc!");
+        return;
+      }
+    } else if (validateForm.video && typeof validateForm.video !== "string") {
+      if (!ValidateFiles([validateForm.video])) {
+        toast.warning("Video là bắt buộc!");
+        return;
+      }
+    } else {
+      Object.keys(validateForm).forEach((key) => {
+        const value = validateForm[key];
+        if (typeof value === "string") {
+          if (!validateInput({ [key]: value })) {
+            return;
+          }
+        }
+      });
+    }
 
     onSave(finalData);
 
@@ -175,95 +232,127 @@ const AdminModalV2: React.FC<AdminModalProps> = ({
       width={720}
     >
       <div className="space-y-6">
-        <div>
-          <div className="grid grid-cols-2 gap-4">
-            {structData.map((field) => (
-              <div key={field.name} className="flex flex-col gap-1">
-                {field.type === "INPUT" && (
-                  <>
-                    <label>{field.label}</label>
-                    <MSInput
-                      ref={(el) => {
-                        refValue.current[field.name] = el!;
-                      }}
-                      placeholder={field.placeholder}
-                      type="text"
-                      required={true}
-                      defaultValue={field.value || ""}
-                      errorMessage="Invalid input" // Thông báo lỗi tuỳ chỉnh
-                      className="mb-2"
-                    />
-                  </>
-                )}
-                {field.type === "OPTION" && (
-                  <>
-                    <label>{field.label}</label>
-                    <Select
-                      defaultValue={formData[field.name]}
-                      style={{ width: "100%" }}
-                      onChange={(value) =>
-                        handleSelectChange(value, field.name)
-                      }
-                    >
-                      {field.value?.map((option: string, index: number) => (
-                        <Option key={index} value={option}>
-                          {option}
-                        </Option>
-                      ))}
-                    </Select>
-                  </>
-                )}
-                {field.type === "ARRAY" && (
-                  <>
-                    <label>{field.label}</label>
-                    <Button
-                      icon={<CiCirclePlus />}
-                      onClick={handleAddArrayField}
-                    >
-                      Add New
-                    </Button>
-                    {arrValue.map((item, id) => (
+        <div className="max-h-[560px] overflow-y-auto">
+          <div className="pr-1">
+            <div className="grid grid-cols-2 gap-4">
+              {structData.map((field, idex) => (
+                <div key={idex} className="flex flex-col gap-1">
+                  {field.type === "INPUT" && (
+                    <>
+                      <label>{field.label}</label>
                       <MSInput
-                        key={item.id}
                         ref={(el) => {
-                          refValue.current[`${field.name}_${id}`] = el!;
+                          refValue.current[field.name] = el!;
                         }}
-                        placeholder={`${field.name} ${item.id}`}
-                        type="text"
+                        placeholder={field.placeholder}
+                        type={field.typeText || "text"}
                         required={true}
-                        defaultValue={item.value || ""}
+                        defaultValue={field.value || ""}
                         errorMessage="Invalid input"
                         className="mb-2"
                       />
-                    ))}
-                  </>
-                )}
-                {field.type === "IMAGE" && (
-                  <>
-                    <label>{field.label}</label>
-                    <ImageUploader
-                      titleBtn="Chọn hình ảnh"
-                      typefile="image/*"
-                      onImagesChange={handleImageUploaded}
-                      urls={field?.value ? field.value : ""}
-                      onUrlsReset={hanleResetUrlsImage}
-                    />
-                  </>
-                )}
-                {field.type === "VIDEO" && (
-                  <>
-                    <label>{field.label}</label>
-                    <ImageUploader
-                      titleBtn="Chọn video"
-                      typefile="video/*"
-                      onImagesChange={handleVideoUploaded}
-                      urls={field?.value ? field.value : ""}
-                      onUrlsReset={hanleResetUrlsVideo}
-                    />
-                  </>
-                )}
-              </div>
-            ))}
+                    </>
+                  )}
+                  {field.type === "OPTION" && (
+                    <>
+                      <label>{field.label}</label>
+                      <Select
+                        defaultValue={
+                          typeof field.value === "string" ? field.value : "Chọn"
+                        }
+                        style={{ width: "100%" }}
+                        onChange={handleSelectCategoryType}
+                      >
+                        {field.options?.map((option, index) => (
+                          <Option
+                            key={index}
+                            value={option.option}
+                            content={option.value}
+                          >
+                            {option.option}
+                          </Option>
+                        ))}
+                      </Select>
+                      <div className="w-full h-[340px] max-h-[340px]  h-full overflow-y-auto pb-2">
+                        {selectedContent &&
+                          selectedContent.length > 0 &&
+                          selectedContent.map((content, idex1) => (
+                            <div
+                              key={idex1}
+                              className="flex items-center ml-1 mb-1"
+                            >
+                              <label>
+                                <input
+                                  type="checkbox"
+                                  value={content.value}
+                                  onChange={handleCheckbox}
+                                  checked={
+                                    selectedItemsByOption[
+                                      currentOption!
+                                    ]?.includes(content.value) || false
+                                  }
+                                  style={{
+                                    transform: "scale(1.5)",
+                                    marginRight: "8px",
+                                  }}
+                                />
+                                {content.value}
+                              </label>
+                            </div>
+                          ))}
+                      </div>
+                    </>
+                  )}
+                  {field.type === "ARRAY" && (
+                    <>
+                      <label>{field.label}</label>
+                      <Button
+                        icon={<CiCirclePlus />}
+                        onClick={handleAddArrayField}
+                      >
+                        Add New
+                      </Button>
+                      {arrValue.map((item, id) => (
+                        <MSInput
+                          key={item.id}
+                          ref={(el) => {
+                            refValue.current[`${field.name}_${id}`] = el!;
+                          }}
+                          placeholder={`${field.name} ${item.id}`}
+                          type={field.typeText || "text"}
+                          required={true}
+                          defaultValue={item.value || ""}
+                          errorMessage="Invalid input"
+                          className="mb-2"
+                        />
+                      ))}
+                    </>
+                  )}
+                  {field.type === "IMAGE" && (
+                    <>
+                      <label>{field.label}</label>
+                      <ImageUploader
+                        titleBtn="Chọn hình ảnh"
+                        typefile="image/*"
+                        onImagesChange={handleImageUploaded}
+                        urls={field?.value ? field.value : ""}
+                      />
+                    </>
+                  )}
+                  {field.type === "VIDEO" && (
+                    <>
+                      <label>{field.label}</label>
+                      <ImageUploader
+                        titleBtn="Chọn video"
+                        typefile="video/*"
+                        onImagesChange={handleVideoUploaded}
+                        urls={field?.value ? field.value : ""}
+                      />
+                    </>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
         <div className="flex justify-end space-x-4">

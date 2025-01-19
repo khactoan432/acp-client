@@ -1,288 +1,147 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { toast } from "react-toastify";
-import AdminModal from "../../components/popup/AdminModal";
+// import component
+import AdminModalV2 from "../../components/popup/AdminModalV2";
 import AdminHeader from "../../components/layout/Admin/header";
 import Nav from "../../components/layout/Admin/nav";
+import Table from "../../components/table";
 import Loading from "../../components/loading";
-import { useSelector, useDispatch } from "react-redux";
-import { Table, Button, Input, Checkbox, Pagination } from "antd";
-import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
-import { RootState, AppDispatch } from "../../redux/store";
-import {
-  fetchAdminOrders,
-  updateOrder,
-  deleteOrder,
-} from "../../redux/slices/orderSlice";
+import PopupNotification from "../../components/popup/notify";
+// import antd
+import { Button } from "antd";
+// import axios
+import { postData, getData, deleteData, putData } from "../../axios";
+// import icon react
+import { FaRegEdit } from "react-icons/fa";
+import { MdOutlineDeleteOutline } from "react-icons/md";
 
 interface Order {
-  _id: string;
-  code: string;
-  type: string;
-  method: string; 
+  order: string;
+  data: string;
+  customer: string;
+  product: string;
   payment_status: string;
-  createdAt: string;
-  materialDetails: any;
-  userDetails: any;
+  order_status: string;
+  total: string;
 }
+const AdminOrder = () => {
+  const header = localStorage.getItem("access_token");
+  const [screenHeight, setScreenHeight] = useState(window.innerHeight - 56);
+  const updateScreenHeight = () => {
+    setScreenHeight(window.innerHeight - 56);
+  };
+  useEffect(() => {
+    window.addEventListener("resize", updateScreenHeight);
+    return () => {
+      window.removeEventListener("resize", updateScreenHeight);
+    };
+  }, []);
 
-interface SaveData {
-  files?: File[];
-  default_file: [{ name: string; url: string }];
-  email_user: string;
-  prize: string;
-  competition: string;
-}
-
-const PAGE_SIZE = 10;
-
-const AdminOrder: React.FC = () => {
-  const [isModalSaveOpen, setIsModalSaveOpen] = useState(false);
-  const [isModalUpdateOpen, setIsModalUpdateOpen] = useState(false);
-  const [currentEdit, setCurrentEdit] = useState<string | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
-
-  // const fields = [
-  //   {
-  //     name: "email_user",
-  //     placeholder: "Student Email ...",
-  //     label: "Student Email ...",
-  //   },
-  //   { name: "prize", placeholder: "Prize ...", label: "Prize ..." },
-  //   {
-  //     name: "competition",
-  //     placeholder: "Competition ...",
-  //     label: "Competition ...",
-  //   },
-  // ];
-
-  const dispatch = useDispatch<AppDispatch>();
-  const { adminOrders, totalAdmin, loading, error } = useSelector(
-    (state: RootState) => state.orders
-  );
-  console.log(adminOrders);
+  const [firstHeight, setFirstHeight] = useState<number>(0);
+  const [secondHeight, setSeconHeight] = useState<number>(0);
+  const firstDivRef = useRef<HTMLDivElement>(null);
+  const secondDivRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    dispatch(fetchAdminOrders({ page: currentPage, limit: PAGE_SIZE }));
-  }, [dispatch, currentPage]);
-
-  // const getDataForEdit = (id: string | null): SaveData => {
-  //   const order = adminOrders.find((b) => b._id === id);
-  //   return {
-  //     default_file: [
-  //       {
-  //         name: order?.image.split("/").pop() || "",
-  //         url: order?.image || "",
-  //       },
-  //     ],
-  //     email_user: order?.email_user || "",
-  //     prize: order?.prize || "",
-  //     competition: order?.competition || "",
-  //   };
-  // };
-
-  // const handleSave = async (data: SaveData): Promise<void> => {
-  //   if (!data.files || data.files.length === 0) {
-  //     toast.error("Please upload at least one file.");
-  //     return;
-  //   }
-
-  //   if (!data.email_user || !data.prize || !data.competition) {
-  //     toast.error("Please fill all information.");
-  //     return;
-  //   }
-
-  //   try {
-  //     const formData = new FormData();
-  //     data.files.forEach((file) => formData.append("files", file));
-  //     formData.append("email_user", data.email_user);
-  //     formData.append("prize", data.prize);
-  //     formData.append("competition", data.competition);
-
-  //     await dispatch(createOrder(formData)).unwrap();
-  //     toast.success("Upload successful!");
-
-  //     setIsModalSaveOpen(false);
-  //   } catch (error) {
-  //     toast.error("Upload failed!");
-  //     console.error(error);
-  //   }
-  // };
-
-  // const handleUpdate = async (data: SaveData): Promise<void> => {
-  //   if (!currentEdit) {
-  //     toast.error("Please upload at least one file.");
-  //     return;
-  //   }
-
-  //   try {
-  //     const formData = new FormData();
-  //     data.files?.forEach((file) => formData.append("files", file));
-  //     const fields = [
-  //       { key: "email_user", value: data.email_user },
-  //       { key: "prize", value: data.prize },
-  //       { key: "competition", value: data.competition },
-  //     ];
-
-  //     fields.forEach((field) => {
-  //       if (field.value && String(field.value).trim() !== "") {
-  //         formData.append(field.key, field.value);
-  //       }
-  //     });
-
-  //     await dispatch(
-  //       updateOrder({ orderId: currentEdit, updatedData: formData })
-  //     ).unwrap();
-  //     toast.success("Update successful!");
-
-  //     setIsModalUpdateOpen(false);
-  //   } catch (error) {
-  //     toast.error("Update failed!");
-  //     console.error(error);
-  //   }
-  // };
-
-  const handleDelete = async (orderId: string): Promise<void> => {
-    try {
-      await dispatch(deleteOrder(orderId)).unwrap();
-
-      toast.success("Order deleted successfully!");
-    } catch (error) {
-      toast.error("Failed to delete order!");
-      console.error(error);
+    if (firstDivRef.current) {
+      setFirstHeight(firstDivRef.current.offsetHeight);
     }
-  };
+    if (secondDivRef.current) {
+      setSeconHeight(secondDivRef.current.offsetHeight);
+    }
+  }, []);
 
-  const columns = [
-    {
-      title: <Checkbox />,
-      dataIndex: "checkbox",
-      render: () => <Checkbox />,
-      width: 50,
-    },
-    // {
-    //   title: "Image",
-    //   dataIndex: "image",
-    //   render: (src: string) => (
-    //     <img
-    //       src={src}
-    //       alt="order"
-    //       style={{ width: "100px", height: "50px", objectFit: "cover" }}
-    //     />
-    //   ),
-    // },
-    {
-      title: "Order",
-      dataIndex: "code",
-    },
-    {
-      title: "User",
-      dataIndex: "userEmail",
-    },
-    {
-      title: "Product",
-      dataIndex: "materialName",
-    },
-    {
-      title: "Type",
-      dataIndex: "type",
-    },
-    {
-      title: "Method",
-      dataIndex: "method",
-    },
-    {
-      title: "Amount",
-      dataIndex: "amount",
-    },
-    {
-      title: "Status",
-      dataIndex: "payment_status",
-    },
-    {
-      title: "Actions",
-      dataIndex: "actions",
-      render: (_: unknown, record: Order) => (
-        <div style={{ display: "flex", gap: "8px", justifyContent: "center" }}>
-          {/* <Button
-            type="text"
-            icon={<EditOutlined />}
-            onClick={() => {
-              setCurrentEdit(record._id);
-              setIsModalUpdateOpen(true);
-            }}
-          /> */}
-          <Button
-            type="text"
-            icon={<DeleteOutlined />}
-            danger
-            onClick={() => handleDelete(record._id)}
-          />
-        </div>
-      ),
-      width: 100,
-    },
+  // state boolean
+  const [isLoading, setIsLoading] = useState(false);
+  const [isFetchData, setIsFetchData] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isModalCreate, setIsModalCreate] = useState(false);
+  const [isModalUpdate, setIsModalUpdate] = useState(false);
+
+  // state string
+  const [id, setId] = useState("");
+
+  // state store
+  const [data, setData] = useState<Order[]>([]);
+  const [selectedContent, setSelectedContent] = useState<any>(null);
+
+  let columns = [
+    "order",
+    "date",
+    "customer",
+    "product",
+    "payment_status",
+    "order_status",
+    "total",
   ];
 
-  if (loading) {
-    return <Loading message="Loading data..." size="large" />;
-  }
+  // structure data
+  console.log(data);
+  let fieldSearch = [
+    "order",
+    "date",
+    "customer",
+    "product",
+    "payment_status",
+    "order_status",
+  ];
 
-  if (error) {
-    toast.error(error);
-  }
-
+  // handle action
+  const handleActions = (type: string, row: any) => {
+    if (type === "DELETE") {
+      const id = row._id;
+      setId(id);
+      setIsModalVisible(true);
+    }
+  };
+  const styleAction = {
+    marginRight: "8px",
+    padding: "4px 8px",
+    borderRadius: "4px",
+  };
+  const actions = [
+    {
+      title: "Chỉnh sửa",
+      action: "EDIT",
+      icon: <FaRegEdit />,
+      style: { ...styleAction, color: "#f7bb0a" },
+    },
+    {
+      title: "Xoá",
+      action: "DELETE",
+      icon: <MdOutlineDeleteOutline />,
+      style: { ...styleAction, color: "red" },
+    },
+  ];
+  const handleClosePopup = () => {
+    setIsModalVisible(false);
+    setId("");
+  };
   return (
-    <div className="flex flex-col h-screen">
-      <AdminHeader />
-      <div className="flex flex-1">
-        <Nav />
-        {/* content */}
-        <div
-          style={{ padding: "20px", backgroundColor: "#f9f9f9", width: "100%" }}
-        >
+    <div className="flex h-screen">
+      <Nav />
+      <div className="flex flex-col flex-1">
+        <AdminHeader />
+        <div className="w-full h-full bg-white">
           <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              marginBottom: "16px",
-            }}
+            ref={secondDivRef}
+            className="header_categories flex justify-between items-center bg-primary px-5 py-3 mb-2"
           >
-            <div style={{ display: "flex", gap: "8px" }}>
-              <Input placeholder="Search..." style={{ width: "200px" }} />
-              <Button>Filter</Button>
+            <div className="left uppercase">
+              <h2 className="font-size-20">Thông tin khoá học đã bán</h2>
             </div>
-            <div style={{ display: "flex", gap: "8px" }}>
-              <Button>Export</Button>
-              <Button type="primary" onClick={() => setIsModalSaveOpen(true)} disabled={true}>
-                + Add order
-              </Button>
-            </div>
+            <div className="right uppercase"></div>
           </div>
 
-          <Table
-            dataSource={adminOrders}
-            columns={columns}
-            pagination={false}
-            bordered
-            rowKey="_id"
-          />
-
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginTop: "16px",
-            }}
-          >
-            <span>{totalAdmin} Results</span>
-            <Pagination
-              current={currentPage}
-              total={totalAdmin}
-              pageSize={PAGE_SIZE}
-              onChange={(page) => setCurrentPage(page)}
+          {data && (
+            <Table
+              columns={columns}
+              fieldSearch={fieldSearch}
+              data={data}
+              handleAction={handleActions}
+              actions={actions}
             />
-          </div>
+          )}
         </div>
       </div>
 

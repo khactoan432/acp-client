@@ -21,6 +21,24 @@ interface Advirory {
 
 const Schedules = () => {
   const header = localStorage.getItem("access_token");
+  const [screenHeight, setScreenHeight] = useState(window.innerHeight - 56);
+  const updateScreenHeight = () => {
+    setScreenHeight(window.innerHeight - 56);
+  };
+  useEffect(() => {
+    window.addEventListener("resize", updateScreenHeight);
+    return () => {
+      window.removeEventListener("resize", updateScreenHeight);
+    };
+  }, []);
+  const [firstHeight, setFirstHeight] = useState<number>(0);
+  const firstDivRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (firstDivRef.current) {
+      setFirstHeight(firstDivRef.current.offsetHeight);
+    }
+  }, []);
 
   const [isLoading, setIsLoading] = useState(false);
   const [isFetchData, setIsFetchData] = useState(false);
@@ -87,32 +105,17 @@ const Schedules = () => {
   const styleAction = {
     marginRight: "8px",
     padding: "4px 8px",
-    color: "black",
-    backgroundColor: "white",
     borderRadius: "4px",
-    cursor: "pointer",
   };
 
   const actions = [
     {
-      title: "Xoá",
-      action: "DELETE",
-      icon: <MdOutlineDeleteOutline />,
-      style: { ...styleAction, color: "red" },
+      title: "No action",
     },
   ];
   let columnsCourse = ["name", "phone_number", "email", "mindfulness_course"];
   let data = dataAdvisories;
-
-  // get height element
-  const headerRef = useRef<HTMLDivElement>(null); // Create a ref for the header div
-  const [minHeight, setMinHeight] = useState(0); // State to store the height
-
-  useEffect(() => {
-    if (headerRef.current) {
-      setMinHeight(headerRef.current.offsetHeight + 8);
-    }
-  }, []);
+  let fieldSearch = ["name", "phone_number", "email", "mindfulness_course"];
 
   const handleClosePopup = () => {
     setIsModalVisible(false);
@@ -123,28 +126,31 @@ const Schedules = () => {
     return <Loading message="Đang tải dữ liệu..." size="large" />;
   }
   return (
-    <div className="flex flex-col h-screen">
-      <AdminHeader />
-      <div className="flex flex-1">
-        <Nav />
-        {/* content */}
-        <div className="wrap-container_categories w-full m-2">
-          <div
-            ref={headerRef}
-            className="header_categories w-full bg-primary px-5 py-3"
-          >
-            <div className="left uppercase">
-              <h2 className="font-size-20">Advisories</h2>
+    <div className="flex h-screen">
+      <Nav />
+      <div className="flex flex-col flex-1">
+        <AdminHeader />
+        <div className="w-full h-full bg-white">
+          <div style={{ height: `calc(100% - 8px)` }} className="m-2">
+            <div
+              ref={firstDivRef}
+              className="flex justify-between items-center bg-primary px-5 py-3 mb-2"
+            >
+              <div className="left uppercase">
+                <h2 className="font-size-20">Lịch hẹn tư vấn</h2>
+              </div>
+              <div className="right uppercase"></div>
             </div>
-          </div>
-          <div
-            style={{ minHeight: `calc(100% - ${minHeight + "px"})` }}
-            className="wrap-body-categories w-full overflow-auto bg-primary px-5 py-3 mt-2"
-          >
-            <div className="flex body-categories">
+            <div
+              className="bg-primary"
+              style={{
+                height: `calc(${screenHeight}px - ${firstHeight}px - 24px)`,
+              }}
+            >
               {data && (
                 <Table
                   columns={columnsCourse}
+                  fieldSearch={fieldSearch}
                   data={data}
                   handleAction={handleActions}
                   actions={actions}

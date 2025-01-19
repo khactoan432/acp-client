@@ -101,7 +101,7 @@ const Register: React.FC = () => {
   return (
     <div style={{ width: "100%", padding: "62px 0px" }}>
       <div style={styles.container}>
-        <h1 className="primary-color-text m-2" style={styles.title}>
+        <h1 className="text-color-secondary m-2" style={styles.title}>
           Create an Account
         </h1>
         <div className="flex mb-4">
@@ -118,7 +118,7 @@ const Register: React.FC = () => {
             <p style={styles.error}>Invalid registration</p>
           )}
 
-          <label className="primary-color-text">Name</label>
+          <label className="text-color-secondary">Name</label>
           <input
             type="text"
             placeholder="Enter Your Name"
@@ -130,7 +130,7 @@ const Register: React.FC = () => {
             <p style={styles.error}>Name is required</p>
           )}
 
-          <label className="primary-color-text">Email</label>
+          <label className="text-color-secondary">Email</label>
           <input
             type="text"
             placeholder="Enter Email address"
@@ -142,7 +142,7 @@ const Register: React.FC = () => {
             <p style={styles.error}>Email is required</p>
           )}
 
-          <label className="primary-color-text">Password</label>
+          <label className="text-color-secondary">Password</label>
           <div style={styles.passwordWrapper}>
             <input
               type={showPassword ? "text" : "password"}
@@ -162,7 +162,7 @@ const Register: React.FC = () => {
             <p style={styles.error}>Password is required</p>
           )}
 
-          <label className="primary-color-text">Re-enter password</label>
+          <label className="text-color-secondary">Re-enter password</label>
           <div style={styles.passwordWrapper}>
             <input
               type={showRePassword ? "text" : "password"}
@@ -186,7 +186,7 @@ const Register: React.FC = () => {
             </p>
           )}
 
-          <label className="primary-color-text">Codeforce name</label>
+          <label className="text-color-secondary">Codeforce name</label>
           <input
             type="text"
             placeholder="Enter Your Codeforce Account Name"
@@ -195,7 +195,7 @@ const Register: React.FC = () => {
             style={styles.input}
           />
 
-          <label className="primary-color-text">Phone Number</label>
+          <label className="text-color-secondary">Phone Number</label>
           <input
             type="text"
             placeholder="Enter your phone number"

@@ -1,3 +1,5 @@
+import React, { useState, useEffect, useRef } from "react";
+
 import AdminHeader from "../../components/layout/Admin/header";
 import Nav from "../../components/layout/Admin/nav";
 import { IoCartOutline } from "react-icons/io5";
@@ -13,6 +15,25 @@ import ChartCol from "../../components/helps/chartCol";
 import imageCourse from "../../assets/admin/ImageCourse.png";
 
 const AdminDashboard = () => {
+  const header = localStorage.getItem("access_token");
+  const [screenHeight, setScreenHeight] = useState(window.innerHeight - 56);
+  const updateScreenHeight = () => {
+    setScreenHeight(window.innerHeight - 56);
+  };
+  useEffect(() => {
+    window.addEventListener("resize", updateScreenHeight);
+    return () => {
+      window.removeEventListener("resize", updateScreenHeight);
+    };
+  }, []);
+  const [firstHeight, setFirstHeight] = useState<number>(0);
+  const firstDivRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (firstDivRef.current) {
+      setFirstHeight(firstDivRef.current.offsetHeight);
+    }
+  }, []);
   // fake data chart col
   const dataCol = {
     labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"], // 7 ngày gần nhất
@@ -168,14 +189,20 @@ const AdminDashboard = () => {
     },
   ];
   return (
-    <div className="flex flex-col h-screen">
-      <AdminHeader />
-      <div className="flex flex-1 md:flex-row">
-        <Nav />
-        <div className="w-full h-full overflow-y-auto bg-primary">
-          <div className="px-3 md:px-5">
-            <div className="text-2xl my-3">
-              <h2>DashBoard</h2>
+    <div className="flex h-screen">
+      <Nav />
+      <div className="flex flex-col flex-1">
+        <AdminHeader />
+        <div className="w-full h-full bg-white">
+          <div style={{ height: `calc(100% - 8px)` }} className="m-2">
+            <div
+              ref={firstDivRef}
+              className="flex justify-between items-center bg-primary px-5 py-3 mb-2"
+            >
+              <div className="left uppercase">
+                <h2 className="font-size-20">DashBoard</h2>
+              </div>
+              <div className="right uppercase"></div>
             </div>
 
             {/* Doanh thu */}
@@ -190,7 +217,7 @@ const AdminDashboard = () => {
                   </div>
                 </div>
                 <div className="bg-[#ECF2FF] rounded-full p-2">
-                  <MdAttachMoney className="primary-color-text" />
+                  <MdAttachMoney className="text-color-secondary" />
                 </div>
               </div>
               <div className="w-full sm:w-[45%] lg:w-[208px] bg-white rounded-lg flex p-2 items-center justify-around">
@@ -206,7 +233,7 @@ const AdminDashboard = () => {
                 </div>
                 <div className="right">
                   <div className="bg-[#ECF2FF] rounded-full p-2">
-                    <IoCartOutline className="primary-color-text" />
+                    <IoCartOutline className="text-color-secondary" />
                   </div>
                 </div>
               </div>
@@ -223,7 +250,7 @@ const AdminDashboard = () => {
                 </div>
                 <div className="right">
                   <div className="bg-[#ECF2FF] rounded-full p-2">
-                    <IoCartOutline className="primary-color-text" />
+                    <IoCartOutline className="text-color-secondary" />
                   </div>
                 </div>
               </div>
@@ -257,7 +284,7 @@ const AdminDashboard = () => {
                 </div>
                 <div className="right">
                   <div className="bg-[#ECF2FF] rounded-full p-2">
-                    <TbChartInfographic className="primary-color-text" />
+                    <TbChartInfographic className="text-color-secondary" />
                   </div>
                 </div>
               </div>
@@ -285,7 +312,7 @@ const AdminDashboard = () => {
             </div>
 
             {/* Table */}
-            <div className="flex flex-col lg:flex-row gap-4 my-3 justify-around">
+            {/* <div className="flex flex-col lg:flex-row gap-4 my-3 justify-around">
               <div className="w-full lg:w-[49%] h-[400px] bg-white rounded-lg overflow-auto">
                 <h2 className="px-5 py-4 text-[rgba(30,39,83,1)]">
                   Những khoá học bán chạy
@@ -298,7 +325,7 @@ const AdminDashboard = () => {
                 </h2>
                 <Table columns={columnsExam} data={dataExam} />
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

@@ -1,12 +1,15 @@
 import React from "react";
-import { Modal, Button } from "antd"; // Bạn có thể dùng Ant Design để hiển thị modal
-import { CheckCircleOutlined, CloseCircleOutlined } from "@ant-design/icons"; // Dùng các icon có sẵn của Ant Design
+import { Modal, Button } from "antd";
+import "./notify.scss";
+
+// import react icon
+import { CheckCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
 
 interface PopupNotificationProps {
   title: string;
-  status: "success" | "error"; // Trạng thái: success hoặc error
-  buttonText?: string; // Nội dung của button (có thể không có nếu không truyền)
-  onButtonClick?: (arg?: any) => void; // Hàm khi nhấn nút button
+  status: "success" | "error";
+  buttonText?: string;
+  onButtonClick?: (arg?: any) => void;
   buttonClose?: () => void;
 }
 
@@ -17,20 +20,22 @@ const PopupNotification: React.FC<PopupNotificationProps> = ({
   onButtonClick,
   buttonClose,
 }) => {
-  // Cài đặt icon và màu sắc tùy thuộc vào trạng thái
   const icon =
     status === "success" ? (
-      <CheckCircleOutlined style={{ color: "green", fontSize: "32px" }} />
+      <CheckCircleOutlined style={{ color: "green", fontSize: "24px" }} />
     ) : (
-      <CloseCircleOutlined style={{ color: "red", fontSize: "32px" }} />
+      <CloseCircleOutlined
+        className="text-color-primary"
+        style={{ fontSize: "24px" }}
+      />
     );
 
   return (
     <Modal
       open={true}
       title={title}
-      footer={null} // Không cần footer mặc định
-      closable={false} // Không cho phép đóng modal bằng nút X
+      footer={null}
+      closable={false}
       centered
       width={400}
     >
@@ -38,7 +43,7 @@ const PopupNotification: React.FC<PopupNotificationProps> = ({
         <div
           style={{
             position: "absolute",
-            top: "16px",
+            top: "20px",
             right: "16px",
             cursor: "pointer",
           }}

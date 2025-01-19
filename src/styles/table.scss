@@ -1,0 +1,68 @@
+.group-hover\:flex::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: -16px;
+  height: 100%;
+  width: 16px;
+}
+
+// .body-table:last-of-type .icon-dots > .group-hover\:flex {
+//   top: -92px !important;
+// }
+
+tbody tr:hover,
+.table tbody tr:hover th:last-child,
+.table tbody tr:hover th:first-child,
+.table tbody tr:hover td:last-child,
+.table tbody tr:hover td:first-child {
+  background-color: #f2f9ff;
+}
+
+.custom-slider .ant-slider-track {
+  height: 2px; /* Đường line được kéo */
+}
+
+.custom-slider .ant-slider-rail {
+  height: 2px; /* Đường line nền */
+}
+.ant-slider-rail {
+  height: 1px !important;
+}
+:where(.css-dev-only-do-not-override-1x0dypw).ant-slider-horizontal
+  .ant-slider-step {
+  height: 1px !important;
+  top: 3px !important;
+}
+:where(.css-dev-only-do-not-override-1x0dypw).ant-slider-horizontal
+  .ant-slider-track {
+  height: 1px !important;
+}
+:where(.css-dev-only-do-not-override-1x0dypw).ant-slider .ant-slider-dot {
+  width: 1px !important;
+  border-radius: 0 !important;
+  border: 0.4px solid var(--color__secondary);
+}
+:where(.css-dev-only-do-not-override-1x0dypw).ant-slider .ant-slider-track {
+  background-color: var(--color__secondary);
+}
+:where(.css-dev-only-do-not-override-1x0dypw).ant-slider
+  .ant-slider-handle::after {
+  box-shadow: 0 0 0 2px var(--color__secondary);
+}
+:where(.css-dev-only-do-not-override-1x0dypw).ant-slider:hover
+  .ant-slider-track {
+  background-color: var(--color__hover-primary);
+}
+:where(.css-dev-only-do-not-override-1x0dypw).ant-slider:hover
+  .ant-slider-handle::after {
+  box-shadow: 0 0 0 2px var(--color__hover-primary);
+}
+:where(.css-dev-only-do-not-override-1x0dypw).ant-slider:hover
+  .ant-slider-dot-active {
+  border-color: var(--color__hover-primary);
+}
+:where(.css-dev-only-do-not-override-1x0dypw).ant-slider
+  .ant-slider-handle::after {
+  top: -1px;
+}

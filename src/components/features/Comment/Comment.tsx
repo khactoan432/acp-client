@@ -185,7 +185,7 @@ const CommentPage: React.FC = () => {
               />
               <div className="w-full">
                 <p className="font-bold">{comment.name}</p>
-                <p className="primary-color-text text-sm">{comment.date}</p>
+                <p className="text-color-secondary text-sm">{comment.date}</p>
                 <p className="mt-2 text-gray-700">{comment.text}</p>
                 {comment.images && comment.images.length > 0 && (
                   <div className="mt-2 flex flex-wrap gap-4">

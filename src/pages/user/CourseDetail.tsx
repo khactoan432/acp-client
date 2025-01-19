@@ -208,14 +208,14 @@ const UserCourseDetail = () => {
                 { name: "Đánh giá", to: "rate" },
                 { name: "Bình luận", to: "comment" },
               ].map((item, index) => (
-                <li key={index} className="primary-color-text">
+                <li key={index} className="text-color-secondary">
                   <Link
                     to={item.to}
                     spy={true}
                     smooth={true}
                     offset={-140}
                     duration={500}
-                    className="cursor-pointer font-semibold primary-color-text transition duration-200"
+                    className="cursor-pointer font-semibold text-color-secondary transition duration-200"
                     activeClass="active"
                   >
                     {item.name}
@@ -368,7 +368,7 @@ const UserCourseDetail = () => {
               </ul>
               <p className="text-sm mt-6">
                 Chưa chắc chắn khóa học này dành cho bạn?{" "}
-                <a href="#" className="primary-color-text underline">
+                <a href="#" className="text-color-secondary underline">
                   Liên hệ để nhận tư vấn miễn phí!
                 </a>
               </p>

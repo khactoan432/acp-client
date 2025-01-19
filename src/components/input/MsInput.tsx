@@ -29,6 +29,7 @@ interface MSInputProps {
   errorMessage?: string; // Thông báo lỗi tùy chỉnh
   className?: string; // Thêm style tùy chỉnh
   defaultValue?: string;
+  onChangeInput?: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const MSInput = forwardRef<MSInputHandle, MSInputProps>(
@@ -45,6 +46,7 @@ const MSInput = forwardRef<MSInputHandle, MSInputProps>(
       errorMessage,
       className = "",
       defaultValue = "",
+      onChangeInput,
     },
     ref
   ) => {
@@ -99,6 +101,9 @@ const MSInput = forwardRef<MSInputHandle, MSInputProps>(
       const newValue = e.target.value;
       setValue(newValue);
       validateInput(newValue); // Kiểm tra giá trị mới
+      if (onChangeInput) {
+        onChangeInput(e);
+      }
     };
     const handleBlur = () => {
       validateInput(value);
@@ -113,7 +118,7 @@ const MSInput = forwardRef<MSInputHandle, MSInputProps>(
         )}
         <div className="relative">
           {LeftIcon && (
-            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none primary-color-text">
+            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-color-secondary">
               <LeftIcon />
             </div>
           )}
@@ -125,14 +130,14 @@ const MSInput = forwardRef<MSInputHandle, MSInputProps>(
             value={value}
             onChange={handleChange}
             disabled={disabled}
-            className={`w-full px-11px py-1 border rounded-md ${
-              LeftIcon ? "pl-10" : ""
-            } ${RightIcon ? "pr-10" : ""} ${
-              error ? "border-red-500" : "border-gray-300"
-            }`}
+            className={`w-full ${
+              !LeftIcon && !RightIcon ? "px-11px" : ""
+            } py-1 border rounded-md ${LeftIcon ? "pl-8 pr-11px" : ""} ${
+              RightIcon ? "pr-10 pl-11px" : ""
+            } ${error ? "border-red-500" : "border-gray-300"}`}
           />
           {RightIcon && (
-            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none primary-color-text">
+            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-color-secondary">
               <RightIcon />
             </div>
           )}

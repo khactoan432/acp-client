@@ -55,7 +55,7 @@ const LessonList: React.FC<LessonListProps> = ({
                   className={`flex justify-between items-center px-4 py-3 rounded cursor-pointer ${
                     lesson._id === currentLesson._id
                       ? "bg-blue-100 text-black"
-                      : "bg-gray-50 primary-color-text hover:bg-gray-200"
+                      : "bg-gray-50 text-color-secondary hover:bg-gray-200"
                   }`}
                   onClick={() => changeLesson(section._id, lesson._id)}
                 >
@@ -64,7 +64,7 @@ const LessonList: React.FC<LessonListProps> = ({
                 </li>
               ))}
               {section.lessons.length === 0 && (
-                <p className="primary-color-text italic text-sm">
+                <p className="text-color-secondary italic text-sm">
                   Không có bài học nào.
                 </p>
               )}

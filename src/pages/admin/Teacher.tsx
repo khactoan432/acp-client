@@ -1,20 +1,19 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { toast } from "react-toastify";
-import AdminModal from "../../components/popup/AdminModal";
+// import component
+import AdminModalV2 from "../../components/popup/AdminModalV2";
 import AdminHeader from "../../components/layout/Admin/header";
 import Nav from "../../components/layout/Admin/nav";
+import Table from "../../components/table";
 import Loading from "../../components/loading";
-import { useSelector, useDispatch } from "react-redux";
-import { Table, Button, Input, Checkbox, Pagination } from "antd";
-import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
-import { RootState, AppDispatch } from "../../redux/store";
-import {
-  fetchAdminTeachers,
-  createTeacher,
-  updateTeacher,
-  deleteTeacher,
-} from "../../redux/slices/teacherSlice";
-
+import PopupNotification from "../../components/popup/notify";
+// import antd
+import { Button } from "antd";
+// import axios
+import { postData, getData, deleteData, putData } from "../../axios";
+// import icon
+import { FaRegEdit } from "react-icons/fa";
+import { MdOutlineDeleteOutline } from "react-icons/md";
 interface Teacher {
   _id: string;
   image: string;
@@ -26,318 +25,373 @@ interface Teacher {
   phone_number: string;
 }
 
-interface SaveData {
-  files?: File[];
-  default_file: [{ name: string; url: string }];
-  name: string;
-  email: string;
-  password: string;
-  repassword: string;
-  codeforce_name: string;
-  phone_number: string;
-}
-
-const PAGE_SIZE = 10;
-
 const AdminTeacher: React.FC = () => {
-  const [isModalSaveOpen, setIsModalSaveOpen] = useState(false);
-  const [isModalUpdateOpen, setIsModalUpdateOpen] = useState(false);
-  const [currentEdit, setCurrentEdit] = useState<string | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
+  const header = localStorage.getItem("access_token");
+  const [screenHeight, setScreenHeight] = useState(window.innerHeight - 56);
+  const updateScreenHeight = () => {
+    setScreenHeight(window.innerHeight - 56);
+  };
+  useEffect(() => {
+    window.addEventListener("resize", updateScreenHeight);
+    return () => {
+      window.removeEventListener("resize", updateScreenHeight);
+    };
+  }, []);
 
-  const dispatch = useDispatch<AppDispatch>();
-  const { adminTeachers, totalAdmin, loading, error } = useSelector(
-    (state: RootState) => state.teachers
-  );
+  const [firstHeight, setFirstHeight] = useState<number>(0);
+  const [secondHeight, setSeconHeight] = useState<number>(0);
+  const firstDivRef = useRef<HTMLDivElement>(null);
+  const secondDivRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    dispatch(
-      fetchAdminTeachers({
-        role: "TEACHER",
-        page: currentPage,
-        limit: PAGE_SIZE,
-      })
-    );
-  }, [dispatch, currentPage]);
+    if (firstDivRef.current) {
+      setFirstHeight(firstDivRef.current.offsetHeight);
+    }
+    if (secondDivRef.current) {
+      setSeconHeight(secondDivRef.current.offsetHeight);
+    }
+  }, []);
 
-  const getDataForEdit = (id: string | null): SaveData => {
-    const teacher = adminTeachers.find((b) => b._id === id);
-    return {
-      default_file: [
-        {
-          name: teacher?.image.split("/").pop() || "",
-          url: teacher?.image || "",
-        },
-      ],
-      name: teacher?.name || "",
-      email: teacher?.email || "",
-      password: teacher?.password || "",
-      repassword: teacher?.repassword || "",
-      codeforce_name: teacher?.codeforce_name || "",
-      phone_number: teacher?.phone_number || "",
+  // state boolean
+  const [isLoading, setIsLoading] = useState(false);
+  const [isFetchData, setIsFetchData] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isModalCreate, setIsModalCreate] = useState(false);
+  const [isModalUpdate, setIsModalUpdate] = useState(false);
+
+  // state string
+  const [id, setId] = useState("");
+
+  // state store
+  const [data, setData] = useState<Teacher[]>([]);
+  const [selectedContent, setSelectedContent] = useState<any>(null);
+
+  // fetch data
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const res = await getData(`/api/admin/users?role=TEACHER`, {
+          headers: {
+            Authorization: `Bearer ${header}`,
+          },
+        });
+        setData(res.data);
+      } catch (error) {
+        console.error("Error fetching data: ", error);
+      } finally {
+        setIsLoading(false);
+      }
     };
-  };
+    fetchData();
+  }, [isFetchData]);
 
-  const handleSave = async (data: SaveData): Promise<void> => {
-    if (!data.files || data.files.length === 0) {
-      toast.error("Please upload at least one file.");
-      return;
+  let columns = ["name", "email", "codeforce_name", "phone_number", "image"];
+
+  // structure data video exam
+  console.log(data);
+  let fieldSearch = ["name", "email", "codeforce_name", "phone_number"];
+
+  const [structData, setStructData] = useState<any>([]);
+
+  useEffect(() => {
+    let arrStruct = [
+      {
+        name: "name",
+        placeholder: "Nhập tên giáo viên",
+        label: "Tên giáo viên",
+        value: "",
+        type: "INPUT",
+      },
+      {
+        name: "email",
+        placeholder: "Nhập email",
+        label: "Email",
+        value: "",
+        type: "INPUT",
+      },
+      {
+        name: "password",
+        placeholder: "Nhập mật khẩu",
+        label: "Mật khẩu",
+        value: "",
+        type: "INPUT",
+        hidden: true,
+      },
+      {
+        name: "repassword",
+        placeholder: "Nhập lại mật khẩu",
+        label: "Nhập lại mật khẩu",
+        value: "",
+        type: "INPUT",
+        hidden: true,
+      },
+
+      {
+        name: "codeforce_name",
+        placeholder: "Nhập tên tài khoản codeforce",
+        label: "Tên tài khoản codeforce",
+        value: "",
+        type: "INPUT",
+      },
+      {
+        name: "phone_number",
+        placeholder: "Nhập số điện thoại",
+        label: "Số điện thoại",
+        value: "",
+        type: "INPUT",
+      },
+      {
+        name: "image",
+        label: "Image",
+        type: "IMAGE",
+        value: [],
+      },
+    ];
+    if (selectedContent) {
+      // Loại bỏ các trường `password` và `repassword` trước khi xử lý
+      arrStruct = structData
+        .filter(
+          (field: any) =>
+            field.name !== "password" && field.name !== "repassword"
+        )
+        .map((field: any) => {
+          console.log("field.name: ", field.name);
+          if (selectedContent.hasOwnProperty(field.name)) {
+            return {
+              ...field,
+              value: selectedContent[field.name],
+            };
+          }
+          return field;
+        });
+
+      setIsModalUpdate(true);
     }
 
-    if (
-      !data.name ||
-      !data.email ||
-      !data.password ||
-      !data.repassword ||
-      !data.codeforce_name ||
-      !data.phone_number
-    ) {
-      toast.error("Please fill all information.");
-      return;
-    }
+    console.log("arrStruct: ", arrStruct);
+    setStructData(arrStruct);
+  }, [isModalCreate, selectedContent]);
+
+  // handle create
+  const create = async (data: any) => {
+    setIsLoading(true);
+    const {
+      name,
+      email,
+      password,
+      repassword,
+      codeforce_name,
+      phone_number,
+      image,
+    } = data;
+
+    const formData = new FormData();
+    image.forEach((file) => formData.append("fileImage", file));
+    formData.append("name", name);
+    formData.append("email", email);
+    formData.append("password", password);
+    formData.append("repassword", repassword);
+    formData.append("codeforce_name", codeforce_name);
+    formData.append("phone_number", phone_number);
+    formData.append("role", "TEACHER");
 
     try {
-      const formData = new FormData();
-      data.files.forEach((file) => formData.append("files", file));
-      formData.append("name", data.name);
-      formData.append("email", data.email);
-      formData.append("password", data.password);
-      formData.append("repassword", data.repassword);
-      formData.append("codeforce_name", data.codeforce_name);
-      formData.append("phone_number", data.phone_number);
-      formData.append("role", "TEACHER");
-
-      await dispatch(createTeacher(formData)).unwrap();
-      toast.success("Upload successful!");
-
-      setIsModalSaveOpen(false);
-    } catch (error) {
-      toast.error("Upload failed!");
-      console.error(error);
-    }
-  };
-
-  const handleUpdate = async (data: SaveData): Promise<void> => {
-    if (!currentEdit) {
-      toast.error("Please upload at least one file.");
-      return;
-    }
-
-    try {
-      const formData = new FormData();
-      data.files?.forEach((file) => formData.append("files", file));
-      const fields = [
-        { key: "name", value: data.name },
-        { key: "email", value: data.email },
-        { key: "password", value: data.password },
-        { key: "repassword", value: data.repassword },
-        { key: "codeforce_name", value: data.codeforce_name },
-        { key: "phone_number", value: data.phone_number },
-      ];
-
-      fields.forEach((field) => {
-        if (field.value && String(field.value).trim() !== "") {
-          formData.append(field.key, field.value);
-        }
+      const res = await postData(`/api/admin/user`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${header}`,
+        },
       });
-
-      await dispatch(
-        updateTeacher({ userId: currentEdit, updatedData: formData })
-      ).unwrap();
-
-      toast.success("Update successful!");
-      setIsModalUpdateOpen(false);
-    } catch (error) {
-      toast.error("Update failed!");
-      console.error(error);
+      toast.success("Tạo mới giáo viên thành công!");
+    } catch (e) {
+      toast.error("Tạo mới giáo viên thất bại!", e.message);
+    } finally {
+      setIsFetchData(!isFetchData);
+      setIsLoading(false);
+      setIsModalVisible(false);
     }
   };
 
-  const handleDelete = async (userId: string): Promise<void> => {
+  // handle update
+  const update = async (data: any) => {
+    const { name, email, codeforce_name, phone_number, image } = data;
+    const _id = id;
+    setIsLoading(true);
     try {
-      await dispatch(deleteTeacher(userId)).unwrap();
+      const formData = new FormData();
+      if (image !== data.old_image.value) {
+        image.forEach((file) => formData.append("fileImage", file));
+      } else {
+        formData.append("image", image);
+      }
+      formData.append("name", name);
+      formData.append("email", email);
+      formData.append("codeforce_name", codeforce_name);
+      formData.append("phone_number", phone_number);
 
-      toast.success("Teacher deleted successfully!");
-    } catch (error) {
-      toast.error("Failed to delete teacher!");
-      console.error(error);
+      const res = await putData(`/api/admin/user/${_id}`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${header}`,
+        },
+      });
+      toast.success("Cập nhật giáo viên thành công!");
+    } catch (e) {
+      toast.error("Cập nhật giáo viên thất bại!", e.message);
+    } finally {
+      setIsLoading(false);
+      setIsFetchData(!isFetchData);
+      setId("");
     }
   };
 
-  const columns = [
+  // handle deleteFunc
+  const deleteFunc = async () => {
+    setIsLoading(true);
+    const _id = id;
+    try {
+      const res = await deleteData(`/api/admin/user/${_id}`, {
+        headers: {
+          Authorization: `Bearer ${header}`,
+        },
+      });
+      toast.success("Xóa giáo viên thành công!");
+    } catch (e) {
+      toast.error("Xóa giáo viên thất bại!", e.message);
+    } finally {
+      setIsFetchData(!isFetchData);
+      setIsLoading(false);
+      setId("");
+      setIsModalVisible(false);
+    }
+  };
+
+  const handleActions = (type: string, row: any) => {
+    if (type === "EDIT") {
+      const id = row._id;
+      setId(id);
+      setSelectedContent(row);
+    }
+    if (type === "DELETE") {
+      const id = row._id;
+      setId(id);
+      setIsModalVisible(true);
+    }
+  };
+  const styleAction = {
+    marginRight: "8px",
+    padding: "4px 8px",
+    borderRadius: "4px",
+  };
+
+  const actions = [
     {
-      title: <Checkbox />,
-      dataIndex: "checkbox",
-      render: () => <Checkbox />,
-      width: 50,
+      title: "Chỉnh sửa",
+      action: "EDIT",
+      icon: <FaRegEdit />,
+      style: { ...styleAction, color: "#f7bb0a" },
     },
     {
-      title: "Image",
-      dataIndex: "image",
-      render: (src: string) => (
-        <img
-          src={src}
-          alt="banner"
-          style={{ width: "100px", height: "50px", objectFit: "cover" }}
-        />
-      ),
-    },
-    {
-      title: "Name",
-      dataIndex: "name",
-    },
-    {
-      title: "Email",
-      dataIndex: "email",
-    },
-    {
-      title: "Codeforce Name",
-      dataIndex: "codeforce_name",
-    },
-    {
-      title: "Phone number",
-      dataIndex: "phone_number",
-    },
-    {
-      title: "Actions",
-      dataIndex: "actions",
-      render: (_: unknown, record: Teacher) => (
-        <div style={{ display: "flex", gap: "8px" }}>
-          <Button
-            type="text"
-            icon={<EditOutlined />}
-            onClick={() => {
-              setCurrentEdit(record._id);
-              setIsModalUpdateOpen(true);
-            }}
-          />
-          <Button
-            type="text"
-            icon={<DeleteOutlined />}
-            danger
-            onClick={() => handleDelete(record._id)}
-          />
-        </div>
-      ),
-      width: 100,
+      title: "Xoá",
+      action: "DELETE",
+      icon: <MdOutlineDeleteOutline />,
+      style: { ...styleAction, color: "red" },
     },
   ];
 
-  if (loading) {
+  const handleClosePopup = () => {
+    setIsModalVisible(false);
+    setId("");
+  };
+
+  if (isLoading) {
     return <Loading message="Loading data..." size="large" />;
   }
 
-  if (error) {
-    toast.error(error);
-  }
-
   return (
-    <div className="flex flex-col h-screen">
-      <AdminHeader />
-      <div className="flex flex-1">
-        <Nav />
-        {/* content */}
-        <div
-          style={{ padding: "20px", backgroundColor: "#f9f9f9", width: "100%" }}
-        >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              marginBottom: "16px",
-            }}
-          >
-            <div style={{ display: "flex", gap: "8px" }}>
-              <Input placeholder="Search..." style={{ width: "200px" }} />
-              <Button>Filter</Button>
+    <div className="flex h-screen">
+      <Nav />
+      <div className="flex flex-col flex-1">
+        <AdminHeader />
+        <div className="w-full h-full bg-white">
+          <div style={{ height: `calc(100% - 8px)` }} className="m-2">
+            <div
+              ref={secondDivRef}
+              className="header_categories flex justify-between items-center bg-primary px-5 py-3 mb-2"
+            >
+              <div className="left uppercase">
+                <h2 className="font-size-20">Danh sách giáo viên</h2>
+              </div>
+              <div className="right uppercase">
+                <Button
+                  className="button-save box-shadow-btn-save"
+                  style={{
+                    backgroundColor: "#2d3c88",
+                    color: "white",
+                    borderColor: "#4558b7",
+                    borderWidth: "0.1px",
+                  }}
+                  onClick={() => setIsModalCreate(true)}
+                >
+                  Thêm mới
+                </Button>
+              </div>
             </div>
-            <div style={{ display: "flex", gap: "8px" }}>
-              <Button>Export</Button>
-              <Button type="primary" onClick={() => setIsModalSaveOpen(true)}>
-                + Add teacher
-              </Button>
+            <div
+              className="bg-primary"
+              style={{
+                height: `calc(${screenHeight}px - ${firstHeight}px - ${secondHeight}px - 24px)`,
+              }}
+            >
+              {data && (
+                <Table
+                  columns={columns}
+                  fieldSearch={fieldSearch}
+                  data={data}
+                  handleAction={handleActions}
+                  actions={actions}
+                />
+              )}
             </div>
           </div>
 
-          <Table
-            dataSource={adminTeachers}
-            columns={columns}
-            pagination={false}
-            bordered
-            rowKey="_id"
-          />
-
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginTop: "16px",
-            }}
-          >
-            <span>{totalAdmin} Results</span>
-            <Pagination
-              current={currentPage}
-              total={totalAdmin}
-              pageSize={PAGE_SIZE}
-              onChange={(page) => setCurrentPage(page)}
+          {isModalCreate && (
+            <AdminModalV2
+              action="CREATE"
+              isOpen={isModalCreate}
+              onClose={() => {
+                setIsModalCreate(false);
+              }}
+              structData={structData}
+              onSave={create}
+              title="Tạo mới giáo viên"
             />
-          </div>
+          )}
+          {isModalUpdate && (
+            <AdminModalV2
+              action="UPDATE"
+              isOpen={isModalUpdate}
+              onClose={() => {
+                setIsModalUpdate(false);
+                setSelectedContent(null);
+              }}
+              structData={structData}
+              onSave={update}
+              title="Cập nhật giáo viên"
+            />
+          )}
+          {isModalVisible && (
+            <PopupNotification
+              title="Bạn có chắc chắn muốn xoá giáo viên này?"
+              status="error"
+              buttonText="Xoá ngay"
+              onButtonClick={deleteFunc}
+              buttonClose={handleClosePopup}
+            />
+          )}
         </div>
       </div>
-
-      <AdminModal
-        isOpen={isModalSaveOpen}
-        multiple={false}
-        onClose={() => setIsModalSaveOpen(false)}
-        fields={[
-          { name: "name", placeholder: "Name", label: "Name" },
-          { name: "email", placeholder: "Email", label: "Email" },
-          { name: "password", placeholder: "Password", label: "Password" },
-          {
-            name: "repassword",
-            placeholder: "Re-enter Password",
-            label: "Re-enter Password",
-          },
-          {
-            name: "codeforce_name",
-            placeholder: "Codeforce Name",
-            label: "Codeforce Name",
-          },
-          { name: "phone_number", placeholder: "Phone Number", label: "Phone" },
-        ]}
-        enableImageUpload={true}
-        onSave={handleSave}
-        data={{}}
-        title="Upload New Teacher"
-      />
-
-      <AdminModal
-        isOpen={isModalUpdateOpen}
-        multiple={false}
-        onClose={() => {
-          setIsModalUpdateOpen(false);
-          setCurrentEdit(null);
-        }}
-        fields={[
-          { name: "name", placeholder: "Name", label: "Name" },
-          { name: "email", placeholder: "Email", label: "Email" },
-          {
-            name: "codeforce_name",
-            placeholder: "Codeforce Name",
-            label: "Codeforce Name",
-          },
-          {
-            name: "phone_number",
-            placeholder: "Phone Number",
-            label: "Phone Number",
-          },
-        ]}
-        enableImageUpload={true}
-        onSave={handleUpdate}
-        data={getDataForEdit(currentEdit)}
-        title="Edit Teacher"
-      />
     </div>
   );
 };
