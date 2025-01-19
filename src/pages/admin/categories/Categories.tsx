@@ -361,250 +361,257 @@ const AdminBanner: React.FC = () => {
     return <Loading message="Đang tải dữ liệu..." size="large" />;
   }
   return (
-    <div className="flex flex-col h-screen">
-      <AdminHeader />
-      <div className="flex flex-1">
-        <Nav />
-        <div className="wrap-container_categories w-full m-2">
-          <div
-            ref={headerRef}
-            className="header_categories flex justify-between items-center bg-primary px-5 py-3"
-          >
-            <div className="left uppercase">
-              <h2 className="font-size-20">Categories</h2>
+    <div className="flex h-screen">
+      <Nav />
+      <div className="flex flex-col flex-1">
+        <AdminHeader />
+        <div className="w-full h-full bg-white">
+          <div style={{ height: `calc(100% - 8px)` }} className="m-2 h-full">
+            <div
+              ref={headerRef}
+              className="header_categories flex justify-between items-center bg-primary px-5 py-3"
+            >
+              <div className="left uppercase">
+                <h2 className="font-size-20">Categories</h2>
+              </div>
+              <div className="right uppercase">
+                <Button
+                  className="button-save box-shadow-btn-save"
+                  style={{
+                    backgroundColor: "#2d3c88",
+                    color: "white",
+                    borderColor: "#4558b7",
+                    borderWidth: "0.1px",
+                  }}
+                  onClick={() => setIsModalCreateCategoryType(true)}
+                >
+                  Thêm mới
+                </Button>
+              </div>
             </div>
-            <div className="right uppercase">
-              <Button
-                className="button-save box-shadow-btn-save"
-                style={{
-                  backgroundColor: "#2d3c88",
-                  color: "white",
-                  borderColor: "#4558b7",
-                  borderWidth: "0.1px",
-                }}
-                onClick={() => setIsModalCreateCategoryType(true)}
-              >
-                Thêm mới
-              </Button>
-            </div>
-          </div>
-          <div
-            style={{ minHeight: `calc(100% - ${minHeight + "px"})` }}
-            className="wrap-body-categories w-full overflow-auto bg-primary px-5 py-3 mt-2"
-          >
-            <div className="flex body-categories">
-              {categoryType &&
-                categoryType.length > 0 &&
-                categoryType.map((CT, id) => {
-                  const typeId = id.toString();
+            <div
+              style={{ minHeight: `calc(100% - ${minHeight + "px"})` }}
+              className="wrap-body-categories w-full overflow-auto bg-primary px-5 py-3 mt-2"
+            >
+              <div className="flex body-categories">
+                {categoryType &&
+                  categoryType.length > 0 &&
+                  categoryType.map((CT, id) => {
+                    const typeId = id.toString();
 
-                  if (!refCategories.current[typeId]) {
-                    refCategories.current[typeId] = [];
-                  }
-                  return (
-                    <div
-                      key={id}
-                      className="w-[32%] flex-shrink-0 box-shadow_primary bg-white pa-primary mr-2"
-                    >
-                      <div className="flex justify-center items-center mb-2">
-                        <h3
-                          className="rounded-lg bg-secondary flex-grow mr-1"
-                          style={{
-                            padding: "4px 12px",
-                            fontSize: "18px",
-                            maxWidth: "calc(100% - 36px)",
-                          }}
-                        >
-                          {CT.option ? CT.option : "none"}
-                        </h3>
-                        <div
-                          className="relative group p-2 icon-dots"
-                          style={{ width: "32px", flexShrink: 0 }}
-                        >
-                          <HiDotsVertical className="cursor-pointer" />
-                          <div
-                            className="absolute hidden group-hover:flex flex-col bg-white shadow-lg rounded-md p-2 z-10"
+                    if (!refCategories.current[typeId]) {
+                      refCategories.current[typeId] = [];
+                    }
+                    return (
+                      <div
+                        key={id}
+                        className="w-[32%] flex-shrink-0 box-shadow_primary bg-white pa-primary mr-2"
+                      >
+                        <div className="flex justify-center items-center mb-2">
+                          <h3
+                            className="rounded-lg bg-secondary flex-grow mr-1"
                             style={{
-                              top: "32px",
-                              right: 0,
+                              padding: "4px 12px",
+                              fontSize: "18px",
+                              maxWidth: "calc(100% - 36px)",
                             }}
                           >
+                            {CT.option ? CT.option : "none"}
+                          </h3>
+                          <div
+                            className="relative group p-2 icon-dots"
+                            style={{ width: "32px", flexShrink: 0 }}
+                          >
+                            <HiDotsVertical className="cursor-pointer" />
                             <div
-                              className="flex items-center justify-between px-2 py-1 hover:bg-gray-100 cursor-pointer rounded"
-                              style={{ color: "red" }}
-                              onClick={() =>
-                                deleteCategoryType(CT._id ? CT._id : "")
-                              }
+                              className="absolute hidden group-hover:flex flex-col bg-white shadow-lg rounded-md p-2 z-10"
+                              style={{
+                                top: "32px",
+                                right: 0,
+                              }}
                             >
-                              <FiTrash className="mr-2" />
-                              <span
-                                style={{ fontSize: "12px", minWidth: "32px" }}
+                              <div
+                                className="flex items-center justify-between px-2 py-1 hover:bg-gray-100 cursor-pointer rounded"
+                                style={{ color: "red" }}
+                                onClick={() =>
+                                  deleteCategoryType(CT._id ? CT._id : "")
+                                }
                               >
-                                Delete
-                              </span>
-                            </div>
-                            <div
-                              className="flex items-center justify-between px-2 py-1 hover:bg-gray-100 cursor-pointer rounded"
-                              style={{ color: "#eda22e" }}
-                              onClick={() => handleUpdateCategoryType(CT)}
-                            >
-                              <CiEdit className="mr-2" />
-                              <span
-                                style={{ fontSize: "12px", minWidth: "32px" }}
+                                <FiTrash className="mr-2" />
+                                <span
+                                  style={{ fontSize: "12px", minWidth: "32px" }}
+                                >
+                                  Delete
+                                </span>
+                              </div>
+                              <div
+                                className="flex items-center justify-between px-2 py-1 hover:bg-gray-100 cursor-pointer rounded"
+                                style={{ color: "#eda22e" }}
+                                onClick={() => handleUpdateCategoryType(CT)}
                               >
-                                Edit
-                              </span>
+                                <CiEdit className="mr-2" />
+                                <span
+                                  style={{ fontSize: "12px", minWidth: "32px" }}
+                                >
+                                  Edit
+                                </span>
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                      <div className="wrap-add-new border-line-bottom mb-2 pb-4">
-                        <div className="action flex w-full justify-between items-center">
-                          <ButtonPlus
-                            content="Thêm mới"
-                            icon={CiCirclePlus}
-                            iconSize="text-[22px]"
-                            textSize="text-[12px]"
-                            height="h-[24px]"
-                            width="w-[32%]"
-                            paddingLeft="pl-6"
-                            paddingRight="pr-4"
-                            onClick={() =>
-                              handleAdd(CT._id ? CT._id : "", id.toString())
-                            }
-                          />
-                          {categories[id] && categories[id].length > 0 && (
-                            <Button
-                              className="button-save box-shadow-btn-save"
-                              style={{
-                                backgroundColor: "#2d3c88",
-                                color: "white",
-                                borderColor: "#4558b7",
-                                borderWidth: "0.1px",
-                              }}
-                              onClick={() => createCategory(id.toString())}
-                            >
-                              Lưu
-                            </Button>
-                          )}
-                        </div>
-                        <div className="wrap-input-categories max-h-[300px] overflow-y-auto pr-2">
-                          {categories[id] &&
-                            categories[id].map((category, index) => (
-                              <div key={index}>
-                                <MSInput
-                                  ref={(el) => {
-                                    if (!refCategories.current[typeId]) {
-                                      refCategories.current[typeId] = [];
-                                    }
-                                    while (
-                                      refCategories.current[typeId].length <=
-                                      index
-                                    ) {
-                                      refCategories.current[typeId].push(
-                                        React.createRef<{
-                                          focus: () => void;
-                                          getValue: () => string;
-                                          setValue: (value: string) => void;
-                                          clear: () => void;
-                                        }>()
-                                      );
-                                    }
-                                    refCategories.current[typeId][index] = el!; // vscode ngu:)
-                                  }}
-                                  label={`Category: ${category.id}`}
-                                  placeholder="Enter a category"
-                                  type="text"
-                                  required
-                                />
-                              </div>
-                            ))}
-                        </div>
-                      </div>
-                      <div className="wrap-value pt-4">
-                        {CT.categories && CT.categories.length > 0 ? (
-                          CT.categories.map((value, idex) => (
-                            <div
-                              key={idex}
-                              className="flex justify-center items-center"
-                            >
-                              {CT.type === "CHECKBOX" && (
-                                <input
-                                  type="checkbox"
-                                  checked
-                                  disabled
-                                  style={{
-                                    transform: "scale(1.5)",
-                                    marginRight: "8px",
-                                  }}
-                                />
-                              )}
-                              <MSInput
-                                className="mb-2 mr-1"
-                                type="text"
-                                placeholder="Value categories"
-                                defaultValue={
-                                  value.value ? value.value : "None value"
-                                }
-                                disabled
-                              />
-                              <div
-                                className="relative group p-2 icon-dots mb-2"
-                                style={{ width: "32px", flexShrink: 0 }}
+                        <div className="wrap-add-new border-line-bottom mb-2 pb-4">
+                          <div className="action flex w-full justify-between items-center">
+                            <ButtonPlus
+                              content="Thêm mới"
+                              icon={CiCirclePlus}
+                              iconSize="text-[22px]"
+                              textSize="text-[12px]"
+                              height="h-[24px]"
+                              width="w-[32%]"
+                              paddingLeft="pl-6"
+                              paddingRight="pr-4"
+                              onClick={() =>
+                                handleAdd(CT._id ? CT._id : "", id.toString())
+                              }
+                            />
+                            {categories[id] && categories[id].length > 0 && (
+                              <Button
+                                className="button-save box-shadow-btn-save"
+                                style={{
+                                  backgroundColor: "#2d3c88",
+                                  color: "white",
+                                  borderColor: "#4558b7",
+                                  borderWidth: "0.1px",
+                                }}
+                                onClick={() => createCategory(id.toString())}
                               >
-                                <HiDotsVertical className="cursor-pointer" />
+                                Lưu
+                              </Button>
+                            )}
+                          </div>
+                          <div className="wrap-input-categories max-h-[300px] overflow-y-auto pr-2">
+                            {categories[id] &&
+                              categories[id].map((category, index) => (
+                                <div key={index}>
+                                  <MSInput
+                                    ref={(el) => {
+                                      if (!refCategories.current[typeId]) {
+                                        refCategories.current[typeId] = [];
+                                      }
+                                      while (
+                                        refCategories.current[typeId].length <=
+                                        index
+                                      ) {
+                                        refCategories.current[typeId].push(
+                                          React.createRef<{
+                                            focus: () => void;
+                                            getValue: () => string;
+                                            setValue: (value: string) => void;
+                                            clear: () => void;
+                                          }>()
+                                        );
+                                      }
+                                      refCategories.current[typeId][index] =
+                                        el!; // vscode ngu:)
+                                    }}
+                                    label={`Category: ${category.id}`}
+                                    placeholder="Enter a category"
+                                    type="text"
+                                    required
+                                  />
+                                </div>
+                              ))}
+                          </div>
+                        </div>
+                        <div className="wrap-value pt-4">
+                          {CT.categories && CT.categories.length > 0 ? (
+                            CT.categories.map((value, idex) => (
+                              <div
+                                key={idex}
+                                className="flex justify-center items-center"
+                              >
+                                {CT.type === "CHECKBOX" && (
+                                  <input
+                                    type="checkbox"
+                                    checked
+                                    disabled
+                                    style={{
+                                      transform: "scale(1.5)",
+                                      marginRight: "8px",
+                                    }}
+                                  />
+                                )}
+                                <MSInput
+                                  className="mb-2 mr-1"
+                                  type="text"
+                                  placeholder="Value categories"
+                                  defaultValue={
+                                    value.value ? value.value : "None value"
+                                  }
+                                  disabled
+                                />
                                 <div
-                                  className="absolute hidden group-hover:flex flex-col bg-white shadow-lg rounded-md p-2 z-10"
-                                  style={{
-                                    top: "32px",
-                                    right: 0,
-                                  }}
+                                  className="relative group p-2 icon-dots mb-2"
+                                  style={{ width: "32px", flexShrink: 0 }}
                                 >
+                                  <HiDotsVertical className="cursor-pointer" />
                                   <div
-                                    className="flex items-center justify-between px-2 py-1 hover:bg-gray-100 cursor-pointer rounded"
-                                    style={{ color: "red" }}
-                                    onClick={() =>
-                                      deleteCategory(value._id ? value._id : "")
-                                    }
+                                    className="absolute hidden group-hover:flex flex-col bg-white shadow-lg rounded-md p-2 z-10"
+                                    style={{
+                                      top: "32px",
+                                      right: 0,
+                                    }}
                                   >
-                                    <FiTrash className="mr-2" />
-                                    <span
-                                      style={{
-                                        fontSize: "12px",
-                                        minWidth: "32px",
-                                      }}
+                                    <div
+                                      className="flex items-center justify-between px-2 py-1 hover:bg-gray-100 cursor-pointer rounded"
+                                      style={{ color: "red" }}
+                                      onClick={() =>
+                                        deleteCategory(
+                                          value._id ? value._id : ""
+                                        )
+                                      }
                                     >
-                                      Delete
-                                    </span>
-                                  </div>
-                                  <div
-                                    className="flex items-center justify-between px-2 py-1 hover:bg-gray-100 cursor-pointer rounded"
-                                    style={{ color: "#eda22e" }}
-                                    onClick={() => handleUpdateCategory(value)}
-                                  >
-                                    <CiEdit className="mr-2" />
-                                    <span
-                                      style={{
-                                        fontSize: "12px",
-                                        minWidth: "32px",
-                                      }}
+                                      <FiTrash className="mr-2" />
+                                      <span
+                                        style={{
+                                          fontSize: "12px",
+                                          minWidth: "32px",
+                                        }}
+                                      >
+                                        Delete
+                                      </span>
+                                    </div>
+                                    <div
+                                      className="flex items-center justify-between px-2 py-1 hover:bg-gray-100 cursor-pointer rounded"
+                                      style={{ color: "#eda22e" }}
+                                      onClick={() =>
+                                        handleUpdateCategory(value)
+                                      }
                                     >
-                                      Edit
-                                    </span>
+                                      <CiEdit className="mr-2" />
+                                      <span
+                                        style={{
+                                          fontSize: "12px",
+                                          minWidth: "32px",
+                                        }}
+                                      >
+                                        Edit
+                                      </span>
+                                    </div>
                                   </div>
                                 </div>
                               </div>
+                            ))
+                          ) : (
+                            <div>
+                              Chưa có danh mục nào! <FaHandMiddleFinger />
                             </div>
-                          ))
-                        ) : (
-                          <div>
-                            Chưa có danh mục nào! <FaHandMiddleFinger />
-                          </div>
-                        )}
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+              </div>
             </div>
           </div>
         </div>

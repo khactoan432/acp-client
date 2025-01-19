@@ -1,223 +1,324 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { toast } from "react-toastify";
-import AdminModal from "../../components/popup/AdminModal";
+// import component
+import AdminModalV2 from "../../components/popup/AdminModalV2";
 import AdminHeader from "../../components/layout/Admin/header";
 import Nav from "../../components/layout/Admin/nav";
+import Table from "../../components/table";
 import Loading from "../../components/loading";
-import { useSelector, useDispatch } from "react-redux";
-import { Table, Button, Input, Checkbox, Pagination } from "antd";
-import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
-import { RootState, AppDispatch } from "../../redux/store";
-import {
-  fetchAdminBanners,
-  createBanner,
-  updateBanner,
-  deleteBanner,
-} from "../../redux/slices/bannerSlice";
+import PopupNotification from "../../components/popup/notify";
+// import antd
+import { Button } from "antd";
+// import axios
+import { postData, getData, deleteData, putData } from "../../axios";
+// import icon
+import { FaRegEdit } from "react-icons/fa";
+import { MdOutlineDeleteOutline } from "react-icons/md";
 
 interface Banner {
   _id: string;
   image: string;
 }
 
-interface SaveData {
-  files?: File[];
-  default_file: { name: string; url: string }[];
-}
-
-const PAGE_SIZE = 10;
-
 const AdminBanner: React.FC = () => {
-  const [isModalSaveOpen, setIsModalSaveOpen] = useState(false);
-  const [isModalUpdateOpen, setIsModalUpdateOpen] = useState(false);
-  const [currentEdit, setCurrentEdit] = useState<string | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
+  const header = localStorage.getItem("access_token");
+  const [screenHeight, setScreenHeight] = useState(window.innerHeight - 56);
+  const updateScreenHeight = () => {
+    setScreenHeight(window.innerHeight - 56);
+  };
+  useEffect(() => {
+    window.addEventListener("resize", updateScreenHeight);
+    return () => {
+      window.removeEventListener("resize", updateScreenHeight);
+    };
+  }, []);
 
-  const dispatch = useDispatch<AppDispatch>();
-  const { adminBanners, totalAdmin, loading, error } = useSelector(
-    (state: RootState) => state.banners
-  );
+  const [firstHeight, setFirstHeight] = useState<number>(0);
+  const [secondHeight, setSeconHeight] = useState<number>(0);
+  const firstDivRef = useRef<HTMLDivElement>(null);
+  const secondDivRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    dispatch(fetchAdminBanners({ page: currentPage, limit: PAGE_SIZE }));
-  }, [dispatch, currentPage]);
+    if (firstDivRef.current) {
+      setFirstHeight(firstDivRef.current.offsetHeight);
+    }
+    if (secondDivRef.current) {
+      setSeconHeight(secondDivRef.current.offsetHeight);
+    }
+  }, []);
 
-  const getDataForEdit = (id: string | null): SaveData => {
-    const banner = adminBanners.find((b) => b._id === id);
-    return {
-      default_file: [
-        {
-          name: banner?.image.split("/").pop() || "",
-          url: banner?.image || "",
-        },
-      ],
+  // state boolean
+  const [isLoading, setIsLoading] = useState(false);
+  const [isFetchData, setIsFetchData] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isModalCreateBanner, setIsModalCreateBanner] = useState(false);
+  const [isModalUpdateBanner, setIsModalUpdateBanner] = useState(false);
+
+  // state string
+  const [idBanner, setIdBanner] = useState("");
+
+  // state store
+  const [data, setData] = useState<Banner[]>([]);
+  const [selectedContent, setSelectedContent] = useState(null);
+
+  // fetch data
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const res = await getData(`/api/admin/banners`, {
+          headers: {
+            Authorization: `Bearer ${header}`,
+          },
+        });
+        setData(res.data);
+      } catch (error) {
+        console.error("Error fetching data: ", error);
+      } finally {
+        setIsLoading(false);
+      }
     };
+    fetchData();
+  }, [isFetchData]);
+
+  let columnsBanner = ["image"];
+
+  // structure data video exam
+  let dataBanner = data;
+  console.log(dataBanner);
+  const [structData, setStructData] = useState([]);
+
+  useEffect(() => {
+    let arrStruct = [
+      // {
+      //   name: "describe",
+      //   placeholder: "Nhập mô banner",
+      //   label: "Mô tả banner",
+      //   value: "",
+      //   type: "INPUT",
+      // },
+      {
+        name: "image",
+        label: "Image",
+        type: "IMAGE",
+        value: [],
+      },
+    ];
+    if (selectedContent) {
+      arrStruct = structData.map((field) => {
+        if (selectedContent.hasOwnProperty(field.name)) {
+          return {
+            ...field,
+            value: selectedContent[field.name],
+          };
+        }
+        return field;
+      });
+      setIsModalUpdateBanner(true);
+    }
+    setStructData(arrStruct);
+  }, [isModalCreateBanner, selectedContent]);
+
+  // handle create
+  const createBanner = async (data: any) => {
+    // data: image : [File], //describe: string (chưa có)
+    setIsLoading(true);
+    const { image } = data;
+
+    const formData = new FormData();
+    image.forEach((file) => formData.append("fileImage", file));
+
+    try {
+      const res = await postData(`/api/admin/banner`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${header}`,
+        },
+      });
+      toast.success("Tạo mới banner thành công!");
+    } catch (e) {
+      toast.error("Tạo mới banner thất bại!", e.message);
+    } finally {
+      setIsFetchData(!isFetchData);
+      setIsLoading(false);
+      setIsModalVisible(false);
+    }
   };
 
-  const handleSave = async (data: SaveData): Promise<void> => {
-    if (!data.files || data.files.length === 0) {
-      toast.error("Please upload at least one file.");
-      return;
-    }
-
+  // handle update
+  const updateBanner = async (data: any) => {
+    //image: string | [File], //describe: string (chưa có)
+    const { image } = data;
+    const id = idBanner;
+    setIsLoading(true);
     try {
       const formData = new FormData();
-      data.files.forEach((file) => formData.append("files", file));
-      formData.append("folderPath", "Banners");
+      if (image !== data.old_image.value) {
+        image.forEach((file) => formData.append("fileImage", file));
+      } else {
+        formData.append("image", image);
+      }
 
-      await dispatch(createBanner(formData)).unwrap();
-      toast.success("Upload successful!");
-
-      setIsModalSaveOpen(false);
-    } catch (err) {
-      toast.error("Upload failed!");
-      console.error(err);
+      const res = await putData(`/api/admin/banner/${id}`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${header}`,
+        },
+      });
+      toast.success("Cập nhật banner thành công!");
+    } catch (e) {
+      toast.error("Cập nhật banner thất bại!", e.message);
+    } finally {
+      setIsLoading(false);
+      setIsFetchData(!isFetchData);
+      setIdBanner("");
     }
   };
 
-  const handleUpdate = async (data: SaveData): Promise<void> => {
-    if (!currentEdit) {
-      toast.error("Invalid banner selection.");
-      return;
-    }
-
-    if (!data.files || data.files.length === 0) {
-      toast.error("Please upload at least one file.");
-      return;
-    }
-
+  // handle delete
+  const deleteBanner = async () => {
+    setIsLoading(true);
+    const id = idBanner;
     try {
-      const formData = new FormData();
-      data.files.forEach((file) => formData.append("files", file));
-
-      await dispatch(updateBanner({ bannerId: currentEdit, updatedData: formData })).unwrap();
-      toast.success("Update successful!");
-
-      setIsModalUpdateOpen(false);
-    } catch (err) {
-      toast.error("Update failed!");
-      console.error(err);
+      const res = await deleteData(`/api/admin/banner/${id}`, {
+        headers: {
+          Authorization: `Bearer ${header}`,
+        },
+      });
+      toast.success("Xóa banner thành công!");
+    } catch (e) {
+      toast.error("Xóa banner thất bại!", e.message);
+    } finally {
+      setIsFetchData(!isFetchData);
+      setIsLoading(false);
+      setIdBanner("");
+      setIsModalVisible(false);
     }
   };
 
-  const handleDelete = async (bannerId: string): Promise<void> => {
-    try {
-      await dispatch(deleteBanner(bannerId)).unwrap();
-      toast.success("Banner deleted successfully!");
-    } catch (err) {
-      toast.error("Failed to delete banner!");
-      console.error(err);
+  const handleActions = (type: string, row: any) => {
+    if (type === "EDIT") {
+      const id = row._id;
+      setIdBanner(id);
+      setSelectedContent(row);
+    }
+    if (type === "DELETE") {
+      const id = row._id;
+      setIdBanner(id);
+      setIsModalVisible(true);
     }
   };
+  const styleAction = {
+    marginRight: "8px",
+    padding: "4px 8px",
+    borderRadius: "4px",
+  };
 
-  const columns = [
+  const actions = [
     {
-      title: <Checkbox />,
-      dataIndex: "checkbox",
-      render: () => <Checkbox />,
-      width: 50,
+      title: "Chỉnh sửa",
+      action: "EDIT",
+      icon: <FaRegEdit />,
+      style: { ...styleAction, color: "#f7bb0a" },
     },
     {
-      title: "Image",
-      dataIndex: "image",
-      render: (src: string) => (
-        <img
-          src={src}
-          alt={src?.split("/").pop() || ""}
-          style={{ width: "100px", height: "50px", objectFit: "cover" }}
-        />
-      ),
-    },
-    {
-      title: "Actions",
-      dataIndex: "actions",
-      render: (_: unknown, record: Banner) => (
-        <div style={{ display: "flex", gap: "8px" }}>
-          <Button
-            type="text"
-            icon={<EditOutlined />}
-            onClick={() => {
-              setCurrentEdit(record._id);
-              setIsModalUpdateOpen(true);
-            }}
-          />
-          <Button
-            type="text"
-            icon={<DeleteOutlined />}
-            danger
-            onClick={() => handleDelete(record._id)}
-          />
-        </div>
-      ),
-      width: 100,
+      title: "Xoá",
+      action: "DELETE",
+      icon: <MdOutlineDeleteOutline />,
+      style: { ...styleAction, color: "red" },
     },
   ];
 
-  if (loading) {
+  const handleClosePopup = () => {
+    setIsModalVisible(false);
+    setIdBanner("");
+  };
+
+  if (isLoading) {
     return <Loading message="Loading data..." size="large" />;
   }
 
-  if (error) {
-    toast.error(error);
-  }
-
   return (
-    <div className="flex flex-col h-screen">
-      <AdminHeader />
-      <div className="flex flex-1">
-        <Nav />
-        <div style={{ padding: "20px", backgroundColor: "#f9f9f9", width: "100%" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "16px" }}>
-            <div style={{ display: "flex", gap: "8px" }}>
-              <Input placeholder="Search..." style={{ width: "200px" }} />
-              <Button>Filter</Button>
+    <div className="flex h-screen">
+      <Nav />
+      <div className="flex flex-col flex-1">
+        <AdminHeader />
+        <div className="w-full h-full bg-white">
+          <div style={{ height: `calc(100% - 8px)` }} className="m-2">
+            <div
+              ref={firstDivRef}
+              className="flex justify-between items-center bg-primary px-5 py-3 mb-2"
+            >
+              <div className="left uppercase">
+                <h2 className="font-size-20">Danh sách Banner </h2>
+              </div>
+              <div className="right uppercase">
+                <Button
+                  className="button-save box-shadow-btn-save"
+                  style={{
+                    backgroundColor: "#2d3c88",
+                    color: "white",
+                    borderColor: "#4558b7",
+                    borderWidth: "0.1px",
+                  }}
+                  onClick={() => setIsModalCreateBanner(true)}
+                >
+                  Thêm mới
+                </Button>
+              </div>
             </div>
-            <Button type="primary" onClick={() => setIsModalSaveOpen(true)}>
-              + Add Banner
-            </Button>
-          </div>
-
-          <Table
-            dataSource={adminBanners.map((banner) => ({ ...banner, key: banner._id }))}
-            columns={columns}
-            pagination={false}
-            bordered
-            rowKey="_id"
-          />
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "16px" }}>
-            <span>{totalAdmin} Results</span>
-            <Pagination
-              current={currentPage}
-              total={totalAdmin}
-              pageSize={PAGE_SIZE}
-              onChange={(page) => setCurrentPage(page)}
-            />
+            <div
+              className="bg-primary"
+              style={{
+                height: `calc(${screenHeight}px - ${firstHeight}px - ${secondHeight}px - 24px)`,
+              }}
+            >
+              {dataBanner && (
+                <Table
+                  columns={columnsBanner}
+                  data={dataBanner}
+                  handleAction={handleActions}
+                  actions={actions}
+                />
+              )}
+            </div>
           </div>
         </div>
       </div>
-
-      <AdminModal
-        isOpen={isModalSaveOpen}
-        multiple={true}
-        onClose={() => setIsModalSaveOpen(false)}
-        enableImageUpload={true}
-        onSave={handleSave}
-        data={{}}
-        title="Upload New Banner"
-      />
-
-      <AdminModal
-        isOpen={isModalUpdateOpen}
-        multiple={false}
-        onClose={() => {
-          setIsModalUpdateOpen(false);
-          setCurrentEdit(null);
-        }}
-        enableImageUpload={true}
-        onSave={handleUpdate}
-        data={getDataForEdit(currentEdit)}
-        title="Edit Banner"
-      />
+      {isModalCreateBanner && (
+        <AdminModalV2
+          action="CREATE"
+          isOpen={isModalCreateBanner}
+          onClose={() => {
+            setIsModalCreateBanner(false);
+          }}
+          structData={structData}
+          onSave={createBanner}
+          title="Tạo mới banner"
+        />
+      )}
+      {isModalUpdateBanner && (
+        <AdminModalV2
+          action="UPDATE"
+          isOpen={isModalUpdateBanner}
+          onClose={() => {
+            setIsModalUpdateBanner(false);
+            setSelectedContent(null);
+          }}
+          structData={structData}
+          onSave={updateBanner}
+          title="Cập nhật banner"
+        />
+      )}
+      {isModalVisible && (
+        <PopupNotification
+          title="Bạn có chắc chắn muốn xoá banner này?"
+          status="error"
+          buttonText="Xoá ngay"
+          onButtonClick={deleteBanner}
+          buttonClose={handleClosePopup}
+        />
+      )}
     </div>
   );
 };

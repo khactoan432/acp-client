@@ -105,18 +105,12 @@ const Schedules = () => {
   const styleAction = {
     marginRight: "8px",
     padding: "4px 8px",
-    color: "black",
-    backgroundColor: "white",
     borderRadius: "4px",
-    cursor: "pointer",
   };
 
   const actions = [
     {
-      title: "Xoá",
-      action: "DELETE",
-      icon: <MdOutlineDeleteOutline />,
-      style: { ...styleAction, color: "red" },
+      title: "No action",
     },
   ];
   let columnsCourse = ["name", "phone_number", "email", "mindfulness_course"];
@@ -132,10 +126,10 @@ const Schedules = () => {
     return <Loading message="Đang tải dữ liệu..." size="large" />;
   }
   return (
-    <div className="flex flex-col h-screen">
-      <AdminHeader />
-      <div className="flex flex-1">
-        <Nav />
+    <div className="flex h-screen">
+      <Nav />
+      <div className="flex flex-col flex-1">
+        <AdminHeader />
         <div className="w-full h-full bg-white">
           <div style={{ height: `calc(100% - 8px)` }} className="m-2">
             <div

@@ -371,14 +371,11 @@ const Content: React.FC = () => {
       if (Array.isArray(id_Deleted) && id_Deleted.length > 0) {
         for (const id of id_Deleted) {
           if (id._id) {
-            const deleteRes = await deleteData(
-              `/api/admin/describe/${id._id}`,
-              {
-                headers: { Authorization: `Bearer ${header}` },
-              }
-            );
+            const deleteRes = await deleteData(`/api/admin/lesson/${id._id}`, {
+              headers: { Authorization: `Bearer ${header}` },
+            });
           } else if (typeof id === "string") {
-            const deleteRes = await deleteData(`/api/admin/describe/${id}`, {
+            const deleteRes = await deleteData(`/api/admin/lesson/${id}`, {
               headers: { Authorization: `Bearer ${header}` },
             });
           } else {
@@ -402,46 +399,46 @@ const Content: React.FC = () => {
     }
   };
 
-  const deleteExercise = async () => {
-    const id_Deleted = idDeleted && idDeleted.describes;
-    console.log("delete here: ", id_Deleted);
-    if (!id_Deleted) {
-      console.error("idDeleted is undefined");
-      return;
-    }
+  // const deleteExercise = async () => {
+  //   const id_Deleted = idDeleted && idDeleted.lessons;
+  //   console.log("delete here: ", id_Deleted);
+  //   if (!id_Deleted) {
+  //     console.error("idDeleted is undefined");
+  //     return;
+  //   }
 
-    setIsLoading(true);
-    try {
-      if (Array.isArray(id_Deleted) && id_Deleted.length > 0) {
-        for (const arrDelete of id_Deleted) {
-          for (const id of arrDelete.overviews) {
-            const deleteRes = await deleteData(
-              `/api/admin/overview/${id._id}`,
-              {
-                headers: { Authorization: `Bearer ${header}` },
-              }
-            );
-          }
-        }
-        toast.success("Xoá các overviews thành công!");
-      } else {
-        toast.warning("Xảy ra lỗi khi xoá overviews!");
-      }
-    } catch (error) {
-      toast.error("Xoá mô tả không thành công, " + error.message);
-      console.error(`Error deleting overview`, error);
-    } finally {
-      setIsLoading(false);
-      setIsModalVisible(false);
-      setIsFetchData(!isFetchData);
-      setIdDeleted(undefined);
-      setDataIdDeleted({ describes: [] });
-    }
-  };
+  //   setIsLoading(true);
+  //   try {
+  //     if (Array.isArray(id_Deleted) && id_Deleted.length > 0) {
+  //       for (const arrDelete of id_Deleted) {
+  //         for (const id of arrDelete.exercises) {
+  //           const deleteRes = await deleteData(
+  //             `/api/admin/overview/${id._id}`,
+  //             {
+  //               headers: { Authorization: `Bearer ${header}` },
+  //             }
+  //           );
+  //         }
+  //       }
+  //       toast.success("Xoá các exercises thành công!");
+  //     } else {
+  //       toast.warning("Xảy ra lỗi khi xoá exercises!");
+  //     }
+  //   } catch (error) {
+  //     toast.error("Xoá mô tả không thành công, " + error.message);
+  //     console.error(`Error deleting overview`, error);
+  //   } finally {
+  //     setIsLoading(false);
+  //     setIsModalVisible(false);
+  //     setIsFetchData(!isFetchData);
+  //     setIdDeleted(undefined);
+  //     setDataIdDeleted({ lessons: [] });
+  //   }
+  // };
   const deleteFunc = () => {
-    if (nameDeleted === "overviews") {
-      deleteExercise();
-    } else if (nameDeleted === "describes") {
+    if (nameDeleted === "exercises") {
+      // deleteExercise();
+    } else if (nameDeleted === "lessons") {
       deleteLesson();
     }
   };
@@ -459,12 +456,12 @@ const Content: React.FC = () => {
   };
   // hành động hàng loạt
   const handleSelectActionMany = (value: string) => {
-    if (value === "describes") {
+    if (value === "lessons") {
       const arrId = dataIdDeleted;
-      notifyDelete("describes", arrId);
+      notifyDelete("lessons", arrId);
     } else {
       const arrId = dataIdDeleted;
-      notifyDelete("overviews", arrId);
+      notifyDelete("exercises", arrId);
     }
   };
 
@@ -603,7 +600,7 @@ const Content: React.FC = () => {
         );
         if (!curStatus) {
           // checked
-          // find _id of describe with _id overviews
+          // find _id of describe with _id exercises
 
           const _idDesc = foundDesc ? foundDesc._id : undefined;
           if (foundDesc && foundDesc.exercises) {
@@ -638,7 +635,7 @@ const Content: React.FC = () => {
             );
 
             if (targetDesc) {
-              // Lọc bỏ phần tử trong overviews có _id === _id
+              // Lọc bỏ phần tử trong exercises có _id === _id
               targetDesc.exercises = targetDesc.exercises.filter(
                 (exercise) => exercise._id !== _id
               );
@@ -785,10 +782,10 @@ const Content: React.FC = () => {
     return <Loading message="Đang tải dữ liệu..." size="large" />;
   }
   return (
-    <div className="flex flex-col h-screen">
-      <AdminHeader />
-      <div className="flex flex-1">
-        <Nav />
+    <div className="flex h-screen">
+      <Nav />
+      <div className="flex flex-col flex-1">
+        <AdminHeader />
         <div className="w-full h-full bg-white">
           <div style={{ height: `calc(100% - 8px)` }} className="m-2">
             <div ref={firstDivRef} className="bg-primary px-5 py-3 mb-2">
@@ -862,14 +859,14 @@ const Content: React.FC = () => {
                     {checkboxState &&
                       checkboxState.lv2.some(
                         (item) => item.status === true
-                      ) && <Option value="describes">Xoá tất cả mô tả</Option>}
+                      ) && <Option value="lessons">Xoá tất cả mô tả</Option>}
                     {checkboxState &&
                       checkboxState.lv3.some((item) =>
                         item.child?.some(
                           (childItem) => childItem.status === true
                         )
                       ) && (
-                        <Option value="overviews">Xoá tất cả overviews</Option>
+                        <Option value="exercises">Xoá tất cả exercises</Option>
                       )}
                   </Select>
                 </div>
@@ -982,7 +979,9 @@ const Content: React.FC = () => {
                                 <div
                                   className="flex items-center justify-between px-2 py-1 hover:bg-gray-100 cursor-pointer rounded"
                                   onClick={() =>
-                                    toggleUpdateExercise(lesson._id)
+                                    toggleUpdateExercise(
+                                      lesson._id || "undefined"
+                                    )
                                   }
                                 >
                                   <CiEdit className="mr-2 color-edit" />
@@ -993,7 +992,7 @@ const Content: React.FC = () => {
                                       minWidth: "100px",
                                     }}
                                   >
-                                    {isUpdateExercise[lesson._id]
+                                    {isUpdateExercise[lesson._id || "undefined"]
                                       ? "Huỷ sửa bài tập"
                                       : "Sửa bài tập"}
                                   </span>
@@ -1001,8 +1000,8 @@ const Content: React.FC = () => {
                                 <div
                                   className="flex items-center justify-between px-2 py-1 hover:bg-gray-100 cursor-pointer rounded"
                                   onClick={() =>
-                                    notifyDelete("describes", {
-                                      describes: [lesson._id],
+                                    notifyDelete("lessons", {
+                                      lessons: [lesson._id],
                                     })
                                   }
                                 >
@@ -1026,8 +1025,8 @@ const Content: React.FC = () => {
                                   <div
                                     className="flex items-center justify-between px-2 py-1 hover:bg-gray-100 cursor-pointer rounded"
                                     onClick={() =>
-                                      notifyDelete("overviews", {
-                                        describes: [
+                                      notifyDelete("exercises", {
+                                        lessons: [
                                           dataIdDeleted.lessons.find(
                                             (item) => item._id === lesson._id
                                           ),
@@ -1080,14 +1079,16 @@ const Content: React.FC = () => {
                                     src={lesson.video}
                                     controls
                                     style={{
-                                      width: "220px",
-                                      height: "120px",
+                                      width: "800px",
+                                      height: "400px",
                                       marginRight: "8px",
                                     }}
                                   />
                                 </div>
                                 <div className="flex">
-                                  {isUpdateExercise[lesson._id] ? (
+                                  {isUpdateExercise[
+                                    lesson._id || "undefined"
+                                  ] ? (
                                     <CiEdit
                                       style={{
                                         fontSize: "16px",

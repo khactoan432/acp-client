@@ -15,7 +15,7 @@
   background-color: rgb(235 235 235) !important;
 }
 .nav-container {
-  transition: width 0.3s ease; /* Thêm hiệu ứng transition cho chiều rộng */
+  transition: width 0.3s ease;
   width: 252px;
   background-color: #1e2753;
 }
@@ -23,3 +23,15 @@
 .nav-container.collapsed {
   width: 80px;
 }
+.ant-menu-item-icon {
+  color: white !important;
+}
+.ant-menu-item-selected .ant-menu-item-icon {
+  color: black !important;
+}
+// :where(.css-dev-only-do-not-override-1x0dypw).ant-menu-light:not(
+//     .ant-menu-horizontal
+//   )
+//   .ant-menu-item:not(.ant-menu-item-selected):hover {
+//   background-color: var(--color__hover-primary) !important;
+// }

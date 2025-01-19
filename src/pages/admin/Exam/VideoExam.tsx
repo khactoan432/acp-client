@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 // import ant
 import { Button } from "antd";
 // import icon
@@ -16,7 +17,6 @@ import AdminModalV2 from "../../../components/popup/AdminModalV2";
 import { FaChevronLeft } from "react-icons/fa6";
 // import axios
 import { postData, getData, deleteData, putData } from "../../../axios";
-import { toast } from "react-toastify";
 
 interface VideoExam {
   _id?: string;
@@ -90,6 +90,7 @@ const ExamVideo: React.FC = () => {
   let fieldSearch = ["describe"];
 
   const [structData, setStructData] = useState([]);
+
   useEffect(() => {
     let arrStruct = [
       {
@@ -121,7 +122,7 @@ const ExamVideo: React.FC = () => {
     }
     setStructData(arrStruct);
   }, [isModalCreateVideoExam, selectedContent]);
-  console.log("struct: ", structData);
+
   const styleAction = {
     marginRight: "8px",
     padding: "4px 8px",
@@ -262,10 +263,10 @@ const ExamVideo: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col h-screen">
-      <AdminHeader />
-      <div className="flex flex-1">
-        <Nav />
+    <div className="flex h-screen">
+      <Nav />
+      <div className="flex flex-col flex-1">
+        <AdminHeader />
         <div className="w-full h-full bg-white">
           <div style={{ height: `calc(100% - 8px)` }} className="m-2 h-full">
             <div ref={firstDivRef} className="bg-primary px-5 py-3 mb-2">

@@ -26,9 +26,9 @@ import { postData, getData, deleteData, putData } from "../../../axios";
 // interface
 interface DataDesc {
   _id?: string;
-  desc?: string;
+  desc: string;
   id_material?: string;
-  overviews?: Overview[];
+  overviews: Overview[];
   type?: string;
 }
 interface Overview {
@@ -803,10 +803,10 @@ const Introduce: React.FC = () => {
     return <Loading message="Đang tải dữ liệu..." size="large" />;
   }
   return (
-    <div className="flex flex-col h-screen">
-      <AdminHeader />
-      <div className="flex flex-1">
-        <Nav />
+    <div className="flex h-screen">
+      <Nav />
+      <div className="flex flex-col flex-1">
+        <AdminHeader />
         <div className="w-full h-full bg-white">
           <div style={{ height: `calc(100% - 8px)` }} className="m-2">
             <div ref={firstDivRef} className="bg-primary px-5 py-3 mb-2">

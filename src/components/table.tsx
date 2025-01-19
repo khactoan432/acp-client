@@ -56,7 +56,7 @@ const Table = <T extends Record<string, any>>({
   data,
   handleAction = () => {},
   actions,
-  maxRow = 2,
+  maxRow = 8,
 }: TableProps<T>) => {
   // format data
   const [formatData, setFormatData] = useState<T[]>(data);
@@ -394,11 +394,11 @@ const Table = <T extends Record<string, any>>({
           maxHeight: `calc(100% - ${firstHeight}px - ${secondHeight}px - 16px)`,
         }}
       >
-        <div style={{ width: "1192px", position: "relative" }}>
+        <div style={{ width: "100%", position: "relative" }}>
           <table
             style={{
+              width: "100%",
               maxWidth: "1600px",
-              minWidth: "1196px",
               tableLayout: "auto",
               borderCollapse: "separate",
               borderSpacing: 0,
