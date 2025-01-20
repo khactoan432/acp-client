@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { postData } from "../axios";
+import { toast } from "react-toastify";
 
 import Loading from "../components/loading";
 import PopupNotification from "../components/popup/notify";
@@ -75,6 +76,7 @@ const Register: React.FC = () => {
           repassword: repassword,
           phone_number: phoneNumber,
           codeforce_name: codeforceName,
+          role: "USER",
         },
         {
           headers: {
@@ -82,11 +84,16 @@ const Register: React.FC = () => {
           },
         }
       );
-    } catch (error) {
+      if (response.status === "OK") {
+        toast.success("Tạo tài khoản thành công!");
+        setIsModalVisible(true);
+      }
+    } catch (e) {
+      console.log("aksmd: ", e);
+      toast.error(e.response.data.error);
       setErrorValid("general");
     } finally {
       setIsLoading(false);
-      setIsModalVisible(true);
     }
   };
 
