@@ -27,7 +27,7 @@ const UserExam: React.FC = () => {
     (state: RootState) => state.categories
   );
   useFetchData(fetchUserCategories);
-  // console.log(userCategories);
+  console.log(userCategories);
 
   const [filter, setFilter] = useState<{ type: string; value: string[] }[]>([]);
   console.log(filter);

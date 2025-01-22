@@ -26,7 +26,7 @@ const CommentPage: React.FC = () => {
     {
       id: 2,
       name: "Nguyễn Thị Hạnh",
-      avatar: "https://via.placeholder.com/40",
+      avatar: User,
       text: "Cảm ơn khóa học đã mang lại kiến thức giá trị. Giảng viên rất nhiệt tình và dễ hiểu.",
       date: "20 ngày trước",
       images: [],
@@ -34,7 +34,7 @@ const CommentPage: React.FC = () => {
     {
       id: 3,
       name: "Lê Hoàng Nam",
-      avatar: "https://via.placeholder.com/40",
+      avatar: User,
       text: "Những bài tập thực hành rất sát thực tế, giúp em cải thiện kỹ năng rất nhiều.",
       date: "18 ngày trước",
       images: [],
@@ -54,7 +54,7 @@ const CommentPage: React.FC = () => {
     const newCommentData: Comment = {
       id: comments.length + 1,
       name: "Người dùng mới", // Placeholder cho tên người dùng
-      avatar: "https://via.placeholder.com/40", // Placeholder cho ảnh đại diện
+      avatar: User, // Placeholder cho ảnh đại diện
       text: newComment,
       date: "Vừa xong",
       images: previewImages, // Lưu danh sách URL xem trước của các ảnh
@@ -97,7 +97,7 @@ const CommentPage: React.FC = () => {
       {
         id: comments.length + 1,
         name: "Người dùng khác",
-        avatar: "https://via.placeholder.com/40",
+        avatar: User,
         text: "Đây là bình luận khác đã được tải thêm.",
         date: "30 ngày trước",
       },
@@ -107,9 +107,9 @@ const CommentPage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-[1228px] mx-auto bg-gray-100">
+    <div className="max-w-[1228px] mx-auto">
       {/* Comment Form */}
-      <div className="relative bg-white p-4 rounded-lg shadow-md mb-6">
+      <div className="relative bg-white p-4 rounded-[0.65rem] border border-solid border-[#e0e0e0] shadow-[0_4px_0_0_rgba(143,156,173,0.2)] mb-6">
         <textarea
           value={newComment}
           onChange={(e) => setNewComment(e.target.value)}
@@ -172,7 +172,7 @@ const CommentPage: React.FC = () => {
       </div>
 
       {/* Comment List */}
-      <div className="bg-white p-4 rounded-lg shadow-md">
+      <div className="bg-white p-4 rounded-[0.65rem] border border-solid border-[#e0e0e0] shadow-[0_4px_0_0_rgba(143,156,173,0.2)]">
         <p className="mb-2 text-gray-600">{comments.length} bình luận</p>
         <hr />
         <ul className="space-y-4 mt-4">

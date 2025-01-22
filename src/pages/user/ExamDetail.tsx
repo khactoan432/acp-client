@@ -396,7 +396,7 @@ const UserExamDetail: React.FC = () => {
             </div>
           </div>
 
-          <div id="comment" className="text-[#00095B] mb-6">
+          {/* <div id="comment" className="text-[#00095B] mb-6">
             <div className="flex flex-col items-center justify-center w-full h-full">
               <div className="relative mt-6 mb-6 rounded-lg w-full">
                 <h2 className="text-2xl font-bold mb-6">Bình luận</h2>
@@ -404,7 +404,7 @@ const UserExamDetail: React.FC = () => {
                 <CommentPage />
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

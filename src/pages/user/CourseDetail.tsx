@@ -27,16 +27,18 @@ interface User {
 
 const UserCourseDetail = () => {
   const { id } = useParams<{ id: string }>();
-  const dispatch = useDispatch<AppDispatch>();
-  const { selectedCourse, loading, error } = useSelector(
-    (state: RootState) => state.courses
-  );
-
   const courseId = id ?? "default-id";
+  console.log(courseId);
+
+  const dispatch = useDispatch<AppDispatch>();
+  const selectedCourse = useSelector(
+    (state: RootState) => state.courses.selectedCourse
+  );
 
   useEffect(() => {
     dispatch(fetchCourseDetail(courseId));
-  }, [dispatch, courseId]);
+    console.log(1);
+  }, [courseId]);
 
   const course = {
     id: 1,
@@ -50,45 +52,6 @@ const UserCourseDetail = () => {
     users: 79,
   };
 
-  // const topics = [
-  //   {
-  //     id: 1,
-  //     name: "JavaScript Basics",
-  //     lessons: [
-  //       { name: "Introduction to JavaScript" },
-  //       { name: "Variables and Constants" },
-  //       { name: "Functions and Scope" },
-  //       { name: "Conditionals and Loops" },
-  //       { name: "Arrays and Objects" },
-  //       { name: "Debugging and Error Handling" },
-  //     ],
-  //   },
-  //   {
-  //     id: 2,
-  //     name: "Web Development",
-  //     lessons: [
-  //       { name: "HTML Basics" },
-  //       { name: "CSS Fundamentals" },
-  //       { name: "JavaScript for the Web" },
-  //       { name: "Responsive Design" },
-  //       { name: "Introduction to Web APIs" },
-  //       { name: "Deploying a Website" },
-  //     ],
-  //   },
-  //   {
-  //     id: 3,
-  //     name: "React Framework",
-  //     lessons: [
-  //       { name: "Getting Started with React" },
-  //       { name: "JSX and Component Basics" },
-  //       { name: "State and Props" },
-  //       { name: "Handling Events in React" },
-  //       { name: "Lifecycle Methods and Hooks" },
-  //       { name: "Building a Todo App with React" },
-  //     ],
-  //   },
-  // ];
-
   const [isSticky, setIsSticky] = useState(false);
 
   useEffect(() => {
@@ -101,6 +64,15 @@ const UserCourseDetail = () => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
+
+  const [expandedTopics, setExpandedTopics] = useState({}); // Track which topics are expanded
+
+  const toggleExpand = (topicId) => {
+    setExpandedTopics((prevState) => ({
+      ...prevState,
+      [topicId]: !prevState[topicId],
+    }));
+  };
 
   const payment = async (id_material: string) => {
     try {
@@ -144,11 +116,7 @@ const UserCourseDetail = () => {
     }
   };
 
-  return loading ? (
-    "Waiting for Loading"
-  ) : error ? (
-    "Something have wrong"
-  ) : (
+  return (
     <div>
       <div className="relative flex items-center justify-center">
         {/* Background with opacity */}
@@ -260,36 +228,47 @@ const UserCourseDetail = () => {
                   <h2 className="text-2xl font-bold mb-6">Nội dung khóa học</h2>
 
                   {selectedCourse?.topics?.map((topic) => (
-                    <div key={topic._id} className="">
-                      <p className="bg-secondary text-white font-semibold text-lg py-1 px-2">
-                        {topic.name}
-                      </p>
-
-                      <div className="flex flex-col divide-y divide-gray-200">
-                        {topic?.lessons?.map((lesson) => (
-                          <div
-                            className="flex items-center justify-between px-2"
-                            key={lesson._id}
-                          >
-                            <div className="flex items-center">
-                              <img
-                                className="w-[25px] h-[25px]"
-                                src={play}
-                                alt="alt"
-                              />
-                              <p className="text-base py-2 px-2">
-                                {lesson.name}
-                              </p>
-                            </div>
-
-                            {lesson.status === "PUBLIC" ? (
-                              <Lesson url={lesson.video} name={"dsd"} />
-                            ) : (
-                              ""
-                            )}
+                    <div key={topic._id} className="mb-3">
+                      <div
+                        className="flex items-center justify-between border-solid border-[#ebebeb] border bg-[#f5f5f5] rounded-md py-3 px-4 cursor-pointer"
+                        onClick={() => toggleExpand(topic._id)}
+                      >
+                        <div className="flex items-center space-x-2">
+                          <div className=" w-[15px] flex justify-center">
+                            {expandedTopics[topic._id] 
+                              ? <div className="w-[11px] h-[1.6px] bg-black"></div> 
+                              : <span className="text-[24px] h-[28px] leading-[28px]">+</span>}
                           </div>
-                        ))}
+                          <p className="text-lg">{topic.name}</p>
+                        </div>
+                        <span>{topic?.lessons?.length} bài học</span>
                       </div>
+
+                      {expandedTopics[topic._id] && (
+                        <div className="flex flex-col divide-y divide-gray-200 px-4">
+                          {topic?.lessons?.map((lesson) => (
+                            <div
+                              className="flex items-center justify-between py-3"
+                              key={lesson._id}
+                            >
+                              <div className="flex items-center">
+                                <img
+                                  className="w-[25px] h-[25px]"
+                                  src={play}
+                                  alt="Play"
+                                />
+                                <p className="text-base ml-2">{lesson.name}</p>
+                              </div>
+
+                              {lesson.status === "PUBLIC" ? (
+                                <Lesson url={lesson.video} name={lesson.name} />
+                              ) : (
+                                <span className="text-gray-500 text-sm">Locked</span>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -384,12 +363,12 @@ const UserCourseDetail = () => {
                   Đánh giá của học viên
                 </h2>
 
-                <RatingPage />
+                <RatingPage id_ref_material={courseId} ref_type={"COURSE"}/>
               </div>
             </div>
           </div>
 
-          <div id="comment" className="text-[#00095B] mb-6">
+          {/* <div id="comment" className="text-[#00095B] mb-6">
             <div className="flex flex-col items-center justify-center w-full h-full">
               <div className="relative mt-6 mb-6 rounded-lg w-full">
                 <h2 className="text-2xl font-bold mb-6">Bình luận</h2>
@@ -397,7 +376,7 @@ const UserCourseDetail = () => {
                 <CommentPage />
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

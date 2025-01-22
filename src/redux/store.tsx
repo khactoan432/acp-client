@@ -1,12 +1,14 @@
 // src/redux/store.ts
 import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "./slices/authSlice";
-import bannerReducer from "./slices/bannerSlice";
-import achievementReducer from "./slices/achievementSlice";
-import teacherReducer from "./slices/teacherSlice";
-import courseReducer from "./slices/courseSlice";
-import examReducer from "./slices/examSlice";
-import collapsedReducer from "./slices/collapsedSlice";
+import bannerReducer from './slices/bannerSlice';
+import achievementReducer from './slices/achievementSlice';
+import teacherReducer from './slices/teacherSlice';
+import courseReducer from './slices/courseSlice';
+import examReducer from './slices/examSlice';
+import orderReducer from './slices/orderSlice';
+import categoryReducer from './slices/categorySlice';
+import rateReducer from './slices/rateSlice';
 
 const store = configureStore({
   reducer: {
@@ -16,7 +18,9 @@ const store = configureStore({
     teachers: teacherReducer,
     courses: courseReducer,
     exams: examReducer,
-    collapsed: collapsedReducer,
+    orders: orderReducer,
+    categories: categoryReducer,
+    rates: rateReducer,
   },
 });
 
