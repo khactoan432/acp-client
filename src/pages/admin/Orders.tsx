@@ -65,6 +65,25 @@ const AdminOrder = () => {
   const [data, setData] = useState<Order[]>([]);
   const [selectedContent, setSelectedContent] = useState<any>(null);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const res = await getData("/api/admin/orders?type=COURSE", {
+          headers: {
+            Authorization: `Bearer ${header}`,
+          },
+        });
+        setData(res.data);
+      } catch (e) {
+        console.log("Error fetching data: ", e);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, [isFetchData]);
+
   let columns = [
     "order",
     "date",
