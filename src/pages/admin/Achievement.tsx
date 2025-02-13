@@ -14,6 +14,8 @@ import { postData, getData, deleteData, putData } from "../../axios";
 // import icon
 import { FaRegEdit } from "react-icons/fa";
 import { MdOutlineDeleteOutline } from "react-icons/md";
+import { PiLockKeyLight } from "react-icons/pi";
+import { PiLockKeyOpen } from "react-icons/pi";
 
 interface Achievement {
   _id: string;
@@ -58,7 +60,7 @@ const AdminAchievement: React.FC = () => {
   const [isModalUpdate, setIsModalUpdate] = useState(false);
 
   // state string
-  const [id, setId] = useState("");
+  const [idAchivement, setIdAchivement] = useState<string | string[]>("");
 
   // state store
   const [data, setData] = useState<Achievement[]>([]);
@@ -138,7 +140,7 @@ const AdminAchievement: React.FC = () => {
   }, [isModalCreate, selectedContent]);
 
   // handle create
-  const create = async (data: any) => {
+  const funcCreate = async (data: any) => {
     // data: image : [File], //describe: string (chưa có)
     setIsLoading(true);
     const { email_user, prize, competition, image } = data;
@@ -166,10 +168,10 @@ const AdminAchievement: React.FC = () => {
   };
 
   // handle update
-  const update = async (data: any) => {
+  const funcUpdate = async (data: any) => {
     //image: string | [File], //describe: string (chưa có)
     const { email_user, prize, competition, image } = data;
-    const _id = id;
+    const _id = idAchivement;
     setIsLoading(true);
     try {
       const formData = new FormData();
@@ -195,43 +197,48 @@ const AdminAchievement: React.FC = () => {
     } finally {
       setIsLoading(false);
       setIsFetchData(!isFetchData);
-      setId("");
+      setIdAchivement("");
     }
   };
 
   // handle deleteFunc
-  const deleteFunc = async () => {
+  const funcDelete = async () => {
     setIsLoading(true);
-    const _id = id;
     try {
-      const res = await deleteData(`/api/admin/achievement/${_id}`, {
-        headers: {
-          Authorization: `Bearer ${header}`,
-        },
-      });
-      toast.success("Xóa học sinh xuất sắc thất thành công!");
+      let listIdDeleted = Array.isArray(idAchivement)
+        ? idAchivement
+        : [idAchivement];
+      const results = await Promise.allSettled(
+        listIdDeleted.map((element) =>
+          deleteData(`/api/admin/achievement/${element}`, {
+            headers: {
+              Authorization: `Bearer ${header}`,
+            },
+          })
+        )
+      );
+      const failedItems = results
+        .map((result, index) =>
+          result.status === "rejected" ? listIdDeleted[index] : null
+        )
+        .filter(Boolean);
+
+      if (failedItems.length > 0) {
+        toast.error(
+          `Xóa học sinh suất sắc thất bại các ID ${failedItems.join(", ")}`
+        );
+      } else {
+        toast.success("Xóa các học sinh xuất sắc thành công.");
+      }
     } catch (e) {
       toast.error("Xóa học sinh xuất sắc thất thất bại!", e.message);
     } finally {
       setIsFetchData(!isFetchData);
-      setIsLoading(false);
-      setId("");
+      handleClosePopup();
       setIsModalVisible(false);
     }
   };
 
-  const handleActions = (type: string, row: any) => {
-    if (type === "EDIT") {
-      const id = row._id;
-      setId(id);
-      setSelectedContent(row);
-    }
-    if (type === "DELETE") {
-      const id = row._id;
-      setId(id);
-      setIsModalVisible(true);
-    }
-  };
   const styleAction = {
     marginRight: "8px",
     padding: "4px 8px",
@@ -253,9 +260,47 @@ const AdminAchievement: React.FC = () => {
     },
   ];
 
+  const batchExecution = [
+    {
+      value: "DELETE",
+      icon: <MdOutlineDeleteOutline style={{ color: "red" }} />,
+      content: "Xoá hàng đã chọn",
+    },
+    {
+      value: "LOCK",
+      icon: <PiLockKeyLight />,
+      content: "Khoá các thành thích",
+    },
+    {
+      value: "UNLOCK",
+      icon: <PiLockKeyOpen />,
+      content: "Mở khoá thành tích",
+    },
+  ];
+
+  const handleActions = (type: string, row: any) => {
+    if (type === "EDIT") {
+      const idAchivement = row._id;
+      setIdAchivement(idAchivement);
+      setSelectedContent(row);
+    }
+    if (type === "DELETE") {
+      if (type === "DELETE") {
+        if (Array.isArray(row)) {
+          const idDeleted = row.map((item) => item._id);
+          setIdAchivement(idDeleted);
+        } else {
+          const idOrder = row._id;
+          setIdAchivement(idOrder);
+        }
+        setIsModalVisible(true);
+      }
+    }
+  };
+
   const handleClosePopup = () => {
     setIsModalVisible(false);
-    setId("");
+    setIdAchivement("");
   };
 
   if (isLoading) {
@@ -302,6 +347,7 @@ const AdminAchievement: React.FC = () => {
                   columns={columns}
                   fieldSearch={fieldSearch}
                   data={data}
+                  batchExecution={batchExecution}
                   handleAction={handleActions}
                   actions={actions}
                 />
@@ -317,7 +363,7 @@ const AdminAchievement: React.FC = () => {
                 setIsModalCreate(false);
               }}
               structData={structData}
-              onSave={create}
+              onSave={funcCreate}
               title="Tạo mới học sinh xuất sắc"
             />
           )}
@@ -330,16 +376,20 @@ const AdminAchievement: React.FC = () => {
                 setSelectedContent(null);
               }}
               structData={structData}
-              onSave={update}
+              onSave={funcUpdate}
               title="Cập nhật học sinh xuất sắc"
             />
           )}
           {isModalVisible && (
             <PopupNotification
-              title="Bạn có chắc chắn muốn xoá học sinh này?"
+              title={
+                Array.isArray(idAchivement)
+                  ? `Bạn có chắc chắn muốn xoá xoá các dòng dữ liệu này?`
+                  : "Bạn có chắc chắn muốn xoá hàng dữ liệu này"
+              }
               status="error"
               buttonText="Xoá ngay"
-              onButtonClick={deleteFunc}
+              onButtonClick={funcDelete}
               buttonClose={handleClosePopup}
             />
           )}

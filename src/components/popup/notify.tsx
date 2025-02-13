@@ -43,9 +43,10 @@ const PopupNotification: React.FC<PopupNotificationProps> = ({
         <div
           style={{
             position: "absolute",
-            top: "20px",
-            right: "16px",
+            top: "8px",
+            right: "8px",
             cursor: "pointer",
+            height: "20px",
           }}
           onClick={buttonClose}
         >

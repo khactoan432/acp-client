@@ -8,6 +8,8 @@ import { FaRegEdit } from "react-icons/fa";
 import { MdOutlineDeleteOutline } from "react-icons/md";
 import { MdContentPaste } from "react-icons/md";
 import { MdAttractions } from "react-icons/md";
+import { PiLockKeyLight } from "react-icons/pi";
+import { PiLockKeyOpen } from "react-icons/pi";
 // import components
 import AdminHeader from "../../components/layout/Admin/header";
 import Nav from "../../components/layout/Admin/nav";
@@ -48,7 +50,7 @@ const AdminExam: React.FC = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   // state string
-  const [idCourse, setIdCourse] = useState<string>("");
+  const [idCourse, setIdCourse] = useState<string | string[]>("");
   // data store
   const [allCourse, setAllCourse] = useState([]);
   const [selectedContent, setSelectedContent] = useState(null);
@@ -144,42 +146,10 @@ const AdminExam: React.FC = () => {
   let columnsCourse = ["name", "price", "discount", "image", "video"];
   const fieldSearch = ["name"];
   let dataCourse = allCourse;
-  // styles and action table
-  const styleAction = {
-    marginRight: "8px",
-    padding: "4px 8px",
-    borderRadius: "4px",
-  };
-  const actions = [
-    {
-      title: "Giới thiệu",
-      action: "INTRODUCE",
-      icon: <MdAttractions />,
-      style: styleAction,
-    },
-    {
-      title: "Chương học",
-      action: "CONTENT",
-      icon: <MdContentPaste />,
-      style: styleAction,
-    },
-    {
-      title: "Chỉnh sửa",
-      action: "EDIT",
-      icon: <FaRegEdit />,
-      style: { ...styleAction, color: "#f7bb0a" },
-    },
-    {
-      title: "Xoá",
-      action: "DELETE",
-      icon: <MdOutlineDeleteOutline />,
-      style: { ...styleAction, color: "red" },
-    },
-  ];
 
   // hanle create
 
-  const createCourse = async (data: any) => {
+  const funcCreate = async (data: any) => {
     const { name, price, discount, video, image } = data;
     setIsLoading(true);
     try {
@@ -209,7 +179,7 @@ const AdminExam: React.FC = () => {
   };
 
   // hanle update
-  const updateCourse = async (data: any) => {
+  const funcUpdate = async (data: any) => {
     const { name, price, discount, video, image } = data;
     const id = idCourse;
     setIsLoading(true);
@@ -249,26 +219,90 @@ const AdminExam: React.FC = () => {
     }
   };
   // hanle delete
-  const handleDeleteCourse = async () => {
+  const funcDelete = async () => {
     setIsLoading(true);
-    const id = idCourse;
     try {
-      const res = await deleteData(`/api/admin/course/${id}`, {
-        headers: {
-          Authorization: `Bearer ${header}`,
-        },
-      });
-      toast.success("Xóa khoá học thành công.");
+      let listIdDeleted = Array.isArray(idCourse) ? idCourse : [idCourse];
+      const results = await Promise.allSettled(
+        listIdDeleted.map((element) =>
+          deleteData(`/api/admin/course/${element}`, {
+            headers: {
+              Authorization: `Bearer ${header}`,
+            },
+          })
+        )
+      );
+      const failedItems = results
+        .map((result, index) =>
+          result.status === "rejected" ? listIdDeleted[index] : null
+        )
+        .filter(Boolean);
+
+      if (failedItems.length > 0) {
+        toast.error(`Xóa khoá học thất bại các ID ${failedItems.join(", ")}`);
+      } else {
+        toast.success("Xóa các khoá học thành công.");
+      }
     } catch (err) {
       toast.error("Xóa khoá học thất bại!", err.message);
       console.log("Error deleting: ", err);
     } finally {
       setIsLoading(false);
-      setIsModalVisible(false);
-      setIdCourse("");
+      handleClosePopup();
       setIsFetchData(!isFetchData);
     }
   };
+  // styles and action table
+  const styleAction = {
+    marginRight: "8px",
+    padding: "4px 8px",
+    borderRadius: "4px",
+  };
+
+  const actions = [
+    {
+      title: "Giới thiệu",
+      action: "INTRODUCE",
+      icon: <MdAttractions />,
+      style: styleAction,
+    },
+    {
+      title: "Chương học",
+      action: "CONTENT",
+      icon: <MdContentPaste />,
+      style: styleAction,
+    },
+    {
+      title: "Chỉnh sửa",
+      action: "EDIT",
+      icon: <FaRegEdit />,
+      style: { ...styleAction, color: "#f7bb0a" },
+    },
+    {
+      title: "Xoá",
+      action: "DELETE",
+      icon: <MdOutlineDeleteOutline />,
+      style: { ...styleAction, color: "red" },
+    },
+  ];
+
+  const batchExecution = [
+    {
+      value: "DELETE",
+      icon: <MdOutlineDeleteOutline style={{ color: "red" }} />,
+      content: "Xoá hàng đã chọn",
+    },
+    {
+      value: "LOCK",
+      icon: <PiLockKeyLight />,
+      content: "Khoá các Khoá học",
+    },
+    {
+      value: "UNLOCK",
+      icon: <PiLockKeyOpen />,
+      content: "Mở khoá Khoá học",
+    },
+  ];
   // handle action
   const handleActions = (type: string, row: any) => {
     if (type === "EDIT") {
@@ -277,9 +311,16 @@ const AdminExam: React.FC = () => {
       setSelectedContent(row);
     }
     if (type === "DELETE") {
-      const id = row._id;
-      setIdCourse(id);
-      setIsModalVisible(true);
+      if (type === "DELETE") {
+        if (Array.isArray(row)) {
+          const idDeleted = row.map((item) => item._id);
+          setIdCourse(idDeleted);
+        } else {
+          const idOrder = row._id;
+          setIdCourse(idOrder);
+        }
+        setIsModalVisible(true);
+      }
     }
     if (type === "INTRODUCE") {
       navigate(`/admin/course/${row._id}/introduce`);
@@ -336,8 +377,10 @@ const AdminExam: React.FC = () => {
                   columns={columnsCourse}
                   fieldSearch={fieldSearch}
                   data={dataCourse}
+                  batchExecution={batchExecution}
                   handleAction={handleActions}
                   actions={actions}
+                  topAcctions="-88"
                   filterPrice={true}
                   isAllowEpand={true}
                 />
@@ -352,7 +395,7 @@ const AdminExam: React.FC = () => {
           isOpen={isModalCreate}
           onClose={() => setIsModalCreate(false)}
           structData={structData}
-          onSave={createCourse}
+          onSave={funcCreate}
           title="Tạo mới khoá học"
         />
       )}
@@ -365,16 +408,20 @@ const AdminExam: React.FC = () => {
             setSelectedContent(null);
           }}
           structData={structData}
-          onSave={updateCourse}
+          onSave={funcUpdate}
           title="Cập nhật khoá học"
         />
       )}
       {isModalVisible && (
         <PopupNotification
-          title="Bạn có chắc chắn muốn xoá xoá học này?"
+          title={
+            Array.isArray(idCourse)
+              ? `Bạn có chắc chắn muốn xoá xoá các dòng dữ liệu này?`
+              : "Bạn có chắc chắn muốn xoá hàng dữ liệu này"
+          }
           status="error"
           buttonText="Xoá ngay"
-          onButtonClick={handleDeleteCourse}
+          onButtonClick={funcDelete}
           buttonClose={handleClosePopup}
         />
       )}

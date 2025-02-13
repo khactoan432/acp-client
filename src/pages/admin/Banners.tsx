@@ -14,6 +14,8 @@ import { postData, getData, deleteData, putData } from "../../axios";
 // import icon
 import { FaRegEdit } from "react-icons/fa";
 import { MdOutlineDeleteOutline } from "react-icons/md";
+import { PiLockKeyLight } from "react-icons/pi";
+import { PiLockKeyOpen } from "react-icons/pi";
 
 interface Banner {
   _id: string;
@@ -55,13 +57,11 @@ const AdminBanner: React.FC = () => {
   const [isModalUpdateBanner, setIsModalUpdateBanner] = useState(false);
 
   // state string
-  const [idBanner, setIdBanner] = useState("");
-
+  const [idBanner, setIdBanner] = useState<string | string[]>("");
   // state store
   const [data, setData] = useState<Banner[]>([]);
   const [selectedContent, setSelectedContent] = useState(null);
-
-  // fetch data
+  // get data
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
@@ -90,13 +90,6 @@ const AdminBanner: React.FC = () => {
 
   useEffect(() => {
     let arrStruct = [
-      // {
-      //   name: "describe",
-      //   placeholder: "Nhập mô banner",
-      //   label: "Mô tả banner",
-      //   value: "",
-      //   type: "INPUT",
-      // },
       {
         name: "image",
         label: "Image",
@@ -120,7 +113,7 @@ const AdminBanner: React.FC = () => {
   }, [isModalCreateBanner, selectedContent]);
 
   // handle create
-  const createBanner = async (data: any) => {
+  const funcCreate = async (data: any) => {
     // data: image : [File], //describe: string (chưa có)
     setIsLoading(true);
     const { image } = data;
@@ -146,7 +139,7 @@ const AdminBanner: React.FC = () => {
   };
 
   // handle update
-  const updateBanner = async (data: any) => {
+  const funcUpdate = async (data: any) => {
     //image: string | [File], //describe: string (chưa có)
     const { image } = data;
     const id = idBanner;
@@ -176,16 +169,30 @@ const AdminBanner: React.FC = () => {
   };
 
   // handle delete
-  const deleteBanner = async () => {
+  const funcDelete = async () => {
     setIsLoading(true);
-    const id = idBanner;
     try {
-      const res = await deleteData(`/api/admin/banner/${id}`, {
-        headers: {
-          Authorization: `Bearer ${header}`,
-        },
-      });
-      toast.success("Xóa banner thành công!");
+      let listIdDeleted = Array.isArray(idBanner) ? idBanner : [idBanner];
+      const results = await Promise.allSettled(
+        listIdDeleted.map((element) =>
+          deleteData(`/api/admin/banner/${element}`, {
+            headers: {
+              Authorization: `Bearer ${header}`,
+            },
+          })
+        )
+      );
+      const failedItems = results
+        .map((result, index) =>
+          result.status === "rejected" ? listIdDeleted[index] : null
+        )
+        .filter(Boolean);
+
+      if (failedItems.length > 0) {
+        toast.error(`Xóa banner thất bại các ID ${failedItems.join(", ")}`);
+      } else {
+        toast.success("Xóa các banner thành công.");
+      }
     } catch (e) {
       toast.error("Xóa banner thất bại!", e.message);
     } finally {
@@ -203,9 +210,16 @@ const AdminBanner: React.FC = () => {
       setSelectedContent(row);
     }
     if (type === "DELETE") {
-      const id = row._id;
-      setIdBanner(id);
-      setIsModalVisible(true);
+      if (type === "DELETE") {
+        if (Array.isArray(row)) {
+          const idDeleted = row.map((item) => item._id);
+          setIdBanner(idDeleted);
+        } else {
+          const idOrder = row._id;
+          setIdBanner(idOrder);
+        }
+        setIsModalVisible(true);
+      }
     }
   };
   const styleAction = {
@@ -226,6 +240,23 @@ const AdminBanner: React.FC = () => {
       action: "DELETE",
       icon: <MdOutlineDeleteOutline />,
       style: { ...styleAction, color: "red" },
+    },
+  ];
+  const batchExecution = [
+    {
+      value: "DELETE",
+      icon: <MdOutlineDeleteOutline style={{ color: "red" }} />,
+      content: "Xoá hàng đã chọn",
+    },
+    {
+      value: "LOCK",
+      icon: <PiLockKeyLight />,
+      content: "Khoá các banner",
+    },
+    {
+      value: "UNLOCK",
+      icon: <PiLockKeyOpen />,
+      content: "Mở khoá các banner",
     },
   ];
 
@@ -277,6 +308,7 @@ const AdminBanner: React.FC = () => {
                 <Table
                   columns={columnsBanner}
                   data={dataBanner}
+                  batchExecution={batchExecution}
                   handleAction={handleActions}
                   actions={actions}
                 />
@@ -293,7 +325,7 @@ const AdminBanner: React.FC = () => {
             setIsModalCreateBanner(false);
           }}
           structData={structData}
-          onSave={createBanner}
+          onSave={funcCreate}
           title="Tạo mới banner"
         />
       )}
@@ -306,16 +338,20 @@ const AdminBanner: React.FC = () => {
             setSelectedContent(null);
           }}
           structData={structData}
-          onSave={updateBanner}
+          onSave={funcUpdate}
           title="Cập nhật banner"
         />
       )}
       {isModalVisible && (
         <PopupNotification
-          title="Bạn có chắc chắn muốn xoá banner này?"
+          title={
+            Array.isArray(idBanner)
+              ? `Bạn có chắc chắn muốn xoá xoá các dòng dữ liệu này?`
+              : "Bạn có chắc chắn muốn xoá hàng dữ liệu này"
+          }
           status="error"
           buttonText="Xoá ngay"
-          onButtonClick={deleteBanner}
+          onButtonClick={funcDelete}
           buttonClose={handleClosePopup}
         />
       )}

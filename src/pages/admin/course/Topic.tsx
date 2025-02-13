@@ -6,6 +6,8 @@ import { Button } from "antd";
 import { FaRegEdit } from "react-icons/fa";
 import { MdOutlineDeleteOutline } from "react-icons/md";
 import { FaPhotoVideo } from "react-icons/fa";
+import { PiLockKeyLight } from "react-icons/pi";
+import { PiLockKeyOpen } from "react-icons/pi";
 // import components
 import AdminHeader from "../../../components/layout/Admin/header";
 import Nav from "../../../components/layout/Admin/nav";
@@ -61,7 +63,7 @@ const ExamVideo: React.FC = () => {
   const [isModalUpdateTopic, setIsModalUpdateTopic] = useState(false);
 
   //string
-  const [idVideo, setIdVideo] = useState<string>("");
+  const [idVideo, setIdVideo] = useState<string | string[]>("");
   // store
   const [data, setData] = useState<Topic[]>([]);
   const [selectedContent, setSelectedContent] = useState(null);
@@ -141,11 +143,28 @@ const ExamVideo: React.FC = () => {
       style: { ...styleAction, color: "red" },
     },
   ];
+  const batchExecution = [
+    {
+      value: "DELETE",
+      icon: <MdOutlineDeleteOutline style={{ color: "red" }} />,
+      content: "Xoá hàng đã chọn",
+    },
+    {
+      value: "LOCK",
+      icon: <PiLockKeyLight />,
+      content: "Khoá các Khoá học",
+    },
+    {
+      value: "UNLOCK",
+      icon: <PiLockKeyOpen />,
+      content: "Mở khoá Khoá học",
+    },
+  ];
 
   // structure data video exam
   let dataTopic = data;
 
-  const createTopic = async (data: any) => {
+  const funcCreate = async (data: any) => {
     // data: name: string
     setIsLoading(true);
     const id = idCourse;
@@ -175,7 +194,7 @@ const ExamVideo: React.FC = () => {
     }
   };
   // update
-  const updateTopic = async (data: any) => {
+  const funcUpdate = async (data: any) => {
     // name: string
     const id = idVideo;
     const { name } = data;
@@ -203,16 +222,30 @@ const ExamVideo: React.FC = () => {
     }
   };
   // delete
-  const deleteTopic = async () => {
+  const funcDelete = async () => {
     setIsLoading(true);
-    const id = idVideo;
     try {
-      const res = await deleteData(`/api/admin/topic/${id}`, {
-        headers: {
-          Authorization: `Bearer ${header}`,
-        },
-      });
-      toast.success("Xóa chương học thành công!");
+      let listIdDeleted = Array.isArray(idVideo) ? idVideo : [idVideo];
+      const results = await Promise.allSettled(
+        listIdDeleted.map(async (element) =>
+          deleteData(`/api/admin/topic/${element}`, {
+            headers: {
+              Authorization: `Bearer ${header}`,
+            },
+          })
+        )
+      );
+      let failedItems = results
+        .map((result, index) =>
+          result.status === "rejected" ? listIdDeleted[index] : null
+        )
+        .filter(Boolean);
+      if (failedItems.length > 0) {
+        toast.error(`Xóa chương học thất bại cho ${failedItems.join(", ")}`);
+        return;
+      } else {
+        toast.success("Xóa các chương học thành công!");
+      }
     } catch (e) {
       toast.error("Xóa chương học thất bại!", e.message);
     } finally {
@@ -237,9 +270,16 @@ const ExamVideo: React.FC = () => {
       setSelectedContent(row);
     }
     if (type === "DELETE") {
-      const id = row._id;
-      setIdVideo(id);
-      setIsModalVisible(true);
+      if (type === "DELETE") {
+        if (Array.isArray(row)) {
+          const idDeleted = row.map((item) => item._id);
+          setIdVideo(idDeleted);
+        } else {
+          const idOrder = row._id;
+          setIdVideo(idOrder);
+        }
+        setIsModalVisible(true);
+      }
     }
     if (type === "CONTENT") {
       navigate(`/admin/course/${idCourse}/topic/${row._id}/content`);
@@ -304,8 +344,10 @@ const ExamVideo: React.FC = () => {
                 <Table
                   columns={columnsCourse}
                   data={dataTopic}
+                  batchExecution={batchExecution}
                   handleAction={handleActions}
                   actions={actions}
+                  topAcctions="-66"
                   fieldSearch={fieldSearch}
                 />
               )}
@@ -321,7 +363,7 @@ const ExamVideo: React.FC = () => {
             setIsModalCreateTopic(false);
           }}
           structData={structData}
-          onSave={createTopic}
+          onSave={funcCreate}
           title="Tạo mới chương học"
         />
       )}
@@ -334,16 +376,20 @@ const ExamVideo: React.FC = () => {
             setSelectedContent(null);
           }}
           structData={structData}
-          onSave={updateTopic}
+          onSave={funcUpdate}
           title="Cập nhật chương học"
         />
       )}
       {isModalVisible && (
         <PopupNotification
-          title="Bạn có chắc chắn muốn xoá chương học này không?"
+          title={
+            Array.isArray(idVideo)
+              ? `Bạn có chắc chắn muốn xoá xoá các dòng dữ liệu này?`
+              : "Bạn có chắc chắn muốn xoá hàng dữ liệu này"
+          }
           status="error"
           buttonText="Xoá ngay"
-          onButtonClick={deleteTopic}
+          onButtonClick={funcDelete}
           buttonClose={handleClosePopup}
         />
       )}

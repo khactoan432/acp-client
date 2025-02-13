@@ -1,18 +1,14 @@
 import React, { useState, useEffect, useRef } from "react";
 import { toast } from "react-toastify";
 // import component
-import AdminModalV2 from "../../components/popup/AdminModalV2";
 import AdminHeader from "../../components/layout/Admin/header";
 import Nav from "../../components/layout/Admin/nav";
 import Table from "../../components/table";
 import Loading from "../../components/loading";
 import PopupNotification from "../../components/popup/notify";
-// import antd
-import { Button } from "antd";
 // import axios
-import { postData, getData, deleteData, putData } from "../../axios";
+import { getData, deleteData } from "../../axios";
 // import icon react
-import { FaRegEdit } from "react-icons/fa";
 import { MdOutlineDeleteOutline } from "react-icons/md";
 
 interface Order {
@@ -38,16 +34,11 @@ const AdminOrder = () => {
   }, []);
 
   const [firstHeight, setFirstHeight] = useState<number>(0);
-  const [secondHeight, setSeconHeight] = useState<number>(0);
   const firstDivRef = useRef<HTMLDivElement>(null);
-  const secondDivRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (firstDivRef.current) {
       setFirstHeight(firstDivRef.current.offsetHeight);
-    }
-    if (secondDivRef.current) {
-      setSeconHeight(secondDivRef.current.offsetHeight);
     }
   }, []);
 
@@ -55,11 +46,9 @@ const AdminOrder = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isFetchData, setIsFetchData] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [isModalCreate, setIsModalCreate] = useState(false);
-  const [isModalUpdate, setIsModalUpdate] = useState(false);
 
   // state string
-  const [id, setId] = useState("");
+  const [idOrder, setIdOrder] = useState<string | string[]>("");
 
   // state store
   const [data, setData] = useState<Order[]>([]);
@@ -91,11 +80,10 @@ const AdminOrder = () => {
     "materialName",
     "type",
     "payment_status",
-    "amount"
+    "amount",
   ];
 
   // structure data
-  console.log(data);
   const fieldSearch = [
     "code",
     "createdAt",
@@ -103,14 +91,18 @@ const AdminOrder = () => {
     "materialName",
     "type",
     "payment_status",
-    "amount"
   ];
 
   // handle action
   const handleActions = (type: string, row: any) => {
     if (type === "DELETE") {
-      const id = row._id;
-      setId(id);
+      if (Array.isArray(row)) {
+        const idDeleted = row.map((item) => item._id);
+        setIdOrder(idDeleted);
+      } else {
+        const idOrder = row._id;
+        setIdOrder(idOrder);
+      }
       setIsModalVisible(true);
     }
   };
@@ -121,74 +113,114 @@ const AdminOrder = () => {
   };
   const actions = [
     {
-      title: "Chỉnh sửa",
-      action: "EDIT",
-      icon: <FaRegEdit />,
-      style: { ...styleAction, color: "#f7bb0a" },
-    },
-    {
       title: "Xoá",
       action: "DELETE",
       icon: <MdOutlineDeleteOutline />,
       style: { ...styleAction, color: "red" },
     },
   ];
+  const batchExecution = [
+    {
+      value: "DELETE",
+      icon: <MdOutlineDeleteOutline />,
+      content: "Xoá hàng đã chọn",
+    },
+  ];
   const handleClosePopup = () => {
     setIsModalVisible(false);
-    setId("");
+    setIdOrder("");
   };
+
+  const handleDelete = async () => {
+    setIsLoading(true);
+
+    try {
+      let listIdDeleted = Array.isArray(idOrder) ? idOrder : [idOrder];
+
+      const results = await Promise.allSettled(
+        listIdDeleted.map((element) =>
+          deleteData(`/api/admin/order/${element}`, {
+            headers: { Authorization: `Bearer ${header}` },
+          })
+        )
+      );
+
+      // Kiểm tra lỗi
+      const failedItems = results
+        .map((result, index) =>
+          result.status === "rejected" ? listIdDeleted[index] : null
+        )
+        .filter(Boolean);
+
+      if (failedItems.length > 0) {
+        toast.error(`Không thể xoá các ID sau: ${failedItems.join(", ")}`);
+      } else {
+        toast.success("Xoá thành công!");
+      }
+    } catch (e) {
+      toast.error("Có lỗi xảy ra khi xoá!");
+      console.error(`Error deleting data`, e);
+    } finally {
+      setIsLoading(false);
+      handleClosePopup();
+      setIsFetchData((prev) => !prev);
+    }
+  };
+
+  if (isLoading) {
+    return <Loading message="Đang tải dữ liệu..." size="large" />;
+  }
   return (
     <div className="flex h-screen">
       <Nav />
       <div className="flex flex-col flex-1">
         <AdminHeader />
         <div className="w-full h-full bg-white">
-          <div
-            ref={secondDivRef}
-            className="header_categories flex justify-between items-center bg-primary px-5 py-3 mb-2"
-          >
-            <div className="left uppercase">
-              <h2 className="font-size-20">Thông tin khoá học đã bán</h2>
+          <div style={{ height: `calc(100% - 8px)` }} className="m-2">
+            <div
+              ref={firstDivRef}
+              className="header_categories flex justify-between items-center bg-primary px-5 py-3 mb-2"
+            >
+              <div className="left uppercase">
+                <h2 className="font-size-20">Thông tin khoá học đã bán</h2>
+              </div>
+              <div className="right uppercase"></div>
             </div>
-            <div className="right uppercase"></div>
+            <div
+              className="bg-primary"
+              style={{
+                height: `calc(${screenHeight}px - ${firstHeight}px - 24px)`,
+              }}
+            >
+              {data && (
+                <Table
+                  columns={columns}
+                  fieldSearch={fieldSearch}
+                  filterPrice={true}
+                  data={data}
+                  batchExecution={batchExecution}
+                  handleAction={handleActions}
+                  actions={actions}
+                  topAcctions="-10"
+                />
+              )}
+            </div>
           </div>
-
-          {data && (
-            <Table
-              columns={columns}
-              fieldSearch={fieldSearch}
-              data={data}
-              handleAction={handleActions}
-              actions={actions}
-            />
-          )}
         </div>
       </div>
-
-      {/* <AdminModal
-        isOpen={isModalSaveOpen}
-        multiple={false}
-        onClose={() => setIsModalSaveOpen(false)}
-        fields={fields}
-        enableImageUpload={true}
-        onSave={handleSave}
-        data={{}}
-        title="Upload New Order"
-      /> */}
-
-      {/* <AdminModal
-        isOpen={isModalUpdateOpen}
-        multiple={false}
-        onClose={() => {
-          setIsModalUpdateOpen(false);
-          setCurrentEdit(null);
-        }}
-        fields={fields}
-        enableImageUpload={true}
-        onSave={handleUpdate}
-        data={getDataForEdit(currentEdit)}
-        title="Edit Order"
-      /> */}
+      {isModalVisible && (
+        <PopupNotification
+          title={
+            Array.isArray(idOrder)
+              ? `Bạn có chắc chắn muốn xoá xoá các dòng dữ liệu này?`
+              : "Bạn có chắc chắn muốn xoá hàng dữ liệu này"
+          }
+          status="error"
+          buttonText="Xoá ngay"
+          onButtonClick={() => handleDelete()}
+          buttonClose={handleClosePopup}
+        />
+      )}
     </div>
   );
 };

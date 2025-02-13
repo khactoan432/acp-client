@@ -1,3 +1,6 @@
+import React, { useState, useEffect, useRef } from "react";
+import { toast } from "react-toastify";
+
 import AdminHeader from "../../components/layout/Admin/header";
 import Nav from "../../components/layout/Admin/nav";
 import Loading from "../../components/loading";
@@ -8,8 +11,6 @@ import PopupNotification from "../../components/popup/notify";
 import { MdOutlineDeleteOutline } from "react-icons/md";
 
 import { getData, deleteData } from "../../axios";
-
-import React, { useState, useEffect, useRef } from "react";
 
 interface Advirory {
   _id?: string;
@@ -45,7 +46,7 @@ const Schedules = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   // state string
-  const [idAdvisoryDeleted, setIdAdvisoryDeleted] = useState("");
+  const [idAdvisory, setIdAdvisory] = useState<string | string[]>("");
 
   const [dataAdvisories, setDataAdvisories] = useState<Advirory[]>([]);
 
@@ -68,40 +69,62 @@ const Schedules = () => {
     };
     fetchData();
   }, [isFetchData]);
+  // fake frame course
+  let columnsCourse = ["name", "phone_number", "email", "mindfulness_course"];
+  let data = dataAdvisories;
+  let fieldSearch = ["name", "phone_number", "email", "mindfulness_course"];
 
   const handleDeleteAdvisory = async () => {
+    setIsLoading(true);
     try {
-      setIsLoading(true);
-      const idDeleted = JSON.parse(JSON.stringify(idAdvisoryDeleted));
-      const advisoryDeleted = await deleteData(
-        `/api/admin/advisories/${idDeleted}`,
-        {
-          headers: {
-            Authorization: `Bearer ${header}`,
-          },
-        }
+      let listIdDeleted = Array.isArray(idAdvisory) ? idAdvisory : [idAdvisory];
+      const results = await Promise.allSettled(
+        listIdDeleted.map((element) =>
+          deleteData(`/api/admin/advisories/${element}`, {
+            headers: {
+              Authorization: `Bearer ${header}`,
+            },
+          })
+        )
       );
-      console.log(advisoryDeleted, "course deleted");
+      const failedItems = results
+        .map((result, index) =>
+          result.status === "rejected" ? listIdDeleted[index] : null
+        )
+        .filter(Boolean);
+
+      if (failedItems.length > 0) {
+        toast.error(
+          `Xóa lịch hẹn tư vấn thất bại các ID ${failedItems.join(", ")}`
+        );
+      } else {
+        toast.success("Xóa các lịch hẹn tư vấn thành công.");
+      }
     } catch (err) {
       console.log("Error deleting: ", err);
     } finally {
       setIsLoading(false);
-      setIsModalVisible(false);
-      setIdAdvisoryDeleted("");
+      handleClosePopup();
       setIsFetchData(!isFetchData);
     }
   };
 
   const handleActions = (type: string, row: any) => {
-    console.log("type: ", type);
-    console.log("row: ", row);
     if (type === "DELETE") {
-      const id = row._id;
-      setIdAdvisoryDeleted(id);
-      setIsModalVisible(true);
+      if (type === "DELETE") {
+        if (Array.isArray(row)) {
+          const idDeleted = row.map((item) => item._id);
+          setIdAdvisory(idDeleted);
+        } else {
+          const idOrder = row._id;
+          setIdAdvisory(idOrder);
+        }
+        setIsModalVisible(true);
+      }
     }
   };
 
+  // styles and action table
   const styleAction = {
     marginRight: "8px",
     padding: "4px 8px",
@@ -110,16 +133,24 @@ const Schedules = () => {
 
   const actions = [
     {
-      title: "No action",
+      title: "Xoá",
+      action: "DELETE",
+      icon: <MdOutlineDeleteOutline />,
+      style: { ...styleAction, color: "red" },
     },
   ];
-  let columnsCourse = ["name", "phone_number", "email", "mindfulness_course"];
-  let data = dataAdvisories;
-  let fieldSearch = ["name", "phone_number", "email", "mindfulness_course"];
+
+  const batchExecution = [
+    {
+      value: "DELETE",
+      icon: <MdOutlineDeleteOutline style={{ color: "red" }} />,
+      content: "Xoá hàng đã chọn",
+    },
+  ];
 
   const handleClosePopup = () => {
     setIsModalVisible(false);
-    setIdAdvisoryDeleted("");
+    setIdAdvisory("");
   };
 
   if (isLoading) {
@@ -152,6 +183,7 @@ const Schedules = () => {
                   columns={columnsCourse}
                   fieldSearch={fieldSearch}
                   data={data}
+                  batchExecution={batchExecution}
                   handleAction={handleActions}
                   actions={actions}
                 />
@@ -162,7 +194,11 @@ const Schedules = () => {
       </div>
       {isModalVisible && (
         <PopupNotification
-          title="Bạn có chắc chắn muốn xoá?"
+          title={
+            Array.isArray(idAdvisory)
+              ? `Bạn có chắc chắn muốn xoá xoá các dòng dữ liệu này?`
+              : "Bạn có chắc chắn muốn xoá hàng dữ liệu này"
+          }
           status="error"
           buttonText="Xoá ngay"
           onButtonClick={handleDeleteAdvisory}

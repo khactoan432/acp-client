@@ -14,6 +14,9 @@ import { postData, getData, deleteData, putData } from "../../axios";
 // import icon
 import { FaRegEdit } from "react-icons/fa";
 import { MdOutlineDeleteOutline } from "react-icons/md";
+import { PiLockKeyLight } from "react-icons/pi";
+import { PiLockKeyOpen } from "react-icons/pi";
+
 interface Teacher {
   _id: string;
   image: string;
@@ -60,7 +63,7 @@ const AdminTeacher: React.FC = () => {
   const [isModalUpdate, setIsModalUpdate] = useState(false);
 
   // state string
-  const [id, setId] = useState("");
+  const [idTeacher, setIdTeacher] = useState<string | string[]>("");
 
   // state store
   const [data, setData] = useState<Teacher[]>([]);
@@ -89,7 +92,6 @@ const AdminTeacher: React.FC = () => {
   let columns = ["name", "email", "codeforce_name", "phone_number", "image"];
 
   // structure data video exam
-  console.log(data);
   let fieldSearch = ["name", "email", "codeforce_name", "phone_number"];
 
   const [structData, setStructData] = useState<any>([]);
@@ -174,7 +176,7 @@ const AdminTeacher: React.FC = () => {
   }, [isModalCreate, selectedContent]);
 
   // handle create
-  const create = async (data: any) => {
+  const funcCreate = async (data: any) => {
     setIsLoading(true);
     const {
       name,
@@ -214,9 +216,9 @@ const AdminTeacher: React.FC = () => {
   };
 
   // handle update
-  const update = async (data: any) => {
+  const funcUpdate = async (data: any) => {
     const { name, email, codeforce_name, phone_number, image } = data;
-    const _id = id;
+    const _id = idTeacher;
     setIsLoading(true);
     try {
       const formData = new FormData();
@@ -242,49 +244,50 @@ const AdminTeacher: React.FC = () => {
     } finally {
       setIsLoading(false);
       setIsFetchData(!isFetchData);
-      setId("");
+      setIdTeacher("");
     }
   };
 
   // handle deleteFunc
-  const deleteFunc = async () => {
+  const funcDelete = async () => {
     setIsLoading(true);
-    const _id = id;
+    const _id = idTeacher;
     try {
-      const res = await deleteData(`/api/admin/user/${_id}`, {
-        headers: {
-          Authorization: `Bearer ${header}`,
-        },
-      });
-      toast.success("Xóa giáo viên thành công!");
+      let listIdDeleted = Array.isArray(idTeacher) ? idTeacher : [idTeacher];
+      const results = await Promise.allSettled(
+        listIdDeleted.map((element) =>
+          deleteData(`/api/admin/user/${element}`, {
+            headers: {
+              Authorization: `Bearer ${header}`,
+            },
+          })
+        )
+      );
+      const failedItems = results
+        .map((result, index) =>
+          result.status === "rejected" ? listIdDeleted[index] : null
+        )
+        .filter(Boolean);
+
+      if (failedItems.length > 0) {
+        toast.error(`Xóa giảng viên thất bại các ID ${failedItems.join(", ")}`);
+      } else {
+        toast.success("Xóa các giảng viên thành công.");
+      }
     } catch (e) {
       toast.error("Xóa giáo viên thất bại!", e.message);
     } finally {
       setIsFetchData(!isFetchData);
-      setIsLoading(false);
-      setId("");
+      handleClosePopup();
       setIsModalVisible(false);
     }
   };
 
-  const handleActions = (type: string, row: any) => {
-    if (type === "EDIT") {
-      const id = row._id;
-      setId(id);
-      setSelectedContent(row);
-    }
-    if (type === "DELETE") {
-      const id = row._id;
-      setId(id);
-      setIsModalVisible(true);
-    }
-  };
   const styleAction = {
     marginRight: "8px",
     padding: "4px 8px",
     borderRadius: "4px",
   };
-
   const actions = [
     {
       title: "Chỉnh sửa",
@@ -299,10 +302,47 @@ const AdminTeacher: React.FC = () => {
       style: { ...styleAction, color: "red" },
     },
   ];
+  const batchExecution = [
+    {
+      value: "DELETE",
+      icon: <MdOutlineDeleteOutline style={{ color: "red" }} />,
+      content: "Xoá hàng đã chọn",
+    },
+    {
+      value: "LOCK",
+      icon: <PiLockKeyLight />,
+      content: "Khoá các Khoá học",
+    },
+    {
+      value: "UNLOCK",
+      icon: <PiLockKeyOpen />,
+      content: "Mở khoá Khoá học",
+    },
+  ];
+
+  const handleActions = (type: string, row: any) => {
+    if (type === "EDIT") {
+      const idTeacher = row._id;
+      setIdTeacher(idTeacher);
+      setSelectedContent(row);
+    }
+    if (type === "DELETE") {
+      if (type === "DELETE") {
+        if (Array.isArray(row)) {
+          const idDeleted = row.map((item) => item._id);
+          setIdTeacher(idDeleted);
+        } else {
+          const idOrder = row._id;
+          setIdTeacher(idOrder);
+        }
+        setIsModalVisible(true);
+      }
+    }
+  };
 
   const handleClosePopup = () => {
     setIsModalVisible(false);
-    setId("");
+    setIdTeacher("");
   };
 
   if (isLoading) {
@@ -349,6 +389,7 @@ const AdminTeacher: React.FC = () => {
                   columns={columns}
                   fieldSearch={fieldSearch}
                   data={data}
+                  batchExecution={batchExecution}
                   handleAction={handleActions}
                   actions={actions}
                 />
@@ -364,7 +405,7 @@ const AdminTeacher: React.FC = () => {
                 setIsModalCreate(false);
               }}
               structData={structData}
-              onSave={create}
+              onSave={funcCreate}
               title="Tạo mới giáo viên"
             />
           )}
@@ -377,16 +418,20 @@ const AdminTeacher: React.FC = () => {
                 setSelectedContent(null);
               }}
               structData={structData}
-              onSave={update}
+              onSave={funcUpdate}
               title="Cập nhật giáo viên"
             />
           )}
           {isModalVisible && (
             <PopupNotification
-              title="Bạn có chắc chắn muốn xoá giáo viên này?"
+              title={
+                Array.isArray(idTeacher)
+                  ? `Bạn có chắc chắn muốn xoá xoá các dòng dữ liệu này?`
+                  : "Bạn có chắc chắn muốn xoá hàng dữ liệu này"
+              }
               status="error"
               buttonText="Xoá ngay"
-              onButtonClick={deleteFunc}
+              onButtonClick={funcDelete}
               buttonClose={handleClosePopup}
             />
           )}

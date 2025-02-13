@@ -10,6 +10,8 @@ import { FaRegEdit } from "react-icons/fa";
 import { MdOutlineDeleteOutline } from "react-icons/md";
 import { MdAttractions } from "react-icons/md";
 import { FaPhotoVideo } from "react-icons/fa";
+import { PiLockKeyLight } from "react-icons/pi";
+import { PiLockKeyOpen } from "react-icons/pi";
 
 // import components
 import AdminHeader from "../../components/layout/Admin/header";
@@ -50,11 +52,11 @@ const AdminExam: React.FC = () => {
   const [isFetchData, setIsFetchData] = useState(false);
 
   // state string
-  const [idExam, setIdExam] = useState<string>("");
+  const [idExam, setIdExam] = useState<string | string[]>("");
   // state boolean
   const [isModalCreate, setIsModalCreate] = useState(false);
   const [isModalUpdate, setIsModalUpdate] = useState(false);
-  const [isModalVisible, setIdModalVisible] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   // data store
   const [allExam, setAllExam] = useState([]);
@@ -194,40 +196,8 @@ const AdminExam: React.FC = () => {
   let columnsExam = ["name", "link", "price", "discount", "image", "video"];
   let fieldSearch = ["name", "link"];
   let dataExam = allExam;
-  // styles and action table
-  const styleAction = {
-    marginRight: "8px",
-    padding: "4px 8px",
-    borderRadius: "4px",
-  };
-  const actions = [
-    {
-      title: "Giới thiệu",
-      action: "INTRODUCE",
-      icon: <MdAttractions />,
-      style: styleAction,
-    },
-    {
-      title: "Nội dung",
-      action: "CONTENT",
-      icon: <FaPhotoVideo />,
-      style: styleAction,
-    },
-    {
-      title: "Chỉnh sửa",
-      action: "EDIT",
-      icon: <FaRegEdit />,
-      style: { ...styleAction, color: "#f7bb0a" },
-    },
-    {
-      title: "Xoá",
-      action: "DELETE",
-      icon: <MdOutlineDeleteOutline />,
-      style: { ...styleAction, color: "red" },
-    },
-  ];
   // save
-  const createExam = async (data: any) => {
+  const funcCreate = async (data: any) => {
     const { name, link, price, discount, video, image, type } = data;
     setIsLoading(true);
     try {
@@ -259,7 +229,7 @@ const AdminExam: React.FC = () => {
     }
   };
   // hanle update
-  const updateExam = async (data: any) => {
+  const funcUpdate = async (data: any) => {
     const { name, link, price, discount, video, image, type } = data;
     setIsLoading(true);
     const id = idExam;
@@ -301,31 +271,100 @@ const AdminExam: React.FC = () => {
     }
   };
   // handle delete
-  const handleDeleteExam = async () => {
+  const funcDelete = async () => {
+    setIsLoading(true);
     try {
-      setIsLoading(true);
-      const idDeleted = JSON.parse(JSON.stringify(idExam));
-      const examDeleted = await deleteData(`/api/admin/exam/${idDeleted}`, {
-        headers: {
-          Authorization: `Bearer ${header}`,
-        },
-      });
-      toast.success("Xoá đề thi thành công");
+      let listIdDeleted = Array.isArray(idExam) ? idExam : [idExam];
+      const results = await Promise.allSettled(
+        listIdDeleted.map((element) =>
+          deleteData(`/api/admin/exam/${element}`, {
+            headers: {
+              Authorization: `Bearer ${header}`,
+            },
+          })
+        )
+      );
+      const failedItems = results
+        .map((result, index) =>
+          result.status === "rejected" ? listIdDeleted[index] : null
+        )
+        .filter(Boolean);
+
+      if (failedItems.length > 0) {
+        toast.error(`Xóa đề thi thất bại các ID ${failedItems.join(", ")}`);
+      } else {
+        toast.success("Xóa các đề thi thành công.");
+      }
     } catch (err) {
       toast.error("Xoá đề thi thất bại ", err.message);
     } finally {
       setIsLoading(false);
-      setIdModalVisible(false);
-      setIdExam("");
+      handleClosePopup();
       setIsFetchData(!isFetchData);
     }
   };
+  // styles and action table
+  const styleAction = {
+    marginRight: "8px",
+    padding: "4px 8px",
+    borderRadius: "4px",
+  };
+  const actions = [
+    {
+      title: "Giới thiệu",
+      action: "INTRODUCE",
+      icon: <MdAttractions />,
+      style: styleAction,
+    },
+    {
+      title: "Nội dung",
+      action: "CONTENT",
+      icon: <FaPhotoVideo />,
+      style: styleAction,
+    },
+    {
+      title: "Chỉnh sửa",
+      action: "EDIT",
+      icon: <FaRegEdit />,
+      style: { ...styleAction, color: "#f7bb0a" },
+    },
+    {
+      title: "Xoá",
+      action: "DELETE",
+      icon: <MdOutlineDeleteOutline />,
+      style: { ...styleAction, color: "red" },
+    },
+  ];
+  const batchExecution = [
+    {
+      value: "DELETE",
+      icon: <MdOutlineDeleteOutline style={{ color: "red" }} />,
+      content: "Xoá hàng đã chọn",
+    },
+    {
+      value: "LOCK",
+      icon: <PiLockKeyLight />,
+      content: "Khoá các Khoá học",
+    },
+    {
+      value: "UNLOCK",
+      icon: <PiLockKeyOpen />,
+      content: "Mở khoá Khoá học",
+    },
+  ];
   // func other
   const handleActions = (type: string, row: any) => {
     if (type === "DELETE") {
-      const id = row._id;
-      setIdExam(id);
-      setIdModalVisible(true);
+      if (type === "DELETE") {
+        if (Array.isArray(row)) {
+          const idDeleted = row.map((item) => item._id);
+          setIdExam(idDeleted);
+        } else {
+          const idOrder = row._id;
+          setIdExam(idOrder);
+        }
+        setIsModalVisible(true);
+      }
     }
     if (type === "EDIT") {
       const id = row._id;
@@ -342,7 +381,7 @@ const AdminExam: React.FC = () => {
   };
 
   const handleClosePopup = () => {
-    setIdModalVisible(false);
+    setIsModalVisible(false);
     setIdExam("");
   };
 
@@ -390,6 +429,7 @@ const AdminExam: React.FC = () => {
                   columns={columnsExam}
                   fieldSearch={fieldSearch}
                   data={dataExam}
+                  batchExecution={batchExecution}
                   handleAction={handleActions}
                   actions={actions}
                   filterPrice={true}
@@ -406,7 +446,7 @@ const AdminExam: React.FC = () => {
           isOpen={isModalCreate}
           onClose={() => setIsModalCreate(false)}
           structData={structData}
-          onSave={createExam}
+          onSave={funcCreate}
           title="Tạo mới đề thi"
         />
       )}
@@ -419,16 +459,20 @@ const AdminExam: React.FC = () => {
             setSelectedContent(null);
           }}
           structData={structData}
-          onSave={updateExam}
+          onSave={funcUpdate}
           title="Cập nhật đề thi"
         />
       )}
       {isModalVisible && (
         <PopupNotification
-          title="Bạn có chắc chắn muốn xoá đề thi này?"
+          title={
+            Array.isArray(idExam)
+              ? `Bạn có chắc chắn muốn xoá xoá các dòng dữ liệu này?`
+              : "Bạn có chắc chắn muốn xoá hàng dữ liệu này"
+          }
           status="error"
           buttonText="Xoá ngay"
-          onButtonClick={handleDeleteExam}
+          onButtonClick={funcDelete}
           buttonClose={handleClosePopup}
         />
       )}

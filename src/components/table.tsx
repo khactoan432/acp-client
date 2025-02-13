@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
 import {
-  Input,
   Button,
   Select,
   Modal,
@@ -37,14 +36,22 @@ interface Action {
   style: React.CSSProperties;
 }
 
+interface batchExecution {
+  value: string;
+  icon?: JSX.Element;
+  content: string;
+}
+
 interface TableProps<T> {
   columns: string[];
   fieldSearch?: string[];
   filterPrice?: boolean;
   isAllowEpand?: boolean;
   data: T[];
-  handleAction?: (type: string, row: T) => void;
+  handleAction?: (type: string, row: T | T[]) => void;
   actions: Action[];
+  topAcctions?: string;
+  batchExecution: batchExecution[];
   maxRow?: number;
 }
 
@@ -56,6 +63,8 @@ const Table = <T extends Record<string, any>>({
   data,
   handleAction = () => {},
   actions,
+  topAcctions,
+  batchExecution,
   maxRow = 8,
 }: TableProps<T>) => {
   // format data
@@ -76,7 +85,6 @@ const Table = <T extends Record<string, any>>({
 
     setFormatData(updatedData);
   }, [data]);
-
   const [currentPage, setCurrentPage] = useState(1);
   const [sliderValues, setSliderValues] = useState<
     Record<string, [number, number]>
@@ -96,7 +104,8 @@ const Table = <T extends Record<string, any>>({
     setValue: (value: string) => void;
     clear: () => void;
   }>(null);
-  // dựa vào data đã format kiểm tra có bao nhiêu trường là number để tiến hành viết chức năng lọc khoảng giá, mỗi trường dạng number sẽ có riêng một cái lọc khoảng giá
+  // dựa vào data đã format kiểm tra có bao nhiêu trường là number để tiến hành viết chức năng lọc khoảng giá,
+  //  mỗi trường dạng number sẽ có riêng một cái lọc khoảng giá
   const [filterRanges, setFilterRanges] = useState<
     Record<string, { min: number; max: number }>
   >({});
@@ -110,8 +119,9 @@ const Table = <T extends Record<string, any>>({
       });
       return fields;
     }, []);
+    console.log("numeric: ", numericFields);
 
-    const initialRanges = numericFields.reduce((acc, field) => {
+    const initialRanges = numericFields.reduce((acc: any, field) => {
       const values = formatData
         .map((item) => item[field])
         .filter((v) => typeof v === "number") as number[];
@@ -135,6 +145,7 @@ const Table = <T extends Record<string, any>>({
 
     setSliderValues(initialSliders);
   }, [formatData]);
+  console.log("fillter: ", filterRanges);
   const handleSliderChange = (field: string, value: [number, number]) => {
     setSliderValues((prev) => ({
       ...prev,
@@ -222,7 +233,9 @@ const Table = <T extends Record<string, any>>({
 
   // hành động hàng loạt
   const handleSelectActionMany = (value: string) => {
-    if (value === "describes") {
+    if (value === "DELETE") {
+      console.log("check delete");
+      handleAction(value, selectedBox);
     } else {
     }
   };
@@ -259,7 +272,16 @@ const Table = <T extends Record<string, any>>({
       setSecondHeight(secondDivRef.current.offsetHeight);
     }
   }, []);
+  const [selectedBox, setSelectedBox] = useState<T[]>([]);
+  const handleCheckAll = (checkedAll: boolean) => {
+    setSelectedBox(checkedAll ? currentData.map((item) => item) : []);
+  };
 
+  const handleCheckRow = (row: T, checked: boolean) => {
+    setSelectedBox((prev) =>
+      checked ? [...prev, row] : prev.filter((item) => item !== row)
+    );
+  };
   return (
     <div
       style={{
@@ -273,89 +295,105 @@ const Table = <T extends Record<string, any>>({
         className="flex bg-primary justify-between items-center px-5 py-3 mb-2"
       >
         <div className="left flex">
-          <div className="mr-2">
+          <div className="mr-5">
             <Select
-              defaultValue="Thực hiện hàng loạt"
+              value="Thực hiện hàng loạt"
               style={{ width: 180 }}
               onChange={handleSelectActionMany}
             >
-              <Option value="describes">Xoá các dòng đã chọn</Option>
-              <Option value="overviews">Tắt các dòng đã chọn</Option>
+              {batchExecution &&
+                batchExecution.length > 0 &&
+                selectedBox.length > 0 &&
+                batchExecution.map((item, index) => (
+                  <Option key={index} value={item.value}>
+                    <span className="flex justify-between items-center">
+                      {item?.icon}
+                      {item.content}
+                    </span>
+                  </Option>
+                ))}
             </Select>
           </div>
           {filterPrice && (
-            <div className="filters mr-2">
+            <div className="filters mr-5">
               <Dropdown
                 overlay={
                   <div
                     className="bg-white shadow-md p-4 rounded-md"
                     style={{ minWidth: "400px" }}
                   >
-                    {Object.keys(filterRanges).map((field) => {
-                      const range = filterRanges[field];
-                      const stepSize = (range.max - range.min) / 4; // Chia thành 4 mốc
-                      const marks = {
-                        [range.min]: `${range.min}`,
-                        [Math.round(range.min + stepSize)]: `${Math.round(
-                          range.min + stepSize
-                        )}`,
-                        [Math.round(range.min + stepSize * 2)]: `${Math.round(
-                          range.min + stepSize * 2
-                        )}`,
-                        [Math.round(range.min + stepSize * 3)]: `${Math.round(
-                          range.min + stepSize * 3
-                        )}`,
-                        [range.max]: `${range.max}`,
-                      };
+                    {Object.keys(filterPrice).length > 0 ? (
+                      Object.keys(filterRanges).map((field) => {
+                        const range = filterRanges[field];
+                        const stepSize = (range.max - range.min) / 4;
+                        const marks = {
+                          [range.min]: `${range.min}`,
+                          [Math.round(range.min + stepSize)]: `${Math.round(
+                            range.min + stepSize
+                          )}`,
+                          [Math.round(range.min + stepSize * 2)]: `${Math.round(
+                            range.min + stepSize * 2
+                          )}`,
+                          [Math.round(range.min + stepSize * 3)]: `${Math.round(
+                            range.min + stepSize * 3
+                          )}`,
+                          [range.max]: `${range.max}`,
+                        };
 
-                      return (
-                        <div
-                          key={field}
-                          style={{ padding: "0px 20px", marginBottom: "20px" }}
-                        >
-                          <p className="font-medium mb-2 uppercase text-color-secondary">{`Lọc theo ${field}`}</p>
-                          <Slider
-                            range
-                            min={range.min}
-                            max={range.max}
-                            value={sliderValues[field]}
-                            onChange={(value) =>
-                              handleSliderChange(
-                                field,
-                                value as [number, number]
-                              )
-                            }
-                            step={1}
-                            tooltip={{ formatter: (value) => `${value}` }}
-                            marks={marks} // Thêm mốc vào đây
-                          />
-                          <Space className="justify-between w-full">
-                            <InputNumber
+                        return (
+                          <div
+                            key={field}
+                            style={{
+                              padding: "0px 20px",
+                              marginBottom: "20px",
+                            }}
+                          >
+                            <p className="font-medium mb-2 uppercase text-color-secondary">{`Lọc theo ${field}`}</p>
+                            <Slider
+                              range
                               min={range.min}
                               max={range.max}
-                              value={sliderValues[field][0]}
+                              value={sliderValues[field]}
                               onChange={(value) =>
-                                handleSliderChange(field, [
-                                  value!,
-                                  sliderValues[field][1],
-                                ])
+                                handleSliderChange(
+                                  field,
+                                  value as [number, number]
+                                )
                               }
+                              step={1}
+                              tooltip={{ formatter: (value) => `${value}` }}
+                              marks={marks} // Thêm mốc vào đây
                             />
-                            <InputNumber
-                              min={range.min}
-                              max={range.max}
-                              value={sliderValues[field][1]}
-                              onChange={(value) =>
-                                handleSliderChange(field, [
-                                  sliderValues[field][0],
-                                  value!,
-                                ])
-                              }
-                            />
-                          </Space>
-                        </div>
-                      );
-                    })}
+                            <Space className="justify-between w-full">
+                              <InputNumber
+                                min={range.min}
+                                max={range.max}
+                                value={sliderValues[field][0]}
+                                onChange={(value) =>
+                                  handleSliderChange(field, [
+                                    value!,
+                                    sliderValues[field][1],
+                                  ])
+                                }
+                              />
+                              <InputNumber
+                                min={range.min}
+                                max={range.max}
+                                value={sliderValues[field][1]}
+                                onChange={(value) =>
+                                  handleSliderChange(field, [
+                                    sliderValues[field][0],
+                                    value!,
+                                  ])
+                                }
+                              />
+                            </Space>
+                          </div>
+                        );
+                      })
+                    ) : (
+                      <div>Chỉ có duy nhất một khoảng giá</div>
+                    )}
                   </div>
                 }
                 trigger={["click"]}
@@ -429,7 +467,13 @@ const Table = <T extends Record<string, any>>({
                     background: "white",
                   }}
                 >
-                  <Input type="checkbox" style={{ transform: "scale(1.5)" }} />
+                  <input
+                    className="cursor-pointer"
+                    type="checkbox"
+                    onChange={(e) => handleCheckAll(e.target.checked)}
+                    checked={selectedBox.length === currentData.length}
+                    style={{ transform: "scale(1.2)" }}
+                  />
                 </th>
                 <th
                   style={{
@@ -536,9 +580,12 @@ const Table = <T extends Record<string, any>>({
                         background: "white",
                       }}
                     >
-                      <Input
+                      <input
+                        className="cursor-pointer"
                         type="checkbox"
-                        style={{ transform: "scale(1.5)" }}
+                        onChange={(e) => handleCheckRow(row, e.target.checked)}
+                        checked={selectedBox.includes(row)}
+                        style={{ transform: "scale(1.2)" }}
                       />
                     </td>
                     <td
@@ -629,7 +676,7 @@ const Table = <T extends Record<string, any>>({
                         <div
                           className="absolute hidden group-hover:flex flex-col bg-white shadow-lg rounded-md p-2 z-10"
                           style={{
-                            top: "-40px",
+                            top: `${topAcctions ? topAcctions : "-40"}px`,
                             right: "40px",
                           }}
                         >
@@ -743,7 +790,7 @@ const Table = <T extends Record<string, any>>({
         {columns.map((col) => (
           <div key={col} style={{ marginBottom: "8px" }}>
             <label>{formatColumnName(col)}</label>
-            <Input
+            <input
               type="text"
               placeholder="Nhập chiều rộng (px, %, auto)"
               value={columnWidths[col] || ""}

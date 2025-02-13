@@ -873,7 +873,7 @@ const Introduce: React.FC = () => {
                     }
                   />
                   <Select
-                    defaultValue="Thực hiện hàng loạt"
+                    value="Thực hiện hàng loạt"
                     style={{ width: 180 }}
                     onChange={handleSelectActionMany}
                   >
