@@ -84,25 +84,26 @@ const AdminOrder = () => {
     fetchData();
   }, [isFetchData]);
 
-  let columns = [
-    "order",
-    "date",
-    "customer",
-    "product",
+  const columns = [
+    "code",
+    "createdAt",
+    "userEmail",
+    "materialName",
+    "type",
     "payment_status",
-    "order_status",
-    "total",
+    "amount"
   ];
 
   // structure data
   console.log(data);
-  let fieldSearch = [
-    "order",
-    "date",
-    "customer",
-    "product",
+  const fieldSearch = [
+    "code",
+    "createdAt",
+    "userEmail",
+    "materialName",
+    "type",
     "payment_status",
-    "order_status",
+    "amount"
   ];
 
   // handle action

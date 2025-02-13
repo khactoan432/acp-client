@@ -17,7 +17,7 @@ const UserExam: React.FC = () => {
   const { category } = useParams<{ category: string }>();
   const currentCategory = category ?? "default";
 
-  const examsPerPage = 3;
+  const examsPerPage = 6;
   
   const [currentPage, setCurrentPage] = useState(1);
 
