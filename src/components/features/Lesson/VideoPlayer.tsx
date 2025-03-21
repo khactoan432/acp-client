@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect, useCallback } from "react";
 import { useDispatch } from "react-redux";
 import { createProgress } from "../../../redux/slices/yourMaterialSlice";
+import { AppDispatch } from "../../../redux/store";
 
 interface VideoPlayerProps {
   currentLesson: {
@@ -15,8 +16,8 @@ interface VideoPlayerProps {
 
 const VideoPlayer: React.FC<VideoPlayerProps> = ({ currentLesson, selectedCourseId }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const dispatch = useDispatch();
-  const [progress, setProgress] = useState(0);
+  const dispatch = useDispatch<AppDispatch>();
+  // const [progress, setProgress] = useState(0);
   const [hasCompleted, setHasCompleted] = useState(currentLesson.isCompleted);
 
   const handleCompleteLesson = useCallback(() => {
@@ -41,7 +42,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ currentLesson, selectedCourse
     const handleTimeUpdate = () => {
       if (video.duration > 0) {
         const watchedPercentage = (video.currentTime / video.duration) * 100;
-        setProgress(watchedPercentage);
+        // setProgress(watchedPercentage);
 
         if (watchedPercentage >= 80 && !hasCompleted) {
           handleCompleteLesson();

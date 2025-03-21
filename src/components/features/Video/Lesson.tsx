@@ -9,7 +9,7 @@ interface LessonProps {
   name: string; // Tên khóa học
 }
 
-const Lesson: React.FC<LessonProps> = ({ url, name }) => {
+const Lesson: React.FC<LessonProps> = ({ url }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const openModal = () => setIsModalOpen(true);

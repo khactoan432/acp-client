@@ -151,7 +151,7 @@ const AdminAchievement: React.FC = () => {
     formData.append("prize", prize);
     formData.append("competition", competition);
     try {
-      const res = await postData(`/api/admin/achievement`, formData, {
+      await postData(`/api/admin/achievement`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${header}`,
@@ -185,7 +185,7 @@ const AdminAchievement: React.FC = () => {
       formData.append("prize", prize);
       formData.append("competition", competition);
 
-      const res = await putData(`/api/admin/achievement/${_id}`, formData, {
+      await putData(`/api/admin/achievement/${_id}`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${header}`,

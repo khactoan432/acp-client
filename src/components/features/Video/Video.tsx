@@ -9,7 +9,7 @@ interface VideoPopupProps {
   name: string; // Tên khóa học
 }
 
-const VideoPopup: React.FC<VideoPopupProps> = ({ url, name }) => {
+const VideoPopup: React.FC<VideoPopupProps> = ({ url}) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const openModal = () => setIsModalOpen(true);

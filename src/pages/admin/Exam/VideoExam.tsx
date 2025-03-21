@@ -164,7 +164,7 @@ const ExamVideo: React.FC = () => {
     formData.append("describe", describe);
 
     try {
-      const res = await postData(`/api/admin/exam/video/${id}`, formData, {
+      await postData(`/api/admin/exam/video/${id}`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${header}`,
@@ -172,7 +172,7 @@ const ExamVideo: React.FC = () => {
       });
       toast.success("Tạo mới video đề thi thành công!");
     } catch (error) {
-      toast.error("Tạo mới video đề thi thất bại!", e.message);
+      toast.error("Tạo mới video đề thi thất bại!", error.message);
       console.error("Error saving data: ", error);
     } finally {
       setIsFetchData(!isFetchData);
@@ -200,7 +200,7 @@ const ExamVideo: React.FC = () => {
       }
       formData.append("describe", describe);
 
-      const res = await putData(`/api/admin/exam/video/${id}`, formData, {
+      await putData(`/api/admin/exam/video/${id}`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${header}`,
@@ -221,7 +221,7 @@ const ExamVideo: React.FC = () => {
     setIsLoading(true);
     const id = idVideo;
     try {
-      const res = await deleteData(`/api/admin/exam/video/${id}`, {
+      await deleteData(`/api/admin/exam/video/${id}`, {
         headers: {
           Authorization: `Bearer ${header}`,
         },

@@ -29,7 +29,7 @@ const Advisory: React.FC = () => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const res = await postData(
+      await postData(
         "/api/advisories",
         {
           name: formData.name,

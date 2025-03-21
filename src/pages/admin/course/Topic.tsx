@@ -179,14 +179,14 @@ const ExamVideo: React.FC = () => {
     formData.append("name", name);
 
     try {
-      const res = await postData(`/api/admin/topic/${id}`, formData, {
+      await postData(`/api/admin/topic/${id}`, formData, {
         headers: {
           Authorization: `Bearer ${header}`,
         },
       });
       toast.success("Tạo mới chươgn học thành công!");
     } catch (error) {
-      toast.error("Tạo mới chương học thất bại!", e.message);
+      toast.error("Tạo mới chương học thất bại!", error.message);
     } finally {
       setIsFetchData(!isFetchData);
       setIsLoading(false);
@@ -207,7 +207,7 @@ const ExamVideo: React.FC = () => {
       const formData = new FormData();
       formData.append("name", name);
 
-      const res = await putData(`/api/admin/topic/${id}`, formData, {
+      await putData(`/api/admin/topic/${id}`, formData, {
         headers: {
           Authorization: `Bearer ${header}`,
         },

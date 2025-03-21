@@ -11,7 +11,7 @@ import "dayjs/locale/vi"; // Import tiếng Việt
 dayjs.extend(relativeTime);
 dayjs.locale("vi");
 
-import useFetchData from "../../../hooks/useFetchData";
+// import useFetchData from "../../../hooks/useFetchData";
 import { createRate, fetchUserRates } from "../../../redux/slices/rateSlice";
 import Loading from "../../loading";
 
@@ -22,6 +22,7 @@ interface Rating {
   createdAt: string;
   rate: number;
   content: string;
+  ref_type: any;
 }
 
 interface RatingPageProps {

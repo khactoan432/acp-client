@@ -7,12 +7,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../redux/store";
 import { fetchYourMaterial } from "../../../redux/slices/yourMaterialSlice";
 
-interface Course {
-  id: string;
-  name: string;
-  image: string;
-  progress: number; // Tiến độ khóa học (0-100)
-}
+// interface Course {
+//   id: string;
+//   name: string;
+//   image: string;
+//   progress: number; // Tiến độ khóa học (0-100)
+// }
 
 interface ExamResult {
   id: string;
@@ -36,26 +36,26 @@ interface ExamResult {
 //   },
 // ];
 
-const sampleExamResults: ExamResult[] = [
-  {
-    id: "1",
-    name: "Bài thi thử lập trình cơ bản",
-    image: banner,
-    score: 85, // Điểm số 85
-  },
-  {
-    id: "2",
-    name: "Bài thi thử JavaScript",
-    image: banner,
-    score: 42, // Điểm số 72
-  },
-  {
-    id: "2",
-    name: "Bài thi thử JavaScript nâng cao",
-    image: banner,
-    score: null, // Điểm số 72
-  },
-];
+// const sampleExamResults: ExamResult[] = [
+//   {
+//     id: "1",
+//     name: "Bài thi thử lập trình cơ bản",
+//     image: banner,
+//     score: 85, // Điểm số 85
+//   },
+//   {
+//     id: "2",
+//     name: "Bài thi thử JavaScript",
+//     image: banner,
+//     score: 42, // Điểm số 72
+//   },
+//   {
+//     id: "2",
+//     name: "Bài thi thử JavaScript nâng cao",
+//     image: banner,
+//     score: null, // Điểm số 72
+//   },
+// ];
 
 const ProfileTabs: React.FC = () => {
   const navigate = useNavigate();
@@ -65,6 +65,7 @@ const ProfileTabs: React.FC = () => {
   const { yourCourses, yourExams, loading, error } = useSelector(
     (state: RootState) => state.yourMaterials
   );
+  console.log(loading, error);
 
   useEffect(() => {
     dispatch(fetchYourMaterial({ id_user: JSON.parse(localStorage.getItem("user"))?._id }));
@@ -142,7 +143,7 @@ const ProfileTabs: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             {yourExams.map((exam) => (
               <div
-                key={exam.id}
+                key={exam._id}
                 className="bg-white shadow-md rounded-lg flex flex-col items-center"
               >
                 <img

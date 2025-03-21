@@ -122,7 +122,7 @@ const AdminBanner: React.FC = () => {
     image.forEach((file) => formData.append("fileImage", file));
 
     try {
-      const res = await postData(`/api/admin/banner`, formData, {
+      await postData(`/api/admin/banner`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${header}`,
@@ -152,7 +152,7 @@ const AdminBanner: React.FC = () => {
         formData.append("image", image);
       }
 
-      const res = await putData(`/api/admin/banner/${id}`, formData, {
+      await putData(`/api/admin/banner/${id}`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${header}`,

@@ -16,7 +16,7 @@ const ListFile: React.FC = () => {
   // Hàm lấy danh sách file từ server
   const fetchFiles = async () => {
     try {
-      const response = await getData("/api/upload/files"); // Endpoint lấy danh sách file
+      const response = await getData("/api/upload/files",{}); // Endpoint lấy danh sách file
       setFiles(response.files);
     } catch (error) {
       toast.error("Không thể tải danh sách file!");
@@ -30,7 +30,7 @@ const ListFile: React.FC = () => {
   const handleDeleteFile = async (fileName: string) => {
     try {
       // Gửi yêu cầu xóa file
-      const response = await deleteData("/api/upload/files/"+fileName);
+      await deleteData("/api/upload/files/"+fileName,{});
 
       // Nếu xóa thành công, cập nhật lại danh sách file
       setFiles((prevFiles) => prevFiles.filter((file) => file.fileName !== fileName));

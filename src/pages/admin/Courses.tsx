@@ -161,7 +161,7 @@ const AdminExam: React.FC = () => {
       formData.append("price", price);
       formData.append("discount", discount);
 
-      const res = await postData("/api/admin/course", formData, {
+      await postData("/api/admin/course", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${header}`,
@@ -201,7 +201,7 @@ const AdminExam: React.FC = () => {
       formData.append("price", price);
       formData.append("discount", discount);
 
-      const res = await putData(`/api/admin/course/${id}`, formData, {
+      await putData(`/api/admin/course/${id}`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${header}`,

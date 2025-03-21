@@ -199,7 +199,7 @@ const AdminTeacher: React.FC = () => {
     formData.append("role", "TEACHER");
 
     try {
-      const res = await postData(`/api/admin/user`, formData, {
+      await postData(`/api/admin/user`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${header}`,
@@ -232,7 +232,7 @@ const AdminTeacher: React.FC = () => {
       formData.append("codeforce_name", codeforce_name);
       formData.append("phone_number", phone_number);
 
-      const res = await putData(`/api/admin/user/${_id}`, formData, {
+      await putData(`/api/admin/user/${_id}`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${header}`,
@@ -251,7 +251,7 @@ const AdminTeacher: React.FC = () => {
   // handle deleteFunc
   const funcDelete = async () => {
     setIsLoading(true);
-    const _id = idTeacher;
+    // const _id = idTeacher;
     try {
       let listIdDeleted = Array.isArray(idTeacher) ? idTeacher : [idTeacher];
       const results = await Promise.allSettled(

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { toast } from "react-toastify";
 // import component
 import AdminHeader from "../../components/layout/Admin/header";
@@ -52,7 +52,7 @@ const AdminOrder = () => {
 
   // state store
   const [data, setData] = useState<Order[]>([]);
-  const [selectedContent, setSelectedContent] = useState<any>(null);
+  // const [selectedContent, setSelectedContent] = useState<any>(null);
 
   useEffect(() => {
     const fetchData = async () => {

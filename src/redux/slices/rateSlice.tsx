@@ -10,7 +10,7 @@ interface Rate {
   ref_type: string;
   type: string;
   rate: number; 
-  replies: object[];
+  replies: any;
   content: string;
   createdAt: string;
 }

@@ -15,6 +15,7 @@ interface Course {
   totalLessons: any;
   courseProgress: any;
   isCompleted: any;
+  totalProgress: any;
 }
 
 interface Exam {
@@ -25,6 +26,7 @@ interface Exam {
   video: string;
   price: string;
   discount: string;
+  score: any;
 }
 
 // Define the initial state
