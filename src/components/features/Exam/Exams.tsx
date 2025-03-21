@@ -13,7 +13,7 @@ const Exams: React.FC = () => {
   );
 
   useEffect(() => {
-    dispatch(fetchUserExams({ page: 1, limit: 4 }));
+    dispatch(fetchUserExams({ page: 1, limit: 4 , filters:[]}));
   }, [dispatch]);
   console.log(userExams);
 

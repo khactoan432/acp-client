@@ -1,6 +1,6 @@
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
-import Dashboard from "../pages/admin/Dashboard";
+import Dashboard from "../pages/admin/DashBoard";
 import GlobalSetting from "../pages/admin/GlobalSetting";
 import PersonalSetting from "../pages/admin/PersonalSetting";
 import Courses from "../pages/admin/Courses";

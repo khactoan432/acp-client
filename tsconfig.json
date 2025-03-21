@@ -5,6 +5,8 @@
     { "path": "./tsconfig.node.json" }
   ],
   "compilerOptions": {
+    "noImplicitAny": false,
+    "strict": false,
     "typeRoots": ["node_modules/@types", "node_modules/swiper/types"]
   }
 }

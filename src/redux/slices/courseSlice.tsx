@@ -10,6 +10,8 @@ interface Course {
   video: string;
   price: string;
   discount: string;
+  describes: any;
+  topics: any;
 }
 
 // Define the initial state

@@ -10,6 +10,7 @@ import orderReducer from "./slices/orderSlice";
 import categoryReducer from "./slices/categorySlice";
 import rateReducer from "./slices/rateSlice";
 import collapsedReducer from "./slices/collapsedSlice";
+import yourMaterialReducer from "./slices/yourMaterialSlice";
 
 const store = configureStore({
   reducer: {
@@ -23,6 +24,7 @@ const store = configureStore({
     categories: categoryReducer,
     rates: rateReducer,
     collapsed: collapsedReducer,
+    yourMaterials: yourMaterialReducer,
   },
 });
 

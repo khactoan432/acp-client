@@ -8,43 +8,44 @@ import Logo from "../../assets/logoacp.jpg";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../redux/store";
-import { fetchCourseDetail } from "../../redux/slices/courseSlice";
+import { fetchYourCourseDetail } from "../../redux/slices/yourMaterialSlice";
 
-interface Lesson {
-  _id: number;
-  name: string;
-  video: string;
-  // locked: boolean;
-}
+import { FaQuestionCircle } from "react-icons/fa";
 
-interface Section {
-  id: number;
-  title: string;
-  lessons: Lesson[];
-  totalLessons: number;
-  completedLessons: number;
-  totalTime: string;
-}
+// interface Lesson {
+//   _id: string;
+//   video: string;
+//   name: string;  isCompleted: boolean;
+//   exercises?: { name: string; link: string }[];
+// };
+
+// interface Section {
+//   id: number;
+//   title: string;
+//   lessons: Lesson[];
+//   totalLessons: number;
+//   completedLessons: number;
+//   totalTime: string;
+// }
 
 const UserLearning: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const dispatch = useDispatch<AppDispatch>();
   const { selectedCourse, loading, error } = useSelector(
-    (state: RootState) => state.courses
+    (state: RootState) => state.yourMaterials
   );
+  console.log(loading, error);
 
-  const [currentLesson, setCurrentLesson] = useState({
-    _id : "",
-    video: "",
-    name:""
-  });
+  const [currentLesson, setCurrentLesson] = useState(null);
 
-  const courseId = id ?? "default-id";
+  const id_course = id ?? "default-id";
 
   useEffect(() => {
-    dispatch(fetchCourseDetail(courseId));
-  }, [dispatch, courseId]);
+    dispatch(fetchYourCourseDetail({id_user: JSON.parse(localStorage.getItem("user"))?._id ,id_course}));
+  }, [dispatch, id_course]);
+
+  console.log(selectedCourse);
 
   // Xử lý cập nhật bài học hiện tại khi selectedCourse thay đổi
   useEffect(() => {
@@ -118,41 +119,96 @@ const UserLearning: React.FC = () => {
   //     },
   //   ];
 
+  const circumference = 16 * 2 * Math.PI;
+
   return (
-    <div className=" bg-white">
+    <div className=" flex flex-col h-screen bg-white">
       {/* Thanh điều hướng */}
       <header className="bg-gray-800 sticky top-0 text-white px-4 flex items-center text-lg font-bold h-[54px]">
-        <div className="pl-8">
+        <div className="px-8 flex items-center justify-between w-full">
           <div className="flex items-center">
             <img className="w-[30px] h-[30px] rounded-lg mr-3 cursor-pointer" src={Logo} alt="alt" onClick={()=>navigate("/")}/>
             <p>Kiến Thức Nhập Môn IT</p>
           </div>
+
+          <div className="flex items-center gap-6">
+            <div className="flex items-center gap-2">
+              {/* Vòng tròn tiến độ */}
+              <svg width="36" height="36" viewBox="0 0 36 36" className="relative">
+                <circle
+                  cx="18"
+                  cy="18"
+                  r="16"
+                  fill="none"
+                  stroke="gray"
+                  strokeWidth="3"
+                  opacity="0.2"
+                />
+                <circle
+                  cx="18"
+                  cy="18"
+                  r="16"
+                  fill="none"
+                  stroke="#f97316"
+                  strokeWidth="3"
+                  strokeDasharray={circumference}
+                  strokeDashoffset={circumference - (selectedCourse?.courseProgress / 100) * circumference}
+                  strokeLinecap="round"
+                  transform="rotate(-90 18 18)"
+                />
+                <text
+                  x="50%"
+                  y="50%"
+                  textAnchor="middle"
+                  dy=".3em"
+                  fontSize="10"
+                  fill="white"
+                  fontWeight="bold"
+                >
+                  {selectedCourse?.courseProgress}%
+                </text>
+              </svg>
+
+              {/* Số bài học */}
+              <span className="text-white text-sm">
+                {selectedCourse?.totalCompletedLessons}/{selectedCourse?.totalLessons} bài học
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <FaQuestionCircle className="text-xl cursor-pointer" />
+              {/* Số bài học */}
+              <span className="text-white text-sm">
+                Hướng dẫn
+              </span>
+            </div>
+          </div>
+          
         </div>
-        
       </header>
 
-      <div className="flex flex-1">
+      <div className="flex flex-1 overflow-hidden">
         {/* Video chính */}
-        <div className="flex-1 w-[80%]">
+        <div className="flex-1 w-[80%] h-full overflow-y-auto">
           <VideoPlayer
-            currentLesson={currentLesson}
+            currentLesson={currentLesson} selectedCourseId={selectedCourse?._id}
           />
         </div>
 
         {/* Danh sách bài học */}
-        <div className="bg-gray-50  text-black w-[20%] border-l">
+        <div className="bg-gray-50  text-black w-[20%] border-l h-full overflow-y-auto">
           <LessonList sections ={selectedCourse?.topics} currentLesson={currentLesson} changeLesson={changeLesson} />
         </div>
       </div>
       
-      <div className="sticky bottom-0 w-full flex justify-between items-center h-[54px] px-6 bg-gray-200 z-50">
+      {/* <div className="sticky bottom-0 w-full flex justify-between items-center h-[54px] px-6 bg-gray-200 z-50">
         <button className="bg-blue-600 text-white px-4 py-1.5 h-fit rounded hover:bg-blue-700">
           &lt; Bài trước
         </button>
         <button className="bg-blue-600 text-white px-4 py-1.5 h-fit rounded hover:bg-blue-700">
           Bài tiếp theo &gt;
         </button>
-      </div>
+      </div> */}
     </div>
   );
 };

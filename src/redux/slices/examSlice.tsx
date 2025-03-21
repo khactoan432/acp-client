@@ -10,6 +10,7 @@ interface Exam {
   video: string;
   price: string;
   discount: string;
+  describes: any;
 }
 
 // Define the initial state

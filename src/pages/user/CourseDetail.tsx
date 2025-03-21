@@ -4,7 +4,7 @@ import bg from "../../assets/banner-detail.jpg";
 import banner from "../../assets/banner1.jpg";
 import play from "../../assets/play.png";
 import RatingPage from "../../components/features/Rating/Rating";
-import CommentPage from "../../components/features/Comment/Comment";
+// import CommentPage from "../../components/features/Comment/Comment";
 import VideoPopup from "../../components/features/Video/Video";
 
 import { useParams } from "react-router-dom";
@@ -300,8 +300,8 @@ const UserCourseDetail = () => {
                 <div className="flex gap-4 mt-2">
                   <p className="text-green-600 text-2xl font-bold mt-2">
                     {new Intl.NumberFormat("vi-VN").format(
-                      (selectedCourse?.price ?? 0) -
-                        (selectedCourse?.discount ?? 0)
+                      (Number(selectedCourse?.price ?? 0)) -
+                        (Number(selectedCourse?.discount ?? 0))
                     )}
                     đ
                   </p>
@@ -309,19 +309,19 @@ const UserCourseDetail = () => {
                     <p className="text-gray-400 line-through text-sm">
                       Giá gốc:{" "}
                       {new Intl.NumberFormat("vi-VN").format(
-                        selectedCourse?.price
+                        Number(selectedCourse?.price)
                       )}
                       đ
                     </p>
                     <p className="text-red-500 text-sm font-medium">
                       Tiết kiệm:{" "}
                       {new Intl.NumberFormat("vi-VN").format(
-                        selectedCourse?.discount
+                        Number(selectedCourse?.discount)
                       )}
                       đ ( -
                       {Math.round(
-                        ((selectedCourse?.discount ?? 0) /
-                          (selectedCourse?.price ?? 1)) *
+                        (Number(selectedCourse?.discount ?? 0) /
+                          Number(selectedCourse?.price ?? 1)) *
                           100
                       )}
                       %)

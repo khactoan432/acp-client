@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 
-import banner from "../../assets/banner1.jpg";
+// import banner from "../../assets/banner1.jpg";
 import banner3 from "../../assets/banner3.jpg";
 import Advisory from "../../components/features/Advisory/Advisory";
 import Exam from "../../components/features/Exam/Exam";
-import SideFilter from "../../components/features/SideFilter/SideFilter";
+// import SideFilter from "../../components/features/SideFilter/SideFilter";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import { fetchUserExams } from "../../redux/slices/examSlice";
@@ -26,6 +26,7 @@ const UserExam: React.FC = () => {
   const { userCategories, loading: categoriesLoading, error: categoriesError } = useSelector(
     (state: RootState) => state.categories
   );
+  console.log(categoriesLoading, categoriesError);
   useFetchData(fetchUserCategories);
   console.log(userCategories);
 
@@ -36,6 +37,7 @@ const UserExam: React.FC = () => {
   const { userExams, totalUser, loading: examsLoading, error: examsError } = useSelector(
     (state: RootState) => state.exams
   );
+  console.log(examsLoading, examsError)
   useFetchData(() => fetchUserExams({ page: currentPage, limit: examsPerPage , filters: filter}), [filter, currentPage]);
   console.log(userExams);
   

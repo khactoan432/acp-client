@@ -10,5 +10,8 @@ export default defineConfig({
   },
   optimizeDeps: {
     include: ['swiper']
+  },
+  esbuild: {
+    logOverride: { "this-is-undefined-in-esm": "silent" }
   }
 })

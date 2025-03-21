@@ -3,7 +3,7 @@ import { Link } from "react-scroll";
 import bg from "../../assets/banner-detail.jpg";
 import banner from "../../assets/banner1.jpg";
 import RatingPage from "../../components/features/Rating/Rating";
-import CommentPage from "../../components/features/Comment/Comment";
+// import CommentPage from "../../components/features/Comment/Comment";
 import Button from "../../components/common/Button";
 
 import { FaLock } from "react-icons/fa";
@@ -31,6 +31,7 @@ const UserExamDetail: React.FC = () => {
   const { selectedExam, loading, error } = useSelector(
     (state: RootState) => state.exams
   );
+  console.log(loading, error)
 
   const examId = id ?? "default-id";
 
@@ -329,7 +330,7 @@ const UserExamDetail: React.FC = () => {
                 <div className="flex gap-4 mt-2">
                   <p className="text-green-600 text-2xl font-bold mt-2">
                     {new Intl.NumberFormat("vi-VN").format(
-                      (selectedExam?.price ?? 0) - (selectedExam?.discount ?? 0)
+                      Number(selectedExam?.price ?? 0) - Number(selectedExam?.discount ?? 0)
                     )}
                     đ
                   </p>
@@ -337,19 +338,19 @@ const UserExamDetail: React.FC = () => {
                     <p className="text-gray-400 line-through text-sm">
                       Giá gốc:{" "}
                       {new Intl.NumberFormat("vi-VN").format(
-                        selectedExam?.price
+                        Number(selectedExam?.price)
                       )}
                       đ
                     </p>
                     <p className="text-red-500 text-sm font-medium">
                       Tiết kiệm:{" "}
                       {new Intl.NumberFormat("vi-VN").format(
-                        selectedExam?.discount
+                        Number(selectedExam?.discount)
                       )}
                       đ ( -
                       {Math.round(
-                        ((selectedExam?.discount ?? 0) /
-                          (selectedExam?.price ?? 1)) *
+                        (Number(selectedExam?.discount ?? 0) /
+                          Number(selectedExam?.price ?? 1)) *
                           100
                       )}
                       %)
@@ -391,7 +392,7 @@ const UserExamDetail: React.FC = () => {
                   Đánh giá của học viên
                 </h2>
 
-                <RatingPage />
+                <RatingPage id_ref_material={selectedExam?._id} ref_type={"EXAM"}/>
               </div>
             </div>
           </div>

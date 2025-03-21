@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { getData, postData, putData, deleteData } from '../../axios';
+import { getData, putData, deleteData } from '../../axios';
 
 // Define the type for a Order
 interface Order {

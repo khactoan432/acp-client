@@ -125,7 +125,7 @@ const categorySlice = createSlice({
       .addCase(fetchAdminCategories.fulfilled, (state, action) => {
         state.loading = false;
         state.adminCategories = action.payload.data;
-        state.totalAdmin = action.payload.total;
+        // state.totalAdmin = action.payload.total;
       })
       .addCase(fetchAdminCategories.rejected, (state, action) => {
         state.loading = false;
