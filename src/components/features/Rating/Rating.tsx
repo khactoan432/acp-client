@@ -16,18 +16,18 @@ import { createRate, fetchUserRates } from "../../../redux/slices/rateSlice";
 import Loading from "../../loading";
 
 interface Rating {
-  id: number;
+  id?: number;
   id_ref_material: string;
   id_user: object;
-  createdAt: string;
-  rate: number;
+  createdAt?: string;
+  rate?: number;
   content: string;
   ref_type: any;
+  type: any;
 }
-
 interface RatingPageProps {
   id_ref_material: string; // Định nghĩa kiểu của prop
-  ref_type : string;
+  ref_type: string;
 }
 
 interface ReplyForm {
@@ -36,16 +36,22 @@ interface ReplyForm {
   };
 }
 
-const RatingPage: React.FC<RatingPageProps> = ({ id_ref_material, ref_type }) => {
+const RatingPage: React.FC<RatingPageProps> = ({
+  id_ref_material,
+  ref_type,
+}) => {
   const dispatch = useDispatch<AppDispatch>();
-  const { userRates, totalRateUser, loading: ratesLoading, error: ratesError } = useSelector(
-    (state: RootState) => state.rates
-  );
+  const {
+    userRates,
+    totalRateUser,
+    loading: ratesLoading,
+    error: ratesError,
+  } = useSelector((state: RootState) => state.rates);
 
   console.log(userRates);
 
   useEffect(() => {
-    dispatch(fetchUserRates({id_ref_material, ref_type}));
+    dispatch(fetchUserRates({ id_ref_material, ref_type }));
   }, [dispatch, id_ref_material, ref_type]);
 
   // console.log(userRates);
@@ -88,21 +94,21 @@ const RatingPage: React.FC<RatingPageProps> = ({ id_ref_material, ref_type }) =>
   // console.log(material_id);
 
   const handleRateSubmit = async (
-    e: React.FormEvent, 
-    id_ref_material: string,
+    e: React.FormEvent,
+    id_ref_material: string
   ) => {
     e.preventDefault();
-  
+
     if (form.rate > 0 && form.content) {
       const newRating: Rating = {
-        id_user: JSON.parse(localStorage.getItem('user'))?._id,
+        id_user: JSON.parse(localStorage.getItem("user"))?._id,
         id_ref_material: id_ref_material,
         ref_type: ref_type, // Nhận ref_type từ tham số
         type: "RATE", // Nhận type từ tham số
         rate: form.rate,
         content: form.content,
       };
-  
+
       console.log(newRating);
       await dispatch(createRate(newRating)).unwrap();
       setForm({ rate: 0, content: "" });
@@ -114,19 +120,19 @@ const RatingPage: React.FC<RatingPageProps> = ({ id_ref_material, ref_type }) =>
 
   const handleReplySubmit = async (
     e: React.FormEvent,
-    id_ref_material: string,
+    id_ref_material: string
   ) => {
     e.preventDefault();
-  
+
     if (replyForm[id_ref_material] && replyForm[id_ref_material].content) {
       const newRating: Rating = {
-        id_user: JSON.parse(localStorage.getItem('user'))?._id,
+        id_user: JSON.parse(localStorage.getItem("user"))?._id,
         id_ref_material: id_ref_material,
         ref_type: "INTERACTION", // Nhận ref_type từ tham số
         type: "COMMENT", // Nhận type từ tham số
         content: replyForm[id_ref_material].content,
       };
-  
+
       console.log(newRating);
       await dispatch(createRate(newRating)).unwrap();
       setForm({ rate: 0, content: "" });
@@ -147,12 +153,12 @@ const RatingPage: React.FC<RatingPageProps> = ({ id_ref_material, ref_type }) =>
   const [openReplies, setOpenReplies] = useState({}); // State quản lý danh sách trả lời mở/đóng
   const [openReply, setOpenReply] = useState({});
 
-  const toggleReplies = (ratingId:string) => {
+  const toggleReplies = (ratingId: string) => {
     setOpenReplies((prev) => {
       const isCurrentlyOpen = prev[ratingId];
       const updatedReply = isCurrentlyOpen
-        ? { ...openReplies, [ratingId]: false } 
-        : { ...openReplies}; 
+        ? { ...openReplies, [ratingId]: false }
+        : { ...openReplies };
 
       setOpenReply(updatedReply);
       return {
@@ -168,10 +174,10 @@ const RatingPage: React.FC<RatingPageProps> = ({ id_ref_material, ref_type }) =>
       const updatedReplies = isCurrentlyOpen
         ? { ...openReplies } // Nếu đóng, không ảnh hưởng openReplies
         : { ...openReplies, [ratingId]: true }; // Nếu mở, mở luôn openReplies[ratingId]
-  
+
       // Cập nhật openReplies đồng thời với openReply
       setOpenReplies(updatedReplies);
-  
+
       // Trả về trạng thái mới cho openReply
       return {
         ...prev,
@@ -238,7 +244,7 @@ const RatingPage: React.FC<RatingPageProps> = ({ id_ref_material, ref_type }) =>
         style={{ visibility: showForm ? "visible" : "hidden" }}
       >
         <h3 className="text-xl font-bold mb-4">Gửi đánh giá của bạn</h3>
-        <form onSubmit={(e)=>handleRateSubmit(e, id_ref_material)}>
+        <form onSubmit={(e) => handleRateSubmit(e, id_ref_material)}>
           <div className="mb-4">
             <label className="block mb-2 font-medium">
               1. Đánh giá của bạn về khóa học
@@ -313,106 +319,124 @@ const RatingPage: React.FC<RatingPageProps> = ({ id_ref_material, ref_type }) =>
       </div>
 
       {/* User contents */}
-      { ratesLoading
-        ? <Loading message="Loading data..." size="large" />
-        : ratesError
-          ? "error"
-          :userRates.length===0
-          ? ""
-          :<div className="bg-white p-4 rounded-[0.65rem] border border-solid border-[#e0e0e0] shadow-[0_4px_0_0_rgba(143,156,173,0.2)]">
-            <p className="mb-2 text-gray-600">{userRates.length} đánh giá</p>
-            <hr />
-            <ul className="space-y-6 mt-4">
-              {userRates?.map((rating) => (
-                <li key={rating._id} className="flex flex-col space-y-4 border-b border-dashed border-gray-200 pb-4 mb-4 last:border-none last:pb-0 last:mb-0">
-                  <div className="flex space-x-4 ">
-                    <div className="flex-shrink-0 w-12 h-12 bg-blue-500 text-white flex items-center justify-center rounded-full text-lg font-bold">
-                      {rating.user_name?.split(" ")
-                        .map((word) => word[0])
-                        .join("")}
-                      {/* {"HNT"} */}
+      {ratesLoading ? (
+        <Loading message="Loading data..." size="large" />
+      ) : ratesError ? (
+        "error"
+      ) : userRates.length === 0 ? (
+        ""
+      ) : (
+        <div className="bg-white p-4 rounded-[0.65rem] border border-solid border-[#e0e0e0] shadow-[0_4px_0_0_rgba(143,156,173,0.2)]">
+          <p className="mb-2 text-gray-600">{userRates.length} đánh giá</p>
+          <hr />
+          <ul className="space-y-6 mt-4">
+            {userRates?.map((rating) => (
+              <li
+                key={rating._id}
+                className="flex flex-col space-y-4 border-b border-dashed border-gray-200 pb-4 mb-4 last:border-none last:pb-0 last:mb-0"
+              >
+                <div className="flex space-x-4 ">
+                  <div className="flex-shrink-0 w-12 h-12 bg-blue-500 text-white flex items-center justify-center rounded-full text-lg font-bold">
+                    {rating.user_name
+                      ?.split(" ")
+                      .map((word) => word[0])
+                      .join("")}
+                    {/* {"HNT"} */}
+                  </div>
+                  <div>
+                    <p className="font-bold h-[20px]">{rating.user_name}</p>
+                    <div className="text-yellow-500">
+                      {"★".repeat(rating.rate)}
                     </div>
-                    <div>
-                      <p className="font-bold h-[20px]">{rating.user_name}</p>
-                      <div className="text-yellow-500">
-                        {"★".repeat(rating.rate)}
-                      </div>
-                      <p className="text-xs text-gray-500">{dayjs(rating.createdAt).fromNow()}</p>
-                      <p className="mt-2 text-gray-700">{rating.content}</p>
-                      <div className="flex space-x-2">
-                        {rating?.replies?.length!==0
-                          ? <button
-                              onClick={() => toggleReplies(rating._id)}
-                              className="text-blue-500 text-sm mt-2 hover:underline"
-                            >
-                              {openReplies[rating._id] ? "Ẩn trả lời" : `${rating?.replies?.length} Trả lời`}
-                            </button>
-                          : <button className="text-blue-500 text-sm mt-2"> 0 Trả lời</button>
-                        }
+                    <p className="text-xs text-gray-500">
+                      {dayjs(rating.createdAt).fromNow()}
+                    </p>
+                    <p className="mt-2 text-gray-700">{rating.content}</p>
+                    <div className="flex space-x-2">
+                      {rating?.replies?.length !== 0 ? (
                         <button
-                          onClick={() => toggleReply(rating._id)}
+                          onClick={() => toggleReplies(rating._id)}
                           className="text-blue-500 text-sm mt-2 hover:underline"
                         >
-                          {openReply[rating._id] ? "Ẩn phản hồi" : "Phản hồi"}
+                          {openReplies[rating._id]
+                            ? "Ẩn trả lời"
+                            : `${rating?.replies?.length} Trả lời`}
                         </button>
-                      </div>
+                      ) : (
+                        <button className="text-blue-500 text-sm mt-2">
+                          {" "}
+                          0 Trả lời
+                        </button>
+                      )}
+                      <button
+                        onClick={() => toggleReply(rating._id)}
+                        className="text-blue-500 text-sm mt-2 hover:underline"
+                      >
+                        {openReply[rating._id] ? "Ẩn phản hồi" : "Phản hồi"}
+                      </button>
                     </div>
                   </div>
-                  
-                  {openReplies[rating._id] && (
-                    <div className="ml-16 mt-4 bg-gray-100 rounded-lg shadow-sm">
-                      {rating?.replies?.map((reply, index) => (
-                        <div
-                          key={index}
-                          className="flex items-start space-x-4 border-b border-gray-200 pb-4 m-4 mb-4 last:border-none last:pb-0 last:mb-0"
-                        >
-                          <div className="flex-shrink-0 w-10 h-10 bg-yellow-500 text-white flex items-center justify-center rounded-full text-sm font-bold">
-                            {reply.user_name
-                              ?.split(" ")
-                              .map((word) => word[0])
-                              .join("")}
-                          </div>
-                          <div>
-                            <div className="flex space-x-2">
-                              <p className="font-bold text-sm ">{reply.user_name}</p>
-                              {reply.user_role==="ADMIN" && (
-                                <p className="text-xs bg-yellow-200 text-yellow-800 px-2 rounded pt-0.5">
-                                  {reply.user_role}
-                                </p>
-                              )}
-                            </div>
-                            <p className="text-xs text-gray-500">
-                              {dayjs(reply.createdAt).fromNow()}
-                            </p>
-                            <p className="text-gray-700 mt-1">{reply.content}</p>
-                          </div>
-                        </div>
-                      ))}
+                </div>
 
-                      {/* Form trả lời */}
-                      {openReply[rating._id] && (
-                        <form onSubmit={(e)=>handleReplySubmit(e, rating._id)} className="m-4">
-                          <div className="mt-4">
-                            <textarea
-                              name="content"
-                              value={replyForm[rating._id]?.content || ""}
-                              onChange={(e) => handleReplyChange(e, rating._id)}
-                              className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                              placeholder="Nhận xét của bạn về đánh giá này"
-                            ></textarea>
-                            <button className="mt-2 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
-                              Gửi trả lời
-                            </button>
+                {openReplies[rating._id] && (
+                  <div className="ml-16 mt-4 bg-gray-100 rounded-lg shadow-sm">
+                    {rating?.replies?.map((reply, index) => (
+                      <div
+                        key={index}
+                        className="flex items-start space-x-4 border-b border-gray-200 pb-4 m-4 mb-4 last:border-none last:pb-0 last:mb-0"
+                      >
+                        <div className="flex-shrink-0 w-10 h-10 bg-yellow-500 text-white flex items-center justify-center rounded-full text-sm font-bold">
+                          {reply.user_name
+                            ?.split(" ")
+                            .map((word) => word[0])
+                            .join("")}
+                        </div>
+                        <div>
+                          <div className="flex space-x-2">
+                            <p className="font-bold text-sm ">
+                              {reply.user_name}
+                            </p>
+                            {reply.user_role === "ADMIN" && (
+                              <p className="text-xs bg-yellow-200 text-yellow-800 px-2 rounded pt-0.5">
+                                {reply.user_role}
+                              </p>
+                            )}
                           </div>
-                        </form>
-                      )}
-                    </div>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </div>
-      }
+                          <p className="text-xs text-gray-500">
+                            {dayjs(reply.createdAt).fromNow()}
+                          </p>
+                          <p className="text-gray-700 mt-1">{reply.content}</p>
+                        </div>
+                      </div>
+                    ))}
+
+                    {/* Form trả lời */}
+                    {openReply[rating._id] && (
+                      <form
+                        onSubmit={(e) => handleReplySubmit(e, rating._id)}
+                        className="m-4"
+                      >
+                        <div className="mt-4">
+                          <textarea
+                            name="content"
+                            value={replyForm[rating._id]?.content || ""}
+                            onChange={(e) => handleReplyChange(e, rating._id)}
+                            className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="Nhận xét của bạn về đánh giá này"
+                          ></textarea>
+                          <button className="mt-2 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
+                            Gửi trả lời
+                          </button>
+                        </div>
+                      </form>
+                    )}
+                  </div>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 };

@@ -3,18 +3,19 @@ import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 // import ant
 import { Button } from "antd";
-// import icon
-import { FaRegEdit } from "react-icons/fa";
-import { MdOutlineDeleteOutline } from "react-icons/md";
 // import components
-import AdminHeader from "../../../components/layout/Admin/header";
-import Nav from "../../../components/layout/Admin/nav";
+import AdminHeader from "../../../components/layout/Admin/Header";
+import Nav from "../../../components/layout/Admin/Nav";
 import Table from "../../../components/table";
 import Loading from "../../../components/loading";
 import PopupNotification from "../../../components/popup/notify";
 import AdminModalV2 from "../../../components/popup/AdminModalV2";
 // import icon react
+import { FaRegEdit } from "react-icons/fa";
+import { MdOutlineDeleteOutline } from "react-icons/md";
 import { FaChevronLeft } from "react-icons/fa6";
+import { PiLockKeyLight } from "react-icons/pi";
+import { PiLockKeyOpen } from "react-icons/pi";
 // import axios
 import { postData, getData, deleteData, putData } from "../../../axios";
 
@@ -141,6 +142,23 @@ const ExamVideo: React.FC = () => {
       action: "DELETE",
       icon: <MdOutlineDeleteOutline />,
       style: { ...styleAction, color: "red" },
+    },
+  ];
+  const batchExecution = [
+    {
+      value: "DELETE",
+      icon: <MdOutlineDeleteOutline style={{ color: "red" }} />,
+      content: "Xoá hàng đã chọn",
+    },
+    {
+      value: "LOCK",
+      icon: <PiLockKeyLight />,
+      content: "Khoá các thành thích",
+    },
+    {
+      value: "UNLOCK",
+      icon: <PiLockKeyOpen />,
+      content: "Mở khoá thành tích",
     },
   ];
 
@@ -318,6 +336,7 @@ const ExamVideo: React.FC = () => {
                   data={dataExamVideo}
                   handleAction={handleActions}
                   actions={actions}
+                  batchExecution={batchExecution}
                   fieldSearch={fieldSearch}
                 />
               )}

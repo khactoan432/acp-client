@@ -6,13 +6,14 @@ import { toast } from "react-toastify";
 import { Button, Select } from "antd";
 
 // import components
-import AdminHeader from "../../../components/layout/Admin/header";
-import Nav from "../../../components/layout/Admin/nav";
+import AdminHeader from "../../../components/layout/Admin/Header";
+import Nav from "../../../components/layout/Admin/Nav";
 import AdminModalV2 from "../../../components/popup/AdminModalV2";
 import SearchInput from "../../../components/input/SeachInput";
 import MSInput from "../../../components/input/MsInput";
 import Loading from "../../../components/loading";
 import PopupNotification from "../../../components/popup/notify";
+import { TypeInput } from "../../../constants/TypeEnum";
 
 // import icon react
 import { CiEdit } from "react-icons/ci";
@@ -25,7 +26,6 @@ import { MdMenuBook } from "react-icons/md";
 
 // import axios
 import { postData, getData, deleteData, putData } from "../../../axios";
-
 // interface
 interface Lesson {
   exercises: Exercise[];
@@ -117,18 +117,18 @@ const Content: React.FC = () => {
   }>(null);
 
   // structure
-  const [structData, setStructData] = useState([
+  const structData = [
     {
       name: "name",
       placeholder: "Nhập tên bài học",
       label: "Tên bài học",
       value: "",
-      type: "INPUT",
+      type: TypeInput.INPUT,
     },
     {
       name: "video",
       label: "Video",
-      type: "VIDEO",
+      type: TypeInput.VIDEO,
       value: [],
     },
     {
@@ -136,16 +136,16 @@ const Content: React.FC = () => {
       placeholder: "Nhập tên bài tập",
       label: "Tên bài tập",
       value: "",
-      type: "INPUT",
+      type: TypeInput.INPUT,
     },
     {
       name: "link",
       placeholder: "Nhập đường dẫn bài tập",
       label: "Đường dẫn bài tập",
       value: "",
-      type: "INPUT",
+      type: TypeInput.INPUT,
     },
-  ]);
+  ];
 
   const [structUpdateLesson, setStructUpdateLesson] = useState([
     {
@@ -153,12 +153,12 @@ const Content: React.FC = () => {
       placeholder: "Nhập tên bài học",
       label: "Tên bài học",
       value: "",
-      type: "INPUT",
+      type: TypeInput.INPUT,
     },
     {
       name: "video",
       label: "Video",
-      type: "VIDEO",
+      type: TypeInput.VIDEO,
       value: [],
     },
   ]);
@@ -169,14 +169,14 @@ const Content: React.FC = () => {
       placeholder: "Nhập tên bài tập",
       label: "Tên bài tập",
       value: "",
-      type: "INPUT",
+      type: TypeInput.INPUT,
     },
     {
       name: "link",
       placeholder: "Nhập đường dẫn đề thi",
       label: "Đường dẫn đề thi",
       value: "",
-      type: "INPUT",
+      type: TypeInput.INPUT,
     },
   ]);
 
@@ -300,7 +300,7 @@ const Content: React.FC = () => {
         formData.append("video", video);
       }
       formData.append("name", name);
-      const res = await putData(`/api/admin/lesson/${idIntro}`, formData, {
+      await putData(`/api/admin/lesson/${idIntro}`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${header}`,
@@ -338,7 +338,7 @@ const Content: React.FC = () => {
     setIsLoading(true);
     try {
       console.log("id: ", id);
-      const res = await putData(
+      await putData(
         `/api/admin/exercise/${id}`,
         {
           name,
@@ -371,11 +371,11 @@ const Content: React.FC = () => {
       if (Array.isArray(id_Deleted) && id_Deleted.length > 0) {
         for (const id of id_Deleted) {
           if (id._id) {
-            const deleteRes = await deleteData(`/api/admin/lesson/${id._id}`, {
+            await deleteData(`/api/admin/lesson/${id._id}`, {
               headers: { Authorization: `Bearer ${header}` },
             });
           } else if (typeof id === "string") {
-            const deleteRes = await deleteData(`/api/admin/lesson/${id}`, {
+            await deleteData(`/api/admin/lesson/${id}`, {
               headers: { Authorization: `Bearer ${header}` },
             });
           } else {
@@ -399,45 +399,42 @@ const Content: React.FC = () => {
     }
   };
 
-  // const deleteExercise = async () => {
-  //   const id_Deleted = idDeleted && idDeleted.lessons;
-  //   console.log("delete here: ", id_Deleted);
-  //   if (!id_Deleted) {
-  //     console.error("idDeleted is undefined");
-  //     return;
-  //   }
+  const deleteExercise = async () => {
+    const id_Deleted = idDeleted && idDeleted.lessons;
+    console.log("delete here: ", id_Deleted);
+    if (!id_Deleted) {
+      console.error("idDeleted is undefined");
+      return;
+    }
 
-  //   setIsLoading(true);
-  //   try {
-  //     if (Array.isArray(id_Deleted) && id_Deleted.length > 0) {
-  //       for (const arrDelete of id_Deleted) {
-  //         for (const id of arrDelete.exercises) {
-  //           const deleteRes = await deleteData(
-  //             `/api/admin/overview/${id._id}`,
-  //             {
-  //               headers: { Authorization: `Bearer ${header}` },
-  //             }
-  //           );
-  //         }
-  //       }
-  //       toast.success("Xoá các exercises thành công!");
-  //     } else {
-  //       toast.warning("Xảy ra lỗi khi xoá exercises!");
-  //     }
-  //   } catch (error) {
-  //     toast.error("Xoá mô tả không thành công, " + error.message);
-  //     console.error(`Error deleting overview`, error);
-  //   } finally {
-  //     setIsLoading(false);
-  //     setIsModalVisible(false);
-  //     setIsFetchData(!isFetchData);
-  //     setIdDeleted(undefined);
-  //     setDataIdDeleted({ lessons: [] });
-  //   }
-  // };
+    setIsLoading(true);
+    try {
+      if (Array.isArray(id_Deleted) && id_Deleted.length > 0) {
+        for (const arrDelete of id_Deleted) {
+          for (const id of arrDelete.exercises) {
+            await deleteData(`/api/admin/overview/${id._id}`, {
+              headers: { Authorization: `Bearer ${header}` },
+            });
+          }
+        }
+        toast.success("Xoá các exercises thành công!");
+      } else {
+        toast.warning("Xảy ra lỗi khi xoá exercises!");
+      }
+    } catch (error) {
+      toast.error("Xoá mô tả không thành công, " + error.message);
+      console.error(`Error deleting overview`, error);
+    } finally {
+      setIsLoading(false);
+      setIsModalVisible(false);
+      setIsFetchData(!isFetchData);
+      setIdDeleted(undefined);
+      setDataIdDeleted({ lessons: [] });
+    }
+  };
   const deleteFunc = () => {
     if (nameDeleted === "exercises") {
-      // deleteExercise();
+      deleteExercise();
     } else if (nameDeleted === "lessons") {
       deleteLesson();
     }
@@ -1050,7 +1047,7 @@ const Content: React.FC = () => {
                                   </div>
                                 )} */}
                               </div>
-                              <style jsx="true">{`
+                              <style>{`
                                 .group:hover::before {
                                   content: "";
                                   position: absolute;
@@ -1076,7 +1073,7 @@ const Content: React.FC = () => {
                               <div className="mb-2">
                                 <div className="">
                                   <video
-                                    src={lesson.video}
+                                    src={String(lesson.video)}
                                     controls
                                     style={{
                                       width: "800px",

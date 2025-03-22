@@ -8,11 +8,12 @@ import { Button, Select } from "antd";
 // import components
 import SearchInput from "../../../components/input/SeachInput";
 import MSInput from "../../../components/input/MsInput";
-import AdminHeader from "../../../components/layout/Admin/header";
-import Nav from "../../../components/layout/Admin/nav";
+import AdminHeader from "../../../components/layout/Admin/Header";
+import Nav from "../../../components/layout/Admin/Nav";
 import AdminModalV2 from "../../../components/popup/AdminModalV2";
 import PopupNotification from "../../../components/popup/notify";
 import Loading from "../../../components/loading";
+import { TypeInput } from "../../../constants/TypeEnum";
 
 //icon react
 import { CiEdit } from "react-icons/ci";
@@ -122,13 +123,13 @@ const IntroduceExam: React.FC = () => {
       placeholder: "Nhập tiêu đề mô tả",
       label: "Mô tả video",
       value: "",
-      type: "INPUT",
+      type: TypeInput.INPUT,
     },
     {
       name: "overviews",
       placeholder: "Nhập mô tả",
       label: "Thêm mô tả đề thi",
-      type: "ARRAY",
+      type: TypeInput.ARRAY,
       value: [],
     },
   ]);
@@ -139,7 +140,7 @@ const IntroduceExam: React.FC = () => {
       placeholder: "Nhập mô tả",
       label: "Mô tả đề thi",
       value: "",
-      type: "INPUT",
+      type: TypeInput.INPUT,
     },
   ]);
 
@@ -247,7 +248,7 @@ const IntroduceExam: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const resDescribe = await putData(
+      await putData(
         `/api/admin/describe/${idIntro}`,
         {
           desc: introTitle,
@@ -262,7 +263,7 @@ const IntroduceExam: React.FC = () => {
         const value = data.value;
         if (id && value) {
           try {
-            const update = await putData(
+            await putData(
               `/api/admin/overview/${id}`,
               {
                 desc: value,
@@ -277,7 +278,7 @@ const IntroduceExam: React.FC = () => {
           }
         } else if (!id && value) {
           try {
-            const res = await postData(
+            await postData(
               "/api/admin/overview",
               {
                 id_material: idIntro,
@@ -294,7 +295,7 @@ const IntroduceExam: React.FC = () => {
           }
         } else if (id && !value) {
           try {
-            const deleteRes = await deleteData(`/api/admin/overview/${id}`, {
+            await deleteData(`/api/admin/overview/${id}`, {
               headers: { Authorization: `Bearer ${header}` },
             });
             toast.warning("Bạn vừa xoá overviews do không truyền dữ liệu");
@@ -338,7 +339,7 @@ const IntroduceExam: React.FC = () => {
         toast.warning("Vui lòng điền đầy đủ thông tin!");
         return;
       }
-      const res = await putData(
+      await putData(
         `/api/admin/overview/${id}`,
         {
           desc,
@@ -393,14 +394,11 @@ const IntroduceExam: React.FC = () => {
       if (Array.isArray(id_Deleted) && id_Deleted.length > 0) {
         for (const id of id_Deleted) {
           if (id._id) {
-            const deleteRes = await deleteData(
-              `/api/admin/describe/${id._id}`,
-              {
-                headers: { Authorization: `Bearer ${header}` },
-              }
-            );
+            await deleteData(`/api/admin/describe/${id._id}`, {
+              headers: { Authorization: `Bearer ${header}` },
+            });
           } else if (typeof id === "string") {
-            const deleteRes = await deleteData(`/api/admin/describe/${id}`, {
+            await deleteData(`/api/admin/describe/${id}`, {
               headers: { Authorization: `Bearer ${header}` },
             });
           } else {
@@ -437,12 +435,9 @@ const IntroduceExam: React.FC = () => {
       if (Array.isArray(id_Deleted) && id_Deleted.length > 0) {
         for (const arrDelete of id_Deleted) {
           for (const id of arrDelete.overviews) {
-            const deleteRes = await deleteData(
-              `/api/admin/overview/${id._id}`,
-              {
-                headers: { Authorization: `Bearer ${header}` },
-              }
-            );
+            await deleteData(`/api/admin/overview/${id._id}`, {
+              headers: { Authorization: `Bearer ${header}` },
+            });
           }
         }
         toast.success("Xoá các overviews thành công!");
@@ -1075,7 +1070,7 @@ const IntroduceExam: React.FC = () => {
                                   </div>
                                 )}
                               </div>
-                              <style jsx="true">{`
+                              <style>{`
                                 .group:hover::before {
                                   content: "";
                                   position: absolute;

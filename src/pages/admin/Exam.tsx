@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-
 // import ant
 import { Button } from "antd";
 
@@ -14,8 +13,8 @@ import { PiLockKeyLight } from "react-icons/pi";
 import { PiLockKeyOpen } from "react-icons/pi";
 
 // import components
-import AdminHeader from "../../components/layout/Admin/header";
-import Nav from "../../components/layout/Admin/nav";
+import AdminHeader from "../../components/layout/Admin/Header";
+import Nav from "../../components/layout/Admin/Nav";
 import AdminModalV2 from "../../components/popup/AdminModalV2";
 import Loading from "../../components/loading";
 import Table from "../../components/table";

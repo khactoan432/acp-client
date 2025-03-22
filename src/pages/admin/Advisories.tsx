@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { toast } from "react-toastify";
 
-import AdminHeader from "../../components/layout/Admin/header";
-import Nav from "../../components/layout/Admin/nav";
+import AdminHeader from "../../components/layout/Admin/Header";
+import Nav from "../../components/layout/Admin/Nav";
 import Loading from "../../components/loading";
 import Table from "../../components/table";
 import PopupNotification from "../../components/popup/notify";

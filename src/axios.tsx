@@ -3,11 +3,6 @@ import { navigateTo } from "./helpers/navigation";
 import store from "./redux/store";
 import { logout } from "./redux/slices/authSlice";
 
-interface Response {
-  message: string;
-  data: any;
-}
-
 const api = axios.create({
   baseURL: "http://localhost:8080",
   headers: {

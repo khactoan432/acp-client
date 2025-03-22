@@ -1,7 +1,6 @@
 import React from "react";
 import Button from "../../common/Button";
 import { useNavigate } from "react-router-dom";
-
 interface ExamProps {
   _id: string;
   name: string;

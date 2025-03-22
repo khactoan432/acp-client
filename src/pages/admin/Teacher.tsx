@@ -2,8 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import { toast } from "react-toastify";
 // import component
 import AdminModalV2 from "../../components/popup/AdminModalV2";
-import AdminHeader from "../../components/layout/Admin/header";
-import Nav from "../../components/layout/Admin/nav";
+import AdminHeader from "../../components/layout/Admin/Header";
+import Nav from "../../components/layout/Admin/Nav";
 import Table from "../../components/table";
 import Loading from "../../components/loading";
 import PopupNotification from "../../components/popup/notify";

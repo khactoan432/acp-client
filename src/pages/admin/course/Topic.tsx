@@ -9,8 +9,8 @@ import { FaPhotoVideo } from "react-icons/fa";
 import { PiLockKeyLight } from "react-icons/pi";
 import { PiLockKeyOpen } from "react-icons/pi";
 // import components
-import AdminHeader from "../../../components/layout/Admin/header";
-import Nav from "../../../components/layout/Admin/nav";
+import AdminHeader from "../../../components/layout/Admin/Header";
+import Nav from "../../../components/layout/Admin/Nav";
 import Table from "../../../components/table";
 import Loading from "../../../components/loading";
 import PopupNotification from "../../../components/popup/notify";
