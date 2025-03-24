@@ -136,17 +136,7 @@ const Login: React.FC = () => {
   );
 };
 
-const styles: {
-  container: React.CSSProperties;
-  title: React.CSSProperties;
-  form: React.CSSProperties;
-  input: React.CSSProperties;
-  passwordWrapper: React.CSSProperties;
-  eyeIcon: React.CSSProperties;
-  colorCreate: React.CSSProperties;
-  button: React.CSSProperties;
-  error: React.CSSProperties;
-} = {
+const styles = {
   container: {
     width: "37.5%",
     height: "536px",

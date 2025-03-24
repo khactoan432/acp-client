@@ -1,6 +1,7 @@
 // Exams.tsx
 import React, { useEffect } from "react";
 import Exam from "./Exam"; // Import the Exam component
+import banner from "../../../assets/banner1.jpg";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../redux/store";
 import { fetchUserExams } from "../../../redux/slices/examSlice";
@@ -13,7 +14,7 @@ const Exams: React.FC = () => {
   console.log(loading, error);
 
   useEffect(() => {
-    dispatch(fetchUserExams({ page: 1, limit: 4, filters: [] }));
+    dispatch(fetchUserExams({ page: 1, limit: 4 , filters:[]}));
   }, [dispatch]);
   console.log(userExams);
 

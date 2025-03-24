@@ -18,7 +18,6 @@ import Loading from "../../../components/loading";
 import MSInput from "../../../components/input/MsInput";
 import ButtonPlus from "../../../components/button/plus";
 import AdminModalV2 from "../../../components/popup/AdminModalV2";
-import { TypeInput } from "../../../constants/TypeEnum";
 
 import { getData, postData, putData, deleteData } from "../../../axios";
 
@@ -73,31 +72,30 @@ const AdminBanner: React.FC = () => {
       placeholder: "Nhập danh mục tìm kiếm.",
       label: "Danh mục tìm kiếm.",
       value: "",
-      type: TypeInput.INPUT,
+      type: "INPUT",
     },
     {
       name: "type",
       label: "Chọn",
       options: [{ option: "CHECKBOX" }, { option: "STRING" }],
       value: "",
-      type: TypeInput.OPTION,
+      type: "OPTION",
     },
     {
       name: "categories",
       placeholder: "Nhập danh mục",
       label: "Thêm danh mục",
       value: [],
-      type: TypeInput.ARRAY,
+      type: "ARRAY",
     },
   ]);
-
   const [structCategory, setStructCategory] = useState([
     {
       name: "value",
       placeholder: "Nhập vào danh mục",
       label: "Danh mục",
       value: "",
-      type: TypeInput.INPUT,
+      type: "INPUT",
     },
   ]);
 
@@ -142,6 +140,7 @@ const AdminBanner: React.FC = () => {
   const createCategories = async (data: any) => {
     setIsLoading(true);
     try {
+      console.log("data: ", data);
       const option = data.option || "";
       const type = data.type[0].type || "";
       const categories = data.categories.map((d) => ({
@@ -152,7 +151,7 @@ const AdminBanner: React.FC = () => {
         toast.warning("Invalid input");
         return;
       }
-      await postData(
+      const res = await postData(
         "/api/admin/categories",
         {
           option,
@@ -191,7 +190,7 @@ const AdminBanner: React.FC = () => {
     }
     try {
       setIsLoading(true);
-      await putData(
+      const res = await putData(
         `/api/admin/categories/${id}`,
         {
           categories: category,
@@ -253,7 +252,7 @@ const AdminBanner: React.FC = () => {
     }
     try {
       setIsLoading(true);
-      await putData(
+      const res = await putData(
         `/api/admin/categories/${id}`,
         {
           option: option,
@@ -297,7 +296,7 @@ const AdminBanner: React.FC = () => {
     const value = data.value;
     setIsLoading(true);
     try {
-      await putData(
+      const res = await putData(
         `/api/admin/category/${id}`,
         { value },
         { headers: { Authorization: `Bearer ${header}` } }
@@ -317,7 +316,7 @@ const AdminBanner: React.FC = () => {
   const deleteCategoryType = async (id: string) => {
     setIsLoading(true);
     try {
-      await deleteData(`/api/admin/categoryType/${id}`, {
+      const res = await deleteData(`/api/admin/categoryType/${id}`, {
         headers: { Authorization: `Bearer ${header}` },
       });
       toast.success("Xoá loại danh mục thành công");
@@ -333,7 +332,7 @@ const AdminBanner: React.FC = () => {
   const deleteCategory = async (id: string) => {
     setIsLoading(true);
     try {
-      await deleteData(`/api/admin/category/${id}`, {
+      const res = await deleteData(`/api/admin/category/${id}`, {
         headers: { Authorization: `Bearer ${header}` },
       });
       toast.success("Xoá danh mục thành công");

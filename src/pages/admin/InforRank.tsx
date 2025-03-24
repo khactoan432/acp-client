@@ -1,32 +1,30 @@
-import { useState, useRef, useEffect } from "react";
-// import { useNavigate } from "react-router-dom";
-// import { toast } from "react-toastify";
+import React, { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 //import component
-import AdminHeader from "../../components/layout/Admin/Header";
-import Nav from "../../components/layout/Admin/Nav";
+import AdminHeader from "../../components/layout/Admin/header";
+import Nav from "../../components/layout/Admin/nav";
 import Table from "../../components/table";
-// import Loading from "../../components/loading";
+import Loading from "../../components/loading";
 // import ant
 import { Button } from "antd";
 
 // import icon
 import { FaRegEdit } from "react-icons/fa";
 import { MdOutlineDeleteOutline } from "react-icons/md";
-// import { MdAttractions } from "react-icons/md";
-// import { FaPhotoVideo } from "react-icons/fa";
-import { PiLockKeyLight } from "react-icons/pi";
-import { PiLockKeyOpen } from "react-icons/pi";
+import { MdAttractions } from "react-icons/md";
+import { FaPhotoVideo } from "react-icons/fa";
 
-// interface Order {
-//   _id: string;
-//   image: string;
-//   name: string;
-//   email: string;
-//   rank: string;
-//   score: string;
-// }
+interface Order {
+  _id: string;
+  image: string;
+  name: string;
+  email: string;
+  rank: string;
+  score: string;
+}
 const Ranks = () => {
-  // const header = localStorage.getItem("access_token");
+  const header = localStorage.getItem("access_token");
   const [screenHeight, setScreenHeight] = useState(window.innerHeight - 56);
   const updateScreenHeight = () => {
     setScreenHeight(window.innerHeight - 56);
@@ -47,22 +45,23 @@ const Ranks = () => {
   }, []);
 
   // state boolean
-  // const [isLoading, setIsLoading] = useState(false);
-  // const [isFetchData, setIsFetchData] = useState(false);
-  // const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isFetchData, setIsFetchData] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
   const [isModalCreate, setIsModalCreate] = useState(false);
-  // const [isModalUpdate, setIsModalUpdate] = useState(false);
+  const [isModalUpdate, setIsModalUpdate] = useState(false);
 
   // state string
-  // const [id, setId] = useState("");
+  const [id, setId] = useState("");
 
   // state store
-  const data = [];
+  const [data, setData] = useState<Order[]>([]);
   const [selectedContent, setSelectedContent] = useState<any>(null);
 
   let columns = ["name", "email", "codeforce_name", "phone_number", "image"];
 
   // structure data video exam
+  console.log(data);
   let fieldSearch = ["name", "email", "codeforce_name", "phone_number"];
 
   const [structData, setStructData] = useState<any>([]);
@@ -139,7 +138,7 @@ const Ranks = () => {
           return field;
         });
 
-      // setIsModalUpdate(true);
+      setIsModalUpdate(true);
     }
 
     console.log("arrStruct: ", arrStruct);
@@ -148,14 +147,14 @@ const Ranks = () => {
 
   const handleActions = (type: string, row: any) => {
     if (type === "EDIT") {
-      // const id = row._id;
-      // setId(id);
+      const id = row._id;
+      setId(id);
       setSelectedContent(row);
     }
     if (type === "DELETE") {
-      // const id = row._id;
-      // setId(id);
-      // setIsModalVisible(true);
+      const id = row._id;
+      setId(id);
+      setIsModalVisible(true);
     }
   };
   const styleAction = {
@@ -178,32 +177,15 @@ const Ranks = () => {
       style: { ...styleAction, color: "red" },
     },
   ];
-  const batchExecution = [
-    {
-      value: "DELETE",
-      icon: <MdOutlineDeleteOutline style={{ color: "red" }} />,
-      content: "Xoá hàng đã chọn",
-    },
-    {
-      value: "LOCK",
-      icon: <PiLockKeyLight />,
-      content: "Khoá các thành thích",
-    },
-    {
-      value: "UNLOCK",
-      icon: <PiLockKeyOpen />,
-      content: "Mở khoá thành tích",
-    },
-  ];
 
-  // const handleClosePopup = () => {
-  //   setIsModalVisible(false);
-  //   setId("");
-  // };
+  const handleClosePopup = () => {
+    setIsModalVisible(false);
+    setId("");
+  };
 
-  // if (isLoading) {
-  //   return <Loading message="Loading data..." size="large" />;
-  // }
+  if (isLoading) {
+    return <Loading message="Loading data..." size="large" />;
+  }
 
   return (
     <div className="flex h-screen">
@@ -247,7 +229,6 @@ const Ranks = () => {
                   data={data}
                   handleAction={handleActions}
                   actions={actions}
-                  batchExecution={batchExecution}
                 />
               )}
             </div>

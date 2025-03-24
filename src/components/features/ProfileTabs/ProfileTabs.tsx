@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+
+import banner from "../../../assets/banner1.jpg";
 import Button from "../../common/Button";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../redux/store";
@@ -11,6 +13,13 @@ import { fetchYourMaterial } from "../../../redux/slices/yourMaterialSlice";
 //   image: string;
 //   progress: number; // Tiến độ khóa học (0-100)
 // }
+
+interface ExamResult {
+  id: string;
+  name: string;
+  image: string;
+  score: number; // Điểm thi (0-100)
+}
 
 // const sampleCourses: Course[] = [
 //   {
@@ -59,11 +68,7 @@ const ProfileTabs: React.FC = () => {
   console.log(loading, error);
 
   useEffect(() => {
-    dispatch(
-      fetchYourMaterial({
-        id_user: JSON.parse(localStorage.getItem("user"))?._id,
-      })
-    );
+    dispatch(fetchYourMaterial({ id_user: JSON.parse(localStorage.getItem("user"))?._id }));
   }, [dispatch]);
 
   console.log();
@@ -114,17 +119,10 @@ const ProfileTabs: React.FC = () => {
                     <div className="w-full bg-gray-200 rounded-full h-[10px] mb-2">
                       <div
                         className="bg-blue-600 rounded-full h-[10px]"
-                        style={{
-                          width: `${
-                            (course.totalProgress / course.totalLessons) * 100
-                          }%`,
-                        }}
+                        style={{ width: `${course.totalProgress/course.totalLessons*100}%` }}
                       ></div>
                     </div>
-                    <p className="text-sm text-gray-600 pb-3">
-                      Tiến độ:{" "}
-                      {(course.totalProgress / course.totalLessons) * 100}%
-                    </p>
+                    <p className="text-sm text-gray-600 pb-3">Tiến độ: {course.totalProgress/course.totalLessons*100}%</p>
 
                     <Button
                       onClick={() => navigate("/learning/" + course._id)}

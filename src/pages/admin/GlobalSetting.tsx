@@ -1,11 +1,11 @@
-import { useState, useEffect, useRef } from "react";
-// import { toast } from "react-toastify";
+import React, { useState, useEffect, useRef } from "react";
+import { toast } from "react-toastify";
 // import component
-import AdminHeader from "../../components/layout/Admin/Header";
-import Nav from "../../components/layout/Admin/Nav";
+import AdminHeader from "../../components/layout/Admin/header";
+import Nav from "../../components/layout/Admin/nav";
 
 const GlobalSetting = () => {
-  // const header = localStorage.getItem("access_token");
+  const header = localStorage.getItem("access_token");
   const [screenHeight, setScreenHeight] = useState(window.innerHeight - 56);
   const updateScreenHeight = () => {
     setScreenHeight(window.innerHeight - 56);

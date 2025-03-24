@@ -78,11 +78,7 @@ const PopupNotification: React.FC<PopupNotificationProps> = ({
   );
 };
 
-const styles: {
-  content: React.CSSProperties;
-  message: React.CSSProperties;
-  button: React.CSSProperties;
-} = {
+const styles = {
   content: {
     textAlign: "center",
     padding: "20px",

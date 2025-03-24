@@ -11,7 +11,6 @@ import ImageUploader from "../helps/dropImage";
 // import validation
 import validateInput from "../../HOC/validateInput";
 import ValidateFiles from "../../HOC/validateFiles";
-import { TypeInput } from "../../constants/TypeEnum";
 
 const { Option } = Select;
 
@@ -26,7 +25,7 @@ type StructData = {
   label?: string;
   options?: { option: string; value?: string[] }[];
   value?: any;
-  type: TypeInput;
+  type: "IMAGE" | "VIDEO" | "OPTION" | "INPUT" | "ARRAY"; // Các loại dữ liệu
   typeText?: "text" | "email" | "number" | "tel";
 };
 
@@ -181,7 +180,7 @@ const AdminModalV2: React.FC<AdminModalProps> = ({
     const arrayFields = structData.filter((item) => item.type === "ARRAY");
     // arrayFields hiện tại chỉ có 1 phần tử
     arrayFields.forEach((field) => {
-      const arrayValues = arrValue.map((_, id) => ({
+      const arrayValues = arrValue.map((item, id) => ({
         _id:
           field.value.length > 0 && field.value[id]?._id
             ? field.value[id]?._id

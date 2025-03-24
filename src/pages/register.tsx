@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-// import { useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import { postData } from "../axios";
 import { toast } from "react-toastify";
 
@@ -23,7 +23,7 @@ const Register: React.FC = () => {
 
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
 
-  // const dispatch = useDispatch();
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const validateForm = () => {
@@ -240,17 +240,7 @@ const Register: React.FC = () => {
   );
 };
 
-const styles: {
-  container: React.CSSProperties;
-  title: React.CSSProperties;
-  form: React.CSSProperties;
-  input: React.CSSProperties;
-  button: React.CSSProperties;
-  error: React.CSSProperties;
-  passwordWrapper: React.CSSProperties;
-  eyeIcon: React.CSSProperties;
-  colorCreate: React.CSSProperties;
-} = {
+const styles = {
   container: {
     width: "37.5%",
     minHeight: "536px",

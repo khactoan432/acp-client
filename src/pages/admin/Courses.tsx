@@ -11,8 +11,8 @@ import { MdAttractions } from "react-icons/md";
 import { PiLockKeyLight } from "react-icons/pi";
 import { PiLockKeyOpen } from "react-icons/pi";
 // import components
-import AdminHeader from "../../components/layout/Admin/Header";
-import Nav from "../../components/layout/Admin/Nav";
+import AdminHeader from "../../components/layout/Admin/header";
+import Nav from "../../components/layout/Admin/nav";
 import Loading from "../../components/loading";
 import Table from "../../components/table";
 import PopupNotification from "../../components/popup/notify";

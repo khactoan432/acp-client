@@ -4,14 +4,13 @@ import { toast } from "react-toastify";
 // import ant
 import { Button, Select } from "antd";
 // import components
-import AdminHeader from "../../../components/layout/Admin/Header";
-import Nav from "../../../components/layout/Admin/Nav";
+import AdminHeader from "../../../components/layout/Admin/header";
+import Nav from "../../../components/layout/Admin/nav";
 import AdminModalV2 from "../../../components/popup/AdminModalV2";
 import SearchInput from "../../../components/input/SeachInput";
 import MSInput from "../../../components/input/MsInput";
 import PopupNotification from "../../../components/popup/notify";
 import Loading from "../../../components/loading";
-import { TypeInput } from "../../../constants/TypeEnum";
 
 //icon react
 import { CiEdit } from "react-icons/ci";
@@ -31,14 +30,12 @@ interface DataDesc {
   id_material?: string;
   overviews: Overview[];
   type?: string;
-  createdAt?: string;
 }
 interface Overview {
   _id: string;
   desc: string;
   id_material: string;
   type: string;
-  createdAt?: string;
 }
 interface Deleted {
   describes: {
@@ -123,13 +120,13 @@ const Introduce: React.FC = () => {
       placeholder: "Nhập tiêu đề mô tả",
       label: "Mô tả video",
       value: "",
-      type: TypeInput.INPUT,
+      type: "INPUT",
     },
     {
       name: "overviews",
       placeholder: "Nhập mô tả",
       label: "Thêm mô tả đề thi",
-      type: TypeInput.ARRAY,
+      type: "ARRAY",
       value: [],
     },
   ]);
@@ -139,7 +136,7 @@ const Introduce: React.FC = () => {
       placeholder: "Nhập mô tả",
       label: "Mô tả đề thi",
       value: "",
-      type: TypeInput.INPUT,
+      type: "INPUT",
     },
   ]);
 
@@ -247,7 +244,7 @@ const Introduce: React.FC = () => {
     setIsLoading(true);
 
     try {
-      await putData(
+      const resDescribe = await putData(
         `/api/admin/describe/${idIntro}`,
         {
           desc: introTitle,
@@ -262,7 +259,7 @@ const Introduce: React.FC = () => {
         const value = data.value;
         if (id && value) {
           try {
-            await putData(
+            const update = await putData(
               `/api/admin/overview/${id}`,
               {
                 desc: value,
@@ -277,7 +274,7 @@ const Introduce: React.FC = () => {
           }
         } else if (!id && value) {
           try {
-            await postData(
+            const res = await postData(
               "/api/admin/overview",
               {
                 id_material: idIntro,
@@ -294,7 +291,7 @@ const Introduce: React.FC = () => {
           }
         } else if (id && !value) {
           try {
-            await deleteData(`/api/admin/overview/${id}`, {
+            const deleteRes = await deleteData(`/api/admin/overview/${id}`, {
               headers: { Authorization: `Bearer ${header}` },
             });
             toast.warning("Bạn vừa xoá overviews do không truyền dữ liệu");
@@ -338,7 +335,7 @@ const Introduce: React.FC = () => {
         toast.warning("Vui lòng điền đầy đủ thông tin!");
         return;
       }
-      await putData(
+      const res = await putData(
         `/api/admin/overview/${id}`,
         {
           desc,
@@ -392,11 +389,14 @@ const Introduce: React.FC = () => {
       if (Array.isArray(id_Deleted) && id_Deleted.length > 0) {
         for (const id of id_Deleted) {
           if (id._id) {
-            await deleteData(`/api/admin/describe/${id._id}`, {
-              headers: { Authorization: `Bearer ${header}` },
-            });
+            const deleteRes = await deleteData(
+              `/api/admin/describe/${id._id}`,
+              {
+                headers: { Authorization: `Bearer ${header}` },
+              }
+            );
           } else if (typeof id === "string") {
-            await deleteData(`/api/admin/describe/${id}`, {
+            const deleteRes = await deleteData(`/api/admin/describe/${id}`, {
               headers: { Authorization: `Bearer ${header}` },
             });
           } else {
@@ -433,9 +433,12 @@ const Introduce: React.FC = () => {
       if (Array.isArray(id_Deleted) && id_Deleted.length > 0) {
         for (const arrDelete of id_Deleted) {
           for (const id of arrDelete.overviews) {
-            await deleteData(`/api/admin/overview/${id._id}`, {
-              headers: { Authorization: `Bearer ${header}` },
-            });
+            const deleteRes = await deleteData(
+              `/api/admin/overview/${id._id}`,
+              {
+                headers: { Authorization: `Bearer ${header}` },
+              }
+            );
           }
         }
         toast.success("Xoá các overviews thành công!");
@@ -1066,7 +1069,7 @@ const Introduce: React.FC = () => {
                                   </div>
                                 )}
                               </div>
-                              <style>{`
+                              <style jsx="true">{`
                                 .group:hover::before {
                                   content: "";
                                   position: absolute;

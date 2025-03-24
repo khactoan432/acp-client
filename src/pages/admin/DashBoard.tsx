@@ -1,38 +1,39 @@
-// import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
-import AdminHeader from "../../components/layout/Admin/Header";
-import Nav from "../../components/layout/Admin/Nav";
+import AdminHeader from "../../components/layout/Admin/header";
+import Nav from "../../components/layout/Admin/nav";
 import { IoCartOutline } from "react-icons/io5";
 import { IoIosArrowDown } from "react-icons/io";
 import { FaArrowTrendUp, FaArrowTrendDown } from "react-icons/fa6";
 import { MdAttachMoney } from "react-icons/md";
 import { TbChartInfographic } from "react-icons/tb";
 
+import Table from "../../components/table";
 import SalesChart from "../../components/helps/chartLine";
 import ChartCol from "../../components/helps/chartCol";
 
-// import imageCourse from "../../assets/admin/ImageCourse.png";
+import imageCourse from "../../assets/admin/ImageCourse.png";
 
 const AdminDashboard = () => {
-  // const header = localStorage.getItem("access_token");
-  // const [screenHeight, setScreenHeight] = useState(window.innerHeight - 56);
-  // const updateScreenHeight = () => {
-  //   setScreenHeight(window.innerHeight - 56);
-  // };
-  // useEffect(() => {
-  //   window.addEventListener("resize", updateScreenHeight);
-  //   return () => {
-  //     window.removeEventListener("resize", updateScreenHeight);
-  //   };
-  // }, []);
-  // const [firstHeight, setFirstHeight] = useState<number>(0);
-  // const firstDivRef = useRef<HTMLDivElement>(null);
+  const header = localStorage.getItem("access_token");
+  const [screenHeight, setScreenHeight] = useState(window.innerHeight - 56);
+  const updateScreenHeight = () => {
+    setScreenHeight(window.innerHeight - 56);
+  };
+  useEffect(() => {
+    window.addEventListener("resize", updateScreenHeight);
+    return () => {
+      window.removeEventListener("resize", updateScreenHeight);
+    };
+  }, []);
+  const [firstHeight, setFirstHeight] = useState<number>(0);
+  const firstDivRef = useRef<HTMLDivElement>(null);
 
-  // useEffect(() => {
-  //   if (firstDivRef.current) {
-  //     setFirstHeight(firstDivRef.current.offsetHeight);
-  //   }
-  // }, []);
+  useEffect(() => {
+    if (firstDivRef.current) {
+      setFirstHeight(firstDivRef.current.offsetHeight);
+    }
+  }, []);
   // fake data chart col
   const dataCol = {
     labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"], // 7 ngày gần nhất
@@ -130,63 +131,63 @@ const AdminDashboard = () => {
   };
 
   // Khoá học đã bán
-  // const columnsCourse = ["Name", "Price", "Units Sold"];
-  // const dataCourse = [
-  //   {
-  //     Name: { image: imageCourse, text: "[ACP General training]" },
-  //     Price: "$10",
-  //     "Units Sold": 100,
-  //   },
-  //   {
-  //     Name: { image: imageCourse, text: "[ACP General training]" },
-  //     Price: "$20",
-  //     "Units Sold": 50,
-  //   },
-  //   {
-  //     Name: { image: imageCourse, text: "[ACP General training]" },
-  //     Price: "$15",
-  //     "Units Sold": 75,
-  //   },
-  //   {
-  //     Name: { image: imageCourse, text: "[ACP General training]" },
-  //     Price: "$15",
-  //     "Units Sold": 75,
-  //   },
-  //   {
-  //     Name: { image: imageCourse, text: "[ACP General training]" },
-  //     Price: "$15",
-  //     "Units Sold": 75,
-  //   },
-  //   {
-  //     Name: { image: imageCourse, text: "[ACP General training]" },
-  //     Price: "$15",
-  //     "Units Sold": 75,
-  //   },
-  //   {
-  //     Name: { image: imageCourse, text: "[ACP General training]" },
-  //     Price: "$15",
-  //     "Units Sold": 75,
-  //   },
-  // ];
+  const columnsCourse = ["Name", "Price", "Units Sold"];
+  const dataCourse = [
+    {
+      Name: { image: imageCourse, text: "[ACP General training]" },
+      Price: "$10",
+      "Units Sold": 100,
+    },
+    {
+      Name: { image: imageCourse, text: "[ACP General training]" },
+      Price: "$20",
+      "Units Sold": 50,
+    },
+    {
+      Name: { image: imageCourse, text: "[ACP General training]" },
+      Price: "$15",
+      "Units Sold": 75,
+    },
+    {
+      Name: { image: imageCourse, text: "[ACP General training]" },
+      Price: "$15",
+      "Units Sold": 75,
+    },
+    {
+      Name: { image: imageCourse, text: "[ACP General training]" },
+      Price: "$15",
+      "Units Sold": 75,
+    },
+    {
+      Name: { image: imageCourse, text: "[ACP General training]" },
+      Price: "$15",
+      "Units Sold": 75,
+    },
+    {
+      Name: { image: imageCourse, text: "[ACP General training]" },
+      Price: "$15",
+      "Units Sold": 75,
+    },
+  ];
   // đề thi đã bán
-  // const columnsExam = ["Name", "Price", "Units Sold"];
-  // const dataExam = [
-  //   {
-  //     Name: { image: imageCourse, text: "[ACP General training]" },
-  //     Price: "$10",
-  //     "Units Sold": 100,
-  //   },
-  //   {
-  //     Name: { image: imageCourse, text: "[ACP General training]" },
-  //     Price: "$20",
-  //     "Units Sold": 50,
-  //   },
-  //   {
-  //     Name: { image: imageCourse, text: "[ACP General training]" },
-  //     Price: "$15",
-  //     "Units Sold": 75,
-  //   },
-  // ];
+  const columnsExam = ["Name", "Price", "Units Sold"];
+  const dataExam = [
+    {
+      Name: { image: imageCourse, text: "[ACP General training]" },
+      Price: "$10",
+      "Units Sold": 100,
+    },
+    {
+      Name: { image: imageCourse, text: "[ACP General training]" },
+      Price: "$20",
+      "Units Sold": 50,
+    },
+    {
+      Name: { image: imageCourse, text: "[ACP General training]" },
+      Price: "$15",
+      "Units Sold": 75,
+    },
+  ];
   return (
     <div className="flex h-screen">
       <Nav />
@@ -195,7 +196,7 @@ const AdminDashboard = () => {
         <div className="w-full h-full bg-white">
           <div style={{ height: `calc(100% - 8px)` }} className="m-2">
             <div
-              // ref={firstDivRef}
+              ref={firstDivRef}
               className="flex justify-between items-center bg-primary px-5 py-3 mb-2"
             >
               <div className="left uppercase">

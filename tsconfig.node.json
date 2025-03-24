@@ -11,10 +11,7 @@
     "allowImportingTsExtensions": true,
     "isolatedModules": true,
     "moduleDetection": "force",
-    "composite": true,
-    "declaration": true,
-    "resolveJsonModule": true,
-    "esModuleInterop": true ,
+    "noEmit": true,
 
     /* Linting */
     "strict": false,
