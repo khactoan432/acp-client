@@ -219,9 +219,11 @@ const AdminModalV2: React.FC<AdminModalProps> = ({
       });
     }
 
+    // console.log(finalData)
+
     onSave(finalData);
 
-    onClose();
+    // onClose();
   };
 
   return (
@@ -370,6 +372,7 @@ const AdminModalV2: React.FC<AdminModalProps> = ({
             Huỷ
           </Button>
           <Button
+            htmlType="button"
             className="button-save"
             style={{
               backgroundColor: "#00095b",

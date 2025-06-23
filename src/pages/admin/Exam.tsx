@@ -192,36 +192,87 @@ const AdminExam: React.FC = () => {
     fetchDataExam();
   }, [isFetchData]);
   // data table exam
-  let columnsExam = ["name", "link", "price", "discount", "image", "video"];
-  let fieldSearch = ["name", "link"];
-  let dataExam = allExam;
+  const columnsExam = ["name", "link", "price", "discount", "image", "video"];
+  const fieldSearch = ["name", "link"];
+  const dataExam = allExam;
+
+  //get upload url
+  const getSignedUrlAndUpload = async (file: File, folder: string) => {
+    // 1. Xin signed URL từ backend
+    const query = new URLSearchParams({
+      folder,
+      filename: file.name,
+      mimetype: file.type,
+    });
+
+    const res = await getData(`/api/upload/upload-url?${query.toString()}`, {
+      headers: {
+        Authorization: `Bearer ${header}`,
+      },
+    });
+    
+    const data = res;
+    const signedUrl = data.url;
+    const filePath = data.filePath;
+
+    // console.log(folder, file.name, file.type, data)
+
+
+    // 2. Upload trực tiếp lên GCS
+    await fetch(signedUrl, {
+      method: "PUT",
+      headers: { "Content-Type": file.type },
+      mode: "cors",
+      body: file,
+    });
+
+    // 3. Trả về public URL
+    return `https://storage.googleapis.com/acp_website/${filePath}`;
+  };
+
   // save
   const funcCreate = async (data: any) => {
     const { name, link, price, discount, video, image, type } = data;
     setIsLoading(true);
     try {
-      // 1. Upload exam information
-      const formData = new FormData();
-      image.forEach((file) => formData.append("fileImage", file));
-      video.forEach((file) => formData.append("fileVideo", file));
+      // Upload image & video lên GCS
+      const uploadedImages = await Promise.all(
+        image.map((file) => getSignedUrlAndUpload(file, "exams/image"))
+      );
+      const uploadedVideos = await Promise.all(
+        video.map((file) => getSignedUrlAndUpload(file, "exams/video"))
+      );
 
-      formData.append("categories", JSON.stringify(type));
-      formData.append("name", name);
-      formData.append("price", price);
-      formData.append("discount", discount);
-      formData.append("link", link);
+      // console.log({
+      //   name,
+      //   link,
+      //   price,
+      //   discount,
+      //   type,
+      //   image: uploadedImages,
+      //   video: uploadedVideos,
+      // })
 
-      await postData("/api/admin/exam", formData, {
+      // Gửi dữ liệu metadata lên backend
+      await postData("/api/admin/exam", {
+        name,
+        link,
+        price,
+        discount,
+        categories: JSON.stringify(type),
+        image: uploadedImages,
+        video: uploadedVideos,
+      }, {
         headers: {
-          "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${header}`,
         },
       });
 
       toast.success("Tạo mới video đề thi thành công");
+      setIsModalCreate(false);
     } catch (err) {
-      toast.error("Tạo mới video đề thi thất bại", err.message);
-      console.error("Error saving exam:", err);
+      toast.error(`Tạo mới video đề thi thất bại: ${err.message}`);
+      console.error(`Error saving exam:, ${err}`);
     } finally {
       setIsLoading(false);
       setIsFetchData(!isFetchData);
@@ -232,33 +283,36 @@ const AdminExam: React.FC = () => {
     const { name, link, price, discount, video, image, type } = data;
     setIsLoading(true);
     const id = idExam;
+
     try {
-      const formData = new FormData();
-      const allCategories = type;
+      const uploadIfChanged = async (fileOrUrl, folder) => {
+        if (fileOrUrl instanceof File) {
+          return getSignedUrlAndUpload(fileOrUrl, folder);
+        }
+        return fileOrUrl; // giữ nguyên URL cũ
+      };
 
-      if (video !== data.old_video.value) {
-        video.forEach((file) => formData.append("fileVideo", file));
-      } else {
-        formData.append("video", video);
-      }
-      if (image !== data.old_image.value) {
-        image.forEach((file) => formData.append("fileImage", file));
-      } else {
-        formData.append("image", image);
-      }
+      const uploadedImages = await Promise.all(
+        image.map((item) => uploadIfChanged(item, "exams/image"))
+      );
+      const uploadedVideos = await Promise.all(
+        video.map((item) => uploadIfChanged(item, "exams/video"))
+      );
 
-      formData.append("categories", JSON.stringify(allCategories));
-      formData.append("name", name);
-      formData.append("link", link);
-      formData.append("price", price);
-      formData.append("discount", discount);
-
-      await putData(`/api/admin/exam/${id}`, formData, {
+      await putData(`/api/admin/exam/${id}`, {
+        name,
+        link,
+        price,
+        discount,
+        type,
+        image: uploadedImages,
+        video: uploadedVideos,
+      }, {
         headers: {
-          "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${header}`,
         },
       });
+
       toast.success("Cập nhật đề thi thành công");
     } catch (err) {
       toast.error("Cập nhật đề thi thất bại", err.message);
@@ -273,7 +327,7 @@ const AdminExam: React.FC = () => {
   const funcDelete = async () => {
     setIsLoading(true);
     try {
-      let listIdDeleted = Array.isArray(idExam) ? idExam : [idExam];
+      const listIdDeleted = Array.isArray(idExam) ? idExam : [idExam];
       const results = await Promise.allSettled(
         listIdDeleted.map((element) =>
           deleteData(`/api/admin/exam/${element}`, {
