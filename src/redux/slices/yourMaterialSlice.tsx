@@ -30,7 +30,7 @@ interface Exam {
 }
 
 // Define the initial state
-interface UserState {
+export interface UserState {
   yourCourses: Course[];
   yourExams: Exam[];
   totalCourse: number;
@@ -141,6 +141,7 @@ const yourMaterialSlice = createSlice({
       .addCase(fetchYourCourseDetail.fulfilled, (state, action) => {
         state.loading = false;
         state.selectedCourse = action.payload;
+        console.log(action.payload);
       })
       .addCase(fetchYourCourseDetail.rejected, (state, action) => {
         state.loading = false;

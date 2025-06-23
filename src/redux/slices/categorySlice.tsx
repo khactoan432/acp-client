@@ -14,7 +14,7 @@ interface Category {
 }
 
 // Define the initial state
-interface CategoryState {
+export interface CategoryState {
   adminCategories: Category[];
   userCategories: Category[];
   loading: boolean;

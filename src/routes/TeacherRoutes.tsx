@@ -1,6 +1,6 @@
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
-import TeacherDashboard from "../pages/teacher/DashBoard";
+import TeacherDashboard from "../pages/teacher/Dashboard";
 import TeacherCourses from "../pages/teacher/Courses";
 
 const TeacherRoutes: React.FC = () => {

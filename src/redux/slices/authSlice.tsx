@@ -10,7 +10,7 @@ interface User {
   codeforce_name: string | null
 }
 
-interface AuthState {
+export interface AuthState {
   user: User | null // Khởi tạo user là null khi chưa có dữ liệu
   access_token: string | null
 }

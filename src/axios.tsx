@@ -4,6 +4,7 @@ import store from "./redux/store";
 import { logout } from "./redux/slices/authSlice";
 
 const api = axios.create({
+  // baseURL: "https://backend-dot-durable-pipe-444206-d0.as.r.appspot.com",
   baseURL: "http://localhost:8080",
   headers: {
     "Content-Type": "application/json",

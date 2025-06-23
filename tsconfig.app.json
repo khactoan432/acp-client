@@ -9,11 +9,14 @@
 
     /* Bundler mode */
     "moduleResolution": "Bundler",
+    "emitDeclarationOnly": true,
     "allowImportingTsExtensions": true,
     "isolatedModules": true,
     "moduleDetection": "force",
     "composite": true,
     "declaration": true,
+    "outDir": "dist",  //  Chỉ định thư mục xuất file
+    "rootDir": "src",  //  Chỉ lấy code trong src
     "jsx": "react-jsx",
 
     /* Linting */
@@ -21,7 +24,8 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": true,
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
 }

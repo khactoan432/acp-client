@@ -14,7 +14,7 @@ interface Order {
 }
 
 // Define the initial state
-interface OrderState {
+export interface OrderState {
   adminOrders: Order[];
   userOrders: Order[];
   totalAdmin: number;

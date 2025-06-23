@@ -35,9 +35,14 @@ const UserLearning: React.FC = () => {
   const { selectedCourse, loading, error } = useSelector(
     (state: RootState) => state.yourMaterials
   );
-  console.log(loading, error);
+  console.log(loading, error, selectedCourse);
 
-  const [currentLesson, setCurrentLesson] = useState(null);
+  const [currentLesson, setCurrentLesson] = useState({
+    _id : "",
+    video: "",
+    name:"",
+    isCompleted: false
+  });
 
   const id_course = id ?? "default-id";
 

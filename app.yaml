@@ -1,0 +1,13 @@
+runtime: nodejs20
+
+handlers:
+  - url: /(.*\.(js|css|map|json|png|jpg|svg|woff2?|ttf|eot|otf))
+    static_files: dist/\1
+    upload: dist/.*\.(js|css|map|json|png|jpg|svg|woff2?|ttf|eot|otf)
+
+  - url: /assets
+    static_dir: dist/assets
+
+  - url: /.*
+    static_files: dist/index.html
+    upload: dist/index.html

@@ -12,10 +12,10 @@ import { FaHandMiddleFinger } from "react-icons/fa6";
 import { Button } from "antd";
 
 // impoprt component
-import AdminHeader from "../../../components/layout/Admin/header";
-import Nav from "../../../components/layout/Admin/nav";
+import AdminHeader from "../../../components/layout/Admin/Header";
+import Nav from "../../../components/layout/Admin/Nav";
 import Loading from "../../../components/loading";
-import MSInput from "../../../components/input/MsInput";
+import MSInput, { MSInputHandle } from "../../../components/input/MsInput";
 import ButtonPlus from "../../../components/button/plus";
 import AdminModalV2 from "../../../components/popup/AdminModalV2";
 import { TypeInput } from "../../../constants/TypeEnum";
@@ -55,17 +55,7 @@ const AdminBanner: React.FC = () => {
   const [categories, setCategories] = useState<Record<string, Category[]>>({});
 
   // state ref
-  const refCategories: React.MutableRefObject<
-    Record<
-      string,
-      React.RefObject<{
-        focus: () => void;
-        getValue: () => string;
-        setValue: (value: string) => void;
-        clear: () => void;
-      }>[]
-    >
-  > = useRef({});
+  const refCategories = useRef<Record<string, (MSInputHandle | null)[]>>({});
   // structure store
   const [structCategoryType, setStructCategoryType] = useState([
     {
@@ -177,6 +167,7 @@ const AdminBanner: React.FC = () => {
 
   const createCategory = async (idex: string) => {
     const value = refCategories.current[idex].map((d) => d.getValue());
+
 
     const category = value.map((val) => ({
       _id: "",
@@ -497,23 +488,9 @@ const AdminBanner: React.FC = () => {
                                   <MSInput
                                     ref={(el) => {
                                       if (!refCategories.current[typeId]) {
-                                        refCategories.current[typeId] = [];
+                                        refCategories.current[typeId] = []; // Tạo mảng nếu chưa có
                                       }
-                                      while (
-                                        refCategories.current[typeId].length <=
-                                        index
-                                      ) {
-                                        refCategories.current[typeId].push(
-                                          React.createRef<{
-                                            focus: () => void;
-                                            getValue: () => string;
-                                            setValue: (value: string) => void;
-                                            clear: () => void;
-                                          }>()
-                                        );
-                                      }
-                                      refCategories.current[typeId][index] =
-                                        el!; // vscode ngu:)
+                                      refCategories.current[typeId][index] = el; //  Không gán vào `current`
                                     }}
                                     label={`Category: ${category.id}`}
                                     placeholder="Enter a category"

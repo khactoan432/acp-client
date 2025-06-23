@@ -14,7 +14,7 @@ interface User {
 }
 
 // Define the initial state
-interface UserState {
+export interface UserState {
   adminTeachers: User[];
   userTeachers: User[];
   totalAdmin: number;

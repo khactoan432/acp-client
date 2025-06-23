@@ -8,7 +8,7 @@ interface Banner {
 }
 
 // Define the initial state
-interface BannerState {
+export interface BannerState {
   adminBanners: Banner[]; // Banner dành cho admin
   userBanners: Banner[]; // Banner hiển thị cho user
   totalAdmin: number;

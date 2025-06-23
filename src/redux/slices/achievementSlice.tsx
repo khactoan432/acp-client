@@ -11,7 +11,7 @@ interface Achievement {
 }
 
 // Define the initial state
-interface AchievementState {
+export interface AchievementState {
   adminAchievements: Achievement[];
   userAchievements: Achievement[];
   totalAdmin: number;

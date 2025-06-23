@@ -12,7 +12,7 @@ dayjs.extend(relativeTime);
 dayjs.locale("vi");
 
 // import useFetchData from "../../../hooks/useFetchData";
-import { createRate, fetchUserRates } from "../../../redux/slices/rateSlice";
+import { createRate, createReply, fetchUserRates } from "../../../redux/slices/rateSlice";
 import Loading from "../../loading";
 
 interface Rating {
@@ -134,9 +134,11 @@ const RatingPage: React.FC<RatingPageProps> = ({
       };
 
       console.log(newRating);
-      await dispatch(createRate(newRating)).unwrap();
-      setForm({ rate: 0, content: "" });
-      setShowForm(false);
+      await dispatch(createReply(newRating)).unwrap();
+      setReplyForm((prev) => ({
+        ...prev,
+        [id_ref_material]: { content: "" },
+      }));
     } else {
       alert("Vui lòng điền đầy đủ thông tin!");
     }
@@ -360,7 +362,7 @@ const RatingPage: React.FC<RatingPageProps> = ({
                         >
                           {openReplies[rating._id]
                             ? "Ẩn trả lời"
-                            : `${rating?.replies?.length} Trả lời`}
+                            : `${rating?.replies?.length ?? 0} Trả lời`}
                         </button>
                       ) : (
                         <button className="text-blue-500 text-sm mt-2">

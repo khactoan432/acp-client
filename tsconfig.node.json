@@ -8,20 +8,26 @@
 
     /* Bundler mode */
     "moduleResolution": "Bundler",
+    "emitDeclarationOnly": true,
     "allowImportingTsExtensions": true,
     "isolatedModules": true,
     "moduleDetection": "force",
     "composite": true,
     "declaration": true,
+    "outDir": "dist",  //  Xuất file build vào "dist"
+    "rootDir": "src",  //  Chỉ lấy code trong "src"
     "resolveJsonModule": true,
-    "esModuleInterop": true ,
+    "esModuleInterop": true,
 
     /* Linting */
     "strict": false,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": true,
+
+    "jsx": "react-jsx", 
   },
-  "include": ["vite.config.ts"]
+  "include": ["./src/vite.config.ts"],
+  "exclude": ["node_modules", "dist"]
 }

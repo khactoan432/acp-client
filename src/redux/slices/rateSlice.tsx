@@ -26,7 +26,7 @@ interface Comment {
 }
 
 // Define the initial state
-interface RateState {
+export interface RateState {
   adminRates: Rate[];
   userRates: Rate[];
   userComments: Comment[];
@@ -103,6 +103,22 @@ export const createRate = createAsyncThunk(
       return response;
     } catch (error: any) {
       return rejectWithValue(error.message || 'Failed to create rate');
+    }
+  }
+);
+
+export const createReply = createAsyncThunk(
+  'rates/createReply',
+  async (rateData: object, { rejectWithValue }) => {
+    try {
+      const response = await postData('api/user/interaction', rateData, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('access_token')}`
+        },
+      });
+      return response;
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Failed to create reply');
     }
   }
 );
@@ -203,13 +219,50 @@ const rateSlice = createSlice({
       })
       .addCase(createRate.fulfilled, (state, action) => {
         state.loading = false;
-        const createdRates = action.payload.data;
-        console.log(action.payload ,state.userRates, createdRates, state.userRates.concat(createdRates))
+        const createdRate = action.payload.data;
 
-        state.userRates=state.userRates.concat(createdRates);
+        state.userRates = [createdRate, ...state.userRates];
         state.totalRateUser = state.totalRateUser + 1;
       })
       .addCase(createRate.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+
+      // Create Reply
+      .addCase(createReply.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(createReply.fulfilled, (state, action) => {
+        state.loading = false;
+        const newReply = action.payload.data;
+        
+        console.log("Finding in userRates:", state.userRates);
+        
+        const interactionIndex = state.userRates.findIndex(
+            (interaction) => String(interaction._id) === String(newReply.id_ref_material)
+        );
+    
+        console.log("Found at index:", interactionIndex);
+    
+        if (interactionIndex !== -1) {
+            // Cập nhật userRates bằng cách tạo một bản sao mới
+            state.userRates = state.userRates.map((interaction, index) => {
+                if (index === interactionIndex) {
+                    return {
+                        ...interaction,
+                        replies: [newReply, ...(interaction.replies || [])]
+                    };
+                }
+                return interaction;
+            });
+        }
+    
+        console.log("Updated userRates:", JSON.stringify(state.userRates, null, 2));
+      })   
+      
+      .addCase(createReply.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       })
@@ -222,10 +275,11 @@ const rateSlice = createSlice({
       .addCase(updateRate.fulfilled, (state, action) => {
         state.loading = false;
         const updatedRate = action.payload.data;
-        const index = state.adminRates.findIndex((rate) => rate._id === updatedRate._id);
+        const index = state.userRates.findIndex((rate) => rate._id === updatedRate._id);
         if (index !== -1) {
-          state.adminRates[index] = updatedRate;
+          state.userRates[index] = updatedRate;
         }
+        console.log(updatedRate, state.userRates);
       })
       .addCase(updateRate.rejected, (state, action) => {
         state.loading = false;

@@ -10,7 +10,7 @@ import { IconType } from "react-icons";
 import "./MsInput.scss";
 
 // Định nghĩa interface cho các phương thức của ref
-interface MSInputHandle {
+export interface MSInputHandle {
   focus: () => void;
   getValue: () => string;
   setValue: (value: string) => void;

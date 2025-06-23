@@ -14,7 +14,7 @@ interface Exam {
 }
 
 // Define the initial state
-interface UserState {
+export interface UserState {
   adminExams: Exam[];
   userExams: Exam[];
   totalAdmin: number;
