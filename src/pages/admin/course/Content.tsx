@@ -14,6 +14,8 @@ import MSInput from "../../../components/input/MsInput";
 import Loading from "../../../components/loading";
 import PopupNotification from "../../../components/popup/notify";
 import { TypeInput } from "../../../constants/TypeEnum";
+// help func
+import { getSignedUrlAndUpload } from "../../../helpers/reqSignedUrlAndUpload";
 
 // import icon react
 import { CiEdit } from "react-icons/ci";
@@ -225,22 +227,23 @@ const Content: React.FC = () => {
   }, [dataLesson]);
   //handle save
   const createLesson = async (data: any) => {
-    console.log("data: ", data);
     const { name, link, exercise, video } = data;
     const dataExercise = [{ link: link, name: exercise }];
     setIsLoading(true);
     try {
-      const formData = new FormData();
-      video.forEach((file) => formData.append("fileVideo", file));
-      formData.append("name", name);
-      formData.append("status", "PRIVATE");
+      const uploadedVideos = await Promise.all(
+        video.map((file) => getSignedUrlAndUpload(file, "course/topic/video"))
+      );
 
       const resLesson = await postData(
         `/api/admin/lesson/${idTopic}`,
-        formData,
+        {
+          name,
+          video: uploadedVideos,
+          status: "PRIVATE",
+        },
         {
           headers: {
-            "Content-Type": "multipart/form-data",
             Authorization: `Bearer ${header}`,
           },
         }
@@ -262,6 +265,7 @@ const Content: React.FC = () => {
       }
 
       toast.success("Tạo mới bài học thành công.");
+      setIsModalCreate(false);
     } catch (error) {
       toast.error("Tạo mới bài học sảy ra lỗi!");
       console.error(`Error saving describe/describe`, error);
@@ -293,20 +297,28 @@ const Content: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const formData = new FormData();
+      let uploadedVideos;
       if (video !== data.old_video.value) {
-        video.forEach((file) => formData.append("fileVideo", file));
+        uploadedVideos = await Promise.all(
+          video.map((file) => getSignedUrlAndUpload(file, "course/topic/video"))
+        );
       } else {
-        formData.append("video", video);
+        uploadedVideos = video;
       }
-      formData.append("name", name);
-      await putData(`/api/admin/lesson/${idIntro}`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${header}`,
+      await putData(
+        `/api/admin/lesson/${idIntro}`,
+        {
+          name,
+          video: uploadedVideos,
         },
-      });
+        {
+          headers: {
+            Authorization: `Bearer ${header}`,
+          },
+        }
+      );
       toast.success("Cập nhật bài học thành công.");
+      setIsModalUpdate(false);
     } catch (error) {
       toast.error("Cập nhật bài học sảy ra lỗi!");
       console.error(`Error saving describe/describe`, error);

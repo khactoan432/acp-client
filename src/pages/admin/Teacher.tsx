@@ -7,6 +7,9 @@ import Nav from "../../components/layout/Admin/Nav";
 import Table from "../../components/table";
 import Loading from "../../components/loading";
 import PopupNotification from "../../components/popup/notify";
+// help func
+import { getSignedUrlAndUpload } from "../../helpers/reqSignedUrlAndUpload";
+
 // import antd
 import { Button } from "antd";
 // import axios
@@ -188,24 +191,32 @@ const AdminTeacher: React.FC = () => {
       image,
     } = data;
 
-    const formData = new FormData();
-    image.forEach((file) => formData.append("fileImage", file));
-    formData.append("name", name);
-    formData.append("email", email);
-    formData.append("password", password);
-    formData.append("repassword", repassword);
-    formData.append("codeforce_name", codeforce_name);
-    formData.append("phone_number", phone_number);
-    formData.append("role", "TEACHER");
+    // Upload image & video lên GCS
+    const uploadedImages = await Promise.all(
+      image.map((file) => getSignedUrlAndUpload(file, "teacher/image"))
+    );
 
     try {
-      await postData(`/api/admin/user`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${header}`,
+      await postData(
+        `/api/admin/user`,
+        {
+          name,
+          email,
+          password,
+          repassword,
+          codeforce_name,
+          phone_number,
+          role: "TEACHER",
+          image: uploadedImages,
         },
-      });
+        {
+          headers: {
+            Authorization: `Bearer ${header}`,
+          },
+        }
+      );
       toast.success("Tạo mới giáo viên thành công!");
+      setIsModalCreate(false);
     } catch (e) {
       toast.error("Tạo mới giáo viên thất bại!", e.message);
     } finally {
@@ -221,24 +232,34 @@ const AdminTeacher: React.FC = () => {
     const _id = idTeacher;
     setIsLoading(true);
     try {
-      const formData = new FormData();
+      let uploadedImages;
       if (image !== data.old_image.value) {
-        image.forEach((file) => formData.append("fileImage", file));
+        // Upload image & video lên GCS
+        uploadedImages = await Promise.all(
+          image.map((file) => getSignedUrlAndUpload(file, "teacher/image"))
+        );
       } else {
-        formData.append("image", image);
+        uploadedImages = image;
       }
-      formData.append("name", name);
-      formData.append("email", email);
-      formData.append("codeforce_name", codeforce_name);
-      formData.append("phone_number", phone_number);
 
-      await putData(`/api/admin/user/${_id}`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${header}`,
+      await putData(
+        `/api/admin/user/${_id}`,
+        {
+          name,
+          email,
+          codeforce_name,
+          phone_number,
+          role: "TEACHER",
+          image: uploadedImages,
         },
-      });
+        {
+          headers: {
+            Authorization: `Bearer ${header}`,
+          },
+        }
+      );
       toast.success("Cập nhật giáo viên thành công!");
+      setIsModalUpdate(false);
     } catch (e) {
       toast.error("Cập nhật giáo viên thất bại!", e.message);
     } finally {

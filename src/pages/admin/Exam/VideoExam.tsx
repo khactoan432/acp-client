@@ -10,6 +10,8 @@ import Table from "../../../components/table";
 import Loading from "../../../components/loading";
 import PopupNotification from "../../../components/popup/notify";
 import AdminModalV2 from "../../../components/popup/AdminModalV2";
+// import helps fun
+import { getSignedUrlAndUpload } from "../../../helpers/reqSignedUrlAndUpload";
 // import icon react
 import { FaRegEdit } from "react-icons/fa";
 import { MdOutlineDeleteOutline } from "react-icons/md";
@@ -171,24 +173,32 @@ const ExamVideo: React.FC = () => {
     const id = idExam;
     const { describe, video } = data;
 
-    const formData = new FormData();
+    // Upload image & video lên GCS
+    const uploadedVideos = await Promise.all(
+      video.map((file) => getSignedUrlAndUpload(file, "exams/video/introduce"))
+    );
+
     if (!id || !video || !describe) {
       console.error("Missing data");
       alert("Thiếu thông tin id || describe || video ");
       return;
     }
-    // append form
-    video.forEach((file) => formData.append("fileVideo", file));
-    formData.append("describe", describe);
 
     try {
-      await postData(`/api/admin/exam/video/${id}`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${header}`,
+      await postData(
+        `/api/admin/exam/video/${id}`,
+        {
+          describe,
+          video: uploadedVideos,
         },
-      });
+        {
+          headers: {
+            Authorization: `Bearer ${header}`,
+          },
+        }
+      );
       toast.success("Tạo mới video đề thi thành công!");
+      setIsModalCreateVideoExam(false);
     } catch (error) {
       toast.error("Tạo mới video đề thi thất bại!", error.message);
       console.error("Error saving data: ", error);
@@ -203,27 +213,36 @@ const ExamVideo: React.FC = () => {
     //video: string | file, describe: string
     const id = idVideo;
     const { video, describe } = data;
-    console.log("video: ", video);
     if (!id || !describe || !video) {
       alert("Thiếu thông tin id || describe || video ");
       return;
     }
     setIsLoading(true);
     try {
-      const formData = new FormData();
+      let uploadedVideos;
       if (video !== data.old_video.value) {
-        video.forEach((file) => formData.append("fileVideo", file));
+        uploadedVideos = await Promise.all(
+          video.map((file) =>
+            getSignedUrlAndUpload(file, "exams/video/introduce")
+          )
+        );
       } else {
-        formData.append("video", video);
+        uploadedVideos = video;
       }
-      formData.append("describe", describe);
 
-      await putData(`/api/admin/exam/video/${id}`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${header}`,
+      await putData(
+        `/api/admin/exam/video/${id}`,
+        {
+          describe,
+          video: uploadedVideos,
         },
-      });
+        {
+          headers: {
+            Authorization: `Bearer ${header}`,
+          },
+        }
+      );
+      setIsModalUpdateVideoExam(false);
       toast.success("Cập nhật video đề thi thành công!");
     } catch (e) {
       toast.error("Cập nhật video đề thi thất bại!", e.message);

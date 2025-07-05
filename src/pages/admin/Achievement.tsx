@@ -7,6 +7,9 @@ import Nav from "../../components/layout/Admin/Nav";
 import Table from "../../components/table";
 import Loading from "../../components/loading";
 import PopupNotification from "../../components/popup/notify";
+// help func
+import { getSignedUrlAndUpload } from "../../helpers/reqSignedUrlAndUpload";
+
 // import antd
 import { Button } from "antd";
 // import axios
@@ -145,19 +148,27 @@ const AdminAchievement: React.FC = () => {
     setIsLoading(true);
     const { email_user, prize, competition, image } = data;
 
-    const formData = new FormData();
-    image.forEach((file) => formData.append("fileImage", file));
-    formData.append("email_user", email_user);
-    formData.append("prize", prize);
-    formData.append("competition", competition);
+    // Upload image & video lên GCS
+    const uploadedImages = await Promise.all(
+      image.map((file) => getSignedUrlAndUpload(file, "achievement/image"))
+    );
     try {
-      await postData(`/api/admin/achievement`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${header}`,
+      await postData(
+        `/api/admin/achievement`,
+        {
+          email_user,
+          prize,
+          competition,
+          image: uploadedImages,
         },
-      });
+        {
+          headers: {
+            Authorization: `Bearer ${header}`,
+          },
+        }
+      );
       toast.success("Tạo mới học sinh xuất sắc thành công!");
+      setIsModalCreate(false);
     } catch (e) {
       toast.error("Tạo mới học sinh xuất sắc thất bại!", e.message);
     } finally {
@@ -174,24 +185,32 @@ const AdminAchievement: React.FC = () => {
     const _id = idAchivement;
     setIsLoading(true);
     try {
-      const formData = new FormData();
+      // Upload image & video lên GCS
+      let uploadedImages;
       if (image !== data.old_image.value) {
-        image.forEach((file) => formData.append("fileImage", file));
+        uploadedImages = await Promise.all(
+          image.map((file) => getSignedUrlAndUpload(file, "achievement/image"))
+        );
       } else {
-        formData.append("image", image);
+        uploadedImages = image;
       }
 
-      formData.append("email_user", email_user);
-      formData.append("prize", prize);
-      formData.append("competition", competition);
-
-      await putData(`/api/admin/achievement/${_id}`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${header}`,
+      await putData(
+        `/api/admin/achievement/${_id}`,
+        {
+          email_user,
+          prize,
+          competition,
+          image: uploadedImages,
         },
-      });
+        {
+          headers: {
+            Authorization: `Bearer ${header}`,
+          },
+        }
+      );
       toast.success("Cập nhật học sinh xuất sắc thất thành công!");
+      setIsModalUpdate(false);
     } catch (e) {
       toast.error("Cập nhật học sinh xuất sắc thất thất bại!", e.message);
     } finally {

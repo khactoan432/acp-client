@@ -17,6 +17,8 @@ import Loading from "../../components/loading";
 import Table from "../../components/table";
 import PopupNotification from "../../components/popup/notify";
 import AdminModalV2 from "../../components/popup/AdminModalV2";
+// help func
+import { getSignedUrlAndUpload } from "../../helpers/reqSignedUrlAndUpload";
 //axios
 import { postData, getData, deleteData, putData } from "../../axios";
 
@@ -153,22 +155,32 @@ const AdminExam: React.FC = () => {
     const { name, price, discount, video, image } = data;
     setIsLoading(true);
     try {
-      const formData = new FormData();
-      image.forEach((file) => formData.append("fileImage", file));
-      video.forEach((file) => formData.append("fileVideo", file));
+      // Upload image & video lên GCS
+      const uploadedImages = await Promise.all(
+        image.map((file) => getSignedUrlAndUpload(file, "course/image"))
+      );
+      const uploadedVideos = await Promise.all(
+        video.map((file) => getSignedUrlAndUpload(file, "course/video"))
+      );
 
-      formData.append("name", name);
-      formData.append("price", price);
-      formData.append("discount", discount);
-
-      await postData("/api/admin/course", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${header}`,
+      await postData(
+        "/api/admin/course",
+        {
+          name,
+          price,
+          discount,
+          image: uploadedImages,
+          video: uploadedVideos,
         },
-      });
+        {
+          headers: {
+            Authorization: `Bearer ${header}`,
+          },
+        }
+      );
 
       toast.success("Tạo mới khoá học thành công.");
+      setIsModalCreate(false);
     } catch (err) {
       toast.error("Tạo mới khóa học thất bại!", err.message);
       console.error("Error saving course:", err);
@@ -184,31 +196,43 @@ const AdminExam: React.FC = () => {
     const id = idCourse;
     setIsLoading(true);
     try {
-      const formData = new FormData();
+      let uploadedImages;
+      let uploadedVideos;
 
       if (video !== data.old_video.value) {
-        video.forEach((file) => formData.append("fileVideo", file));
+        // Upload image & video lên GCS
+        uploadedVideos = await Promise.all(
+          video.map((file) => getSignedUrlAndUpload(file, "course/video"))
+        );
       } else {
-        formData.append("video", video);
+        uploadedVideos = video;
       }
       if (image !== data.old_image.value) {
-        image.forEach((file) => formData.append("fileImage", file));
+        uploadedImages = await Promise.all(
+          image.map((file) => getSignedUrlAndUpload(file, "course/image"))
+        );
       } else {
-        formData.append("image", image);
+        uploadedImages = image;
       }
 
-      formData.append("name", name);
-      formData.append("price", price);
-      formData.append("discount", discount);
-
-      await putData(`/api/admin/course/${id}`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${header}`,
+      await putData(
+        `/api/admin/course/${id}`,
+        {
+          name,
+          price,
+          discount,
+          image: uploadedImages,
+          video: uploadedVideos,
         },
-      });
+        {
+          headers: {
+            Authorization: `Bearer ${header}`,
+          },
+        }
+      );
 
       toast.success("Cập nhật khoá học thành công.");
+      setIsModalUpdate(false);
     } catch (err) {
       toast.error("Cập nhật khoá học thất bại!", err.message);
       console.error("Error saving course:", err);

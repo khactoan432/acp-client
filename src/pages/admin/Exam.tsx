@@ -20,6 +20,8 @@ import Loading from "../../components/loading";
 import Table from "../../components/table";
 import PopupNotification from "../../components/popup/notify";
 // import validation
+// help func
+import { getSignedUrlAndUpload } from "../../helpers/reqSignedUrlAndUpload";
 
 //axios
 import { postData, getData, deleteData, putData } from "../../axios";
@@ -196,40 +198,6 @@ const AdminExam: React.FC = () => {
   const fieldSearch = ["name", "link"];
   const dataExam = allExam;
 
-  //get upload url
-  const getSignedUrlAndUpload = async (file: File, folder: string) => {
-    // 1. Xin signed URL từ backend
-    const query = new URLSearchParams({
-      folder,
-      filename: file.name,
-      mimetype: file.type,
-    });
-
-    const res = await getData(`/api/upload/upload-url?${query.toString()}`, {
-      headers: {
-        Authorization: `Bearer ${header}`,
-      },
-    });
-    
-    const data = res;
-    const signedUrl = data.url;
-    const filePath = data.filePath;
-
-    // console.log(folder, file.name, file.type, data)
-
-
-    // 2. Upload trực tiếp lên GCS
-    await fetch(signedUrl, {
-      method: "PUT",
-      headers: { "Content-Type": file.type },
-      mode: "cors",
-      body: file,
-    });
-
-    // 3. Trả về public URL
-    return `https://storage.googleapis.com/acp_website/${filePath}`;
-  };
-
   // save
   const funcCreate = async (data: any) => {
     const { name, link, price, discount, video, image, type } = data;
@@ -254,19 +222,23 @@ const AdminExam: React.FC = () => {
       // })
 
       // Gửi dữ liệu metadata lên backend
-      await postData("/api/admin/exam", {
-        name,
-        link,
-        price,
-        discount,
-        categories: JSON.stringify(type),
-        image: uploadedImages,
-        video: uploadedVideos,
-      }, {
-        headers: {
-          Authorization: `Bearer ${header}`,
+      await postData(
+        "/api/admin/exam",
+        {
+          name,
+          link,
+          price,
+          discount,
+          categories: JSON.stringify(type),
+          image: uploadedImages,
+          video: uploadedVideos,
         },
-      });
+        {
+          headers: {
+            Authorization: `Bearer ${header}`,
+          },
+        }
+      );
 
       toast.success("Tạo mới video đề thi thành công");
       setIsModalCreate(false);
@@ -299,19 +271,23 @@ const AdminExam: React.FC = () => {
         video.map((item) => uploadIfChanged(item, "exams/video"))
       );
 
-      await putData(`/api/admin/exam/${id}`, {
-        name,
-        link,
-        price,
-        discount,
-        type,
-        image: uploadedImages,
-        video: uploadedVideos,
-      }, {
-        headers: {
-          Authorization: `Bearer ${header}`,
+      await putData(
+        `/api/admin/exam/${id}`,
+        {
+          name,
+          link,
+          price,
+          discount,
+          type,
+          image: uploadedImages,
+          video: uploadedVideos,
         },
-      });
+        {
+          headers: {
+            Authorization: `Bearer ${header}`,
+          },
+        }
+      );
 
       toast.success("Cập nhật đề thi thành công");
     } catch (err) {

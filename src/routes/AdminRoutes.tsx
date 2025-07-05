@@ -4,6 +4,7 @@ import Dashboard from "../pages/admin/DashBoard";
 import GlobalSetting from "../pages/admin/GlobalSetting";
 import PersonalSetting from "../pages/admin/PersonalSetting";
 import Courses from "../pages/admin/Courses";
+import InfoStudent from "../pages/admin/InforStudent/InforStudent";
 import Topic from "../pages/admin/course/Topic";
 import Content from "../pages/admin/course/Content";
 import Introduce from "../pages/admin/course/Introduce";
@@ -69,7 +70,7 @@ const AdminRoutes: React.FC = () => {
         path="/courses/infor-student"
         element={
           <ProtectedRoute allowedRoles={["ADMIN"]}>
-            <Courses />
+            <InfoStudent />
           </ProtectedRoute>
         }
       />
