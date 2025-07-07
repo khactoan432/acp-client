@@ -28,7 +28,7 @@ interface User {
 const UserCourseDetail = () => {
   const { id } = useParams<{ id: string }>();
   const courseId = id ?? "default-id";
-  console.log(courseId);
+  // console.log(courseId);
 
   const dispatch = useDispatch<AppDispatch>();
   const selectedCourse = useSelector(
@@ -37,7 +37,7 @@ const UserCourseDetail = () => {
 
   useEffect(() => {
     dispatch(fetchCourseDetail(courseId));
-    console.log(1);
+    // console.log(1);
   }, [courseId]);
 
   const course = {
@@ -76,7 +76,7 @@ const UserCourseDetail = () => {
 
   const payment = async (id_material: string) => {
     try {
-      console.log("Payment initiated for:", id_material);
+      // console.log("Payment initiated for:", id_material);
 
       const userString = localStorage.getItem("user");
       let user: User | null = null;
@@ -101,7 +101,7 @@ const UserCourseDetail = () => {
         {}
       );
 
-      console.log("Payment response:", pm);
+      // console.log("Payment response:", pm);
 
       // Điều hướng đến URL thanh toán
       if (pm.data?.payUrl) {

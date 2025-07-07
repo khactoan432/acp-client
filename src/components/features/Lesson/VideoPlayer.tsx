@@ -18,7 +18,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ currentLesson, selectedCourse
   const videoRef = useRef<HTMLVideoElement>(null);
   const dispatch = useDispatch<AppDispatch>();
   // const [progress, setProgress] = useState(0);
-  console.log(currentLesson);
+  // console.log(currentLesson);
   const [hasCompleted, setHasCompleted] = useState(currentLesson.isCompleted);
 
   const handleCompleteLesson = useCallback(() => {

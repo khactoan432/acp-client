@@ -77,7 +77,7 @@ const ExamVideo: React.FC = () => {
             Authorization: `Bearer ${header}`,
           },
         });
-        console.log("res.data:", res.data);
+        // console.log("res.data:", res.data);
         setData(res.data);
       } catch (error) {
         console.error("Error fetching data: ", error);

@@ -35,7 +35,7 @@ const UserLearning: React.FC = () => {
   const { selectedCourse, loading, error } = useSelector(
     (state: RootState) => state.yourMaterials
   );
-  console.log(loading, error, selectedCourse);
+  // console.log(loading, error, selectedCourse);
 
   const [currentLesson, setCurrentLesson] = useState({
     _id : "",
@@ -50,7 +50,7 @@ const UserLearning: React.FC = () => {
     dispatch(fetchYourCourseDetail({id_user: JSON.parse(localStorage.getItem("user"))?._id ,id_course}));
   }, [dispatch, id_course]);
 
-  console.log(selectedCourse);
+  // console.log(selectedCourse);
 
   // Xử lý cập nhật bài học hiện tại khi selectedCourse thay đổi
   useEffect(() => {
@@ -126,7 +126,11 @@ const UserLearning: React.FC = () => {
 
   const circumference = 16 * 2 * Math.PI;
 
-  return (
+  return loading ? (
+    "Waiting for Loading"
+  ) : error ? (
+    "Something have wrong"
+  ) : (
     <div className=" flex flex-col h-screen bg-white">
       {/* Thanh điều hướng */}
       <header className="bg-gray-800 sticky top-0 text-white px-4 flex items-center text-lg font-bold h-[54px]">

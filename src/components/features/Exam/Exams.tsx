@@ -29,12 +29,12 @@ const Exams: React.FC = () => {
   const { userExams, loading, error } = useSelector(
     (state: RootState) => state.exams
   );
-  console.log(loading, error);
+  // console.log(loading, error);
 
   useEffect(() => {
     dispatch(fetchUserExams({ page: 1, limit: 4, filters: [] }));
   }, [dispatch]);
-  console.log(userExams);
+  // console.log(userExams);
 
   const settings = {
     dots: true,

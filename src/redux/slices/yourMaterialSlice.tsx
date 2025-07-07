@@ -63,7 +63,7 @@ export const fetchYourMaterial = createAsyncThunk(
           Authorization: `Bearer ${localStorage.getItem('access_token')}`,
         },
       });
-      console.log(response);
+      // console.log(response);
       return response;
     } catch (error: any) {
       return rejectWithValue(error.message || 'Failed to fetch Courses');
@@ -141,7 +141,7 @@ const yourMaterialSlice = createSlice({
       .addCase(fetchYourCourseDetail.fulfilled, (state, action) => {
         state.loading = false;
         state.selectedCourse = action.payload;
-        console.log(action.payload);
+        // console.log(action.payload);
       })
       .addCase(fetchYourCourseDetail.rejected, (state, action) => {
         state.loading = false;

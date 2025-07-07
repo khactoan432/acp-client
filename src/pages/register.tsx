@@ -89,7 +89,7 @@ const Register: React.FC = () => {
         setIsModalVisible(true);
       }
     } catch (e) {
-      console.log("aksmd: ", e);
+      // console.log("aksmd: ", e);
       toast.error(e.response.data.error);
       setErrorValid("general");
     } finally {

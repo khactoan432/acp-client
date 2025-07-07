@@ -154,7 +154,7 @@ const categorySlice = createSlice({
       .addCase(createCategory.fulfilled, (state, action) => {
         state.loading = false;
         const createdCategories = action.payload.data;
-        console.log(action.payload ,state.adminCategories, createdCategories, state.adminCategories.concat(createdCategories))
+        // console.log(action.payload ,state.adminCategories, createdCategories, state.adminCategories.concat(createdCategories))
 
         state.adminCategories=state.adminCategories.concat(createdCategories);
       })

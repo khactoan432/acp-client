@@ -238,13 +238,13 @@ const rateSlice = createSlice({
         state.loading = false;
         const newReply = action.payload.data;
         
-        console.log("Finding in userRates:", state.userRates);
+        // console.log("Finding in userRates:", state.userRates);
         
         const interactionIndex = state.userRates.findIndex(
             (interaction) => String(interaction._id) === String(newReply.id_ref_material)
         );
     
-        console.log("Found at index:", interactionIndex);
+        // console.log("Found at index:", interactionIndex);
     
         if (interactionIndex !== -1) {
             // Cập nhật userRates bằng cách tạo một bản sao mới
@@ -259,7 +259,7 @@ const rateSlice = createSlice({
             });
         }
     
-        console.log("Updated userRates:", JSON.stringify(state.userRates, null, 2));
+        // console.log("Updated userRates:", JSON.stringify(state.userRates, null, 2));
       })   
       
       .addCase(createReply.rejected, (state, action) => {
@@ -279,7 +279,7 @@ const rateSlice = createSlice({
         if (index !== -1) {
           state.userRates[index] = updatedRate;
         }
-        console.log(updatedRate, state.userRates);
+        // console.log(updatedRate, state.userRates);
       })
       .addCase(updateRate.rejected, (state, action) => {
         state.loading = false;

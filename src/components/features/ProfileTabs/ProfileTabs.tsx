@@ -56,7 +56,7 @@ const ProfileTabs: React.FC = () => {
   const { yourCourses, yourExams, loading, error } = useSelector(
     (state: RootState) => state.yourMaterials
   );
-  console.log(loading, error);
+  // console.log(loading, error);
 
   useEffect(() => {
     dispatch(
@@ -66,9 +66,13 @@ const ProfileTabs: React.FC = () => {
     );
   }, [dispatch]);
 
-  console.log();
+  // console.log();
 
-  return (
+  return loading ? (
+    "Waiting for Loading"
+  ) : error ? (
+    "Something have wrong"
+  ) : (
     <div className="">
       {/* Tabs Header */}
       <div className="pt-4 flex justify-center border-b border-gray-300 bg-white">

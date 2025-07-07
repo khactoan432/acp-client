@@ -111,7 +111,7 @@ const ExamVideo: React.FC = () => {
       },
     ];
     if (selectedContent) {
-      console.log("selectedContent", selectedContent);
+      // console.log("selectedContent", selectedContent);
       arrStruct = structData.map((field) => {
         if (selectedContent.hasOwnProperty(field.name)) {
           return {

@@ -86,7 +86,7 @@ const UserExamDetail: React.FC = () => {
 
   const payment = async (id_material: string) => {
     try {
-      console.log("Payment initiated for:", id_material);
+      // console.log("Payment initiated for:", id_material);
 
       const userString = localStorage.getItem("user");
       let user: User | null = null;
@@ -111,7 +111,7 @@ const UserExamDetail: React.FC = () => {
         {}
       );
 
-      console.log("Payment response:", pm);
+      // console.log("Payment response:", pm);
 
       // Điều hướng đến URL thanh toán
       if (pm.data?.payUrl) {

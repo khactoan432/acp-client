@@ -161,7 +161,7 @@ const AdminTeacher: React.FC = () => {
             field.name !== "password" && field.name !== "repassword"
         )
         .map((field: any) => {
-          console.log("field.name: ", field.name);
+          // console.log("field.name: ", field.name);
           if (selectedContent.hasOwnProperty(field.name)) {
             return {
               ...field,
@@ -174,7 +174,7 @@ const AdminTeacher: React.FC = () => {
       setIsModalUpdate(true);
     }
 
-    console.log("arrStruct: ", arrStruct);
+    // console.log("arrStruct: ", arrStruct);
     setStructData(arrStruct);
   }, [isModalCreate, selectedContent]);
 

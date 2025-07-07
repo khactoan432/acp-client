@@ -119,7 +119,7 @@ const Table = <T extends Record<string, any>>({
       });
       return fields;
     }, []);
-    console.log("numeric: ", numericFields);
+    // console.log("numeric: ", numericFields);
 
     const initialRanges = numericFields.reduce((acc: any, field) => {
       const values = formatData
@@ -145,7 +145,7 @@ const Table = <T extends Record<string, any>>({
 
     setSliderValues(initialSliders);
   }, [formatData]);
-  console.log("fillter: ", filterRanges);
+  // console.log("fillter: ", filterRanges);
   const handleSliderChange = (field: string, value: [number, number]) => {
     setSliderValues((prev) => ({
       ...prev,
@@ -234,7 +234,7 @@ const Table = <T extends Record<string, any>>({
   // hành động hàng loạt
   const handleSelectActionMany = (value: string) => {
     if (value === "DELETE") {
-      console.log("check delete");
+      // console.log("check delete");
       handleAction(value, selectedBox);
     } else {
     }

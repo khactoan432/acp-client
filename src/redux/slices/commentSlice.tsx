@@ -202,7 +202,7 @@ const rateSlice = createSlice({
       .addCase(createRate.fulfilled, (state, action) => {
         state.loading = false;
         const createdRates = action.payload.data;
-        console.log(action.payload ,state.userRates, createdRates, state.userRates.concat(createdRates))
+        // console.log(action.payload ,state.userRates, createdRates, state.userRates.concat(createdRates))
 
         state.userRates=state.userRates.concat(createdRates);
         state.totalRateUser = state.totalRateUser + 1;

@@ -85,7 +85,7 @@ const AdminBanner: React.FC = () => {
 
   // structure data video exam
   let dataBanner = data;
-  console.log(dataBanner);
+  // console.log(dataBanner);
   const [structData, setStructData] = useState([]);
 
   useEffect(() => {

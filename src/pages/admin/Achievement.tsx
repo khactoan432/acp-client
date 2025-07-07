@@ -92,7 +92,7 @@ const AdminAchievement: React.FC = () => {
   let columns = ["email_user", "prize", "competition", "image"];
 
   // structure data video exam
-  console.log(data);
+  // console.log(data);
   let fieldSearch = ["email_user", "prize", "competition"];
 
   const [structData, setStructData] = useState([]);

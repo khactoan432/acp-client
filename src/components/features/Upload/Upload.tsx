@@ -39,12 +39,12 @@ const MultiFileUpload: React.FC = () => {
 
     try {
       setIsUploading(true); // Bật trạng thái upload
-      console.log(formData);
-      const response = await postFile("/api/upload/upload", formData);
+      // console.log(formData);
+      await postFile("/api/upload/upload", formData);
 
       // Hiển thị kết quả
       toast.success("Upload thành công!");
-      console.log("Uploaded Files:", response);
+      // console.log("Uploaded Files:", response);
 
       // Reset danh sách file và folderPath
       setFiles([]);

@@ -1,29 +1,29 @@
 import React, { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+// import { useNavigate } from "react-router-dom";
+// import { toast } from "react-toastify";
 // import ant
 import { Button } from "antd";
 // import icon
-import { FaRegEdit } from "react-icons/fa";
-import { MdOutlineDeleteOutline } from "react-icons/md";
-import { MdContentPaste } from "react-icons/md";
-import { MdAttractions } from "react-icons/md";
-import { PiLockKeyLight } from "react-icons/pi";
-import { PiLockKeyOpen } from "react-icons/pi";
+// import { FaRegEdit } from "react-icons/fa";
+// import { MdOutlineDeleteOutline } from "react-icons/md";
+// import { MdContentPaste } from "react-icons/md";
+// import { MdAttractions } from "react-icons/md";
+// import { PiLockKeyLight } from "react-icons/pi";
+// import { PiLockKeyOpen } from "react-icons/pi";
 // import components
 import AdminHeader from "../../../components/layout/Admin/Header";
 import Nav from "../../../components/layout/Admin/Nav";
-import Loading from "../../../components/loading";
-import Table from "../../../components/table";
-import PopupNotification from "../../../components/popup/notify";
-import AdminModalV2 from "../../../components/popup/AdminModalV2";
+// import Loading from "../../../components/loading";
+// import Table from "../../../components/table";
+// import PopupNotification from "../../../components/popup/notify";
+// import AdminModalV2 from "../../../components/popup/AdminModalV2";
 // help func
-import { getSignedUrlAndUpload } from "../../../helpers/reqSignedUrlAndUpload";
+// import { getSignedUrlAndUpload } from "../../../helpers/reqSignedUrlAndUpload";
 //axios
-import { postData, getData, deleteData, putData } from "../../../axios";
+// import { postData, getData, deleteData, putData } from "../../../axios";
 
 const InfoStudent: React.FC = () => {
-  const header = localStorage.getItem("access_token");
+  // const header = localStorage.getItem("access_token");
   const [screenHeight, setScreenHeight] = useState(window.innerHeight - 56);
   const updateScreenHeight = () => {
     setScreenHeight(window.innerHeight - 56);
@@ -43,7 +43,7 @@ const InfoStudent: React.FC = () => {
     }
   }, []);
 
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   return (
     <div className="flex h-screen">

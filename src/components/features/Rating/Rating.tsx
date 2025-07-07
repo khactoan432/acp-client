@@ -48,7 +48,7 @@ const RatingPage: React.FC<RatingPageProps> = ({
     error: ratesError,
   } = useSelector((state: RootState) => state.rates);
 
-  console.log(userRates);
+  // console.log(userRates);
 
   useEffect(() => {
     dispatch(fetchUserRates({ id_ref_material, ref_type }));
@@ -109,7 +109,7 @@ const RatingPage: React.FC<RatingPageProps> = ({
         content: form.content,
       };
 
-      console.log(newRating);
+      // console.log(newRating);
       await dispatch(createRate(newRating)).unwrap();
       setForm({ rate: 0, content: "" });
       setShowForm(false);
@@ -133,7 +133,7 @@ const RatingPage: React.FC<RatingPageProps> = ({
         content: replyForm[id_ref_material].content,
       };
 
-      console.log(newRating);
+      // console.log(newRating);
       await dispatch(createReply(newRating)).unwrap();
       setReplyForm((prev) => ({
         ...prev,

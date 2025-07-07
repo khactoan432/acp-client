@@ -166,7 +166,7 @@ const Introduce: React.FC = () => {
 
   //handle save
   const createIntro = async (data: any) => {
-    console.log("data: ", data);
+    // console.log("data: ", data);
     setIsLoading(true);
     const introTitle = data.desc;
     const dataList = data.overviews;
@@ -422,7 +422,7 @@ const Introduce: React.FC = () => {
 
   const deleteOverview = async () => {
     const id_Deleted = idDeleted && idDeleted.describes;
-    console.log("delete here: ", id_Deleted);
+    // console.log("delete here: ", id_Deleted);
     if (!id_Deleted) {
       console.error("idDeleted is undefined");
       return;

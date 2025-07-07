@@ -156,7 +156,7 @@ const achievementSlice = createSlice({
       .addCase(createAchievement.fulfilled, (state, action) => {
         state.loading = false;
         const createdAchievements = action.payload.data;
-        console.log(action.payload ,state.adminAchievements, createdAchievements, state.adminAchievements.concat(createdAchievements))
+        // console.log(action.payload ,state.adminAchievements, createdAchievements, state.adminAchievements.concat(createdAchievements))
 
         state.adminAchievements=state.adminAchievements.concat(createdAchievements);
         state.totalAdmin = state.totalAdmin + 1;

@@ -1,4 +1,4 @@
-import { postData, getData, deleteData, putData } from "../axios";
+import { getData } from "../axios";
 
 //get upload url
 export const getSignedUrlAndUpload = async (file: File, folder: string) => {

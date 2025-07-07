@@ -190,7 +190,7 @@ const courseSlice = createSlice({
       .addCase(createCourse.fulfilled, (state, action) => {
         state.loading = false;
         const createdCourses = action.payload.data;
-        console.log(action.payload ,state.adminCourses, createdCourses, state.adminCourses.concat(createdCourses))
+        // console.log(action.payload ,state.adminCourses, createdCourses, state.adminCourses.concat(createdCourses))
 
         state.adminCourses=state.adminCourses.concat(createdCourses);
         state.totalAdmin = state.totalAdmin + 1;

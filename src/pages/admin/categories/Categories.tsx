@@ -348,7 +348,7 @@ const AdminBanner: React.FC = () => {
       setMinHeight(headerRef.current.offsetHeight + 8);
     }
   }, []);
-  console.log("categoryType: ", categoryType);
+  // console.log("categoryType: ", categoryType);
   if (isLoading) {
     return <Loading message="Đang tải dữ liệu..." size="large" />;
   }

@@ -65,7 +65,7 @@ const AdminOrder = () => {
         });
         setData(res.data);
       } catch (e) {
-        console.log("Error fetching data: ", e);
+        // console.log("Error fetching data: ", e);
       } finally {
         setIsLoading(false);
       }

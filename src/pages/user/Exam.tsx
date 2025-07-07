@@ -26,20 +26,20 @@ const UserExam: React.FC = () => {
   const { userCategories, loading: categoriesLoading, error: categoriesError } = useSelector(
     (state: RootState) => state.categories
   );
-  console.log(categoriesLoading, categoriesError);
+  // console.log(categoriesLoading, categoriesError);
   useFetchData(fetchUserCategories);
-  console.log(userCategories);
+  // console.log(userCategories);
 
   const [filter, setFilter] = useState<{ type: string; value: string[] }[]>([]);
-  console.log(filter);
+  // console.log(filter);
 
   // Fetch user exams
   const { userExams, totalUser, loading: examsLoading, error: examsError } = useSelector(
     (state: RootState) => state.exams
   );
-  console.log(examsLoading, examsError)
+  // console.log(examsLoading, examsError)
   useFetchData(() => fetchUserExams({ page: currentPage, limit: examsPerPage , filters: filter}), [filter, currentPage]);
-  console.log(userExams);
+  // console.log(userExams);
   
   useEffect(() => {
     const categoryExists = userCategories.some((cat) =>
@@ -161,7 +161,11 @@ const UserExam: React.FC = () => {
     scrollToExams(); // Scroll whenever page changes
   };
 
-  return (
+  return (examsLoading || categoriesLoading) ? (
+    "Waiting for Loading"
+  ) : (examsError || categoriesError) ? (
+    "Something have wrong"
+  ) : (
     <div>
       <div className="w-full mt-14">
         <div className="max-w-[1228px] mx-auto">

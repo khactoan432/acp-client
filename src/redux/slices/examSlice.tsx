@@ -200,7 +200,7 @@ const examSlice = createSlice({
       .addCase(createExam.fulfilled, (state, action) => {
         state.loading = false;
         const createdExams = action.payload.data;
-        console.log(action.payload ,state.adminExams, createdExams, state.adminExams.concat(createdExams))
+        // console.log(action.payload ,state.adminExams, createdExams, state.adminExams.concat(createdExams))
 
         state.adminExams=state.adminExams.concat(createdExams);
         state.totalAdmin = state.totalAdmin + 1;

@@ -33,7 +33,7 @@ const Course: React.FC<CourseProps> = ({
   const navigate = useNavigate();
   const payment = async (id_material: string, amount: number) => {
     try {
-      console.log("Payment initiated for:", id_material);
+      // console.log("Payment initiated for:", id_material);
 
       // Gửi request thanh toán
       const pm = await postData(
@@ -47,7 +47,7 @@ const Course: React.FC<CourseProps> = ({
         {}
       );
 
-      console.log("Payment response:", pm);
+      // console.log("Payment response:", pm);
 
       // Điều hướng đến URL thanh toán
       if (pm.data?.payUrl) {

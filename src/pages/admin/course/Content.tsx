@@ -192,7 +192,7 @@ const Content: React.FC = () => {
             Authorization: `Bearer ${header}`,
           },
         });
-        console.log("res: ", res);
+        // console.log("res: ", res);
         setDataLesson(res.data);
       } catch (error) {
         console.error("Error fetching data: ", error);
@@ -349,7 +349,7 @@ const Content: React.FC = () => {
     const id = idUpdate;
     setIsLoading(true);
     try {
-      console.log("id: ", id);
+      // console.log("id: ", id);
       await putData(
         `/api/admin/exercise/${id}`,
         {
@@ -413,7 +413,7 @@ const Content: React.FC = () => {
 
   const deleteExercise = async () => {
     const id_Deleted = idDeleted && idDeleted.lessons;
-    console.log("delete here: ", id_Deleted);
+    // console.log("delete here: ", id_Deleted);
     if (!id_Deleted) {
       console.error("idDeleted is undefined");
       return;

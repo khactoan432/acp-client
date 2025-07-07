@@ -60,7 +60,7 @@ const Schedules = () => {
           },
         });
         setDataAdvisories(res.data);
-        console.log("res: ", res);
+        // console.log("res: ", res);
       } catch (e) {
         console.log("Error fetching data: ", e);
       } finally {

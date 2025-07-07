@@ -4,7 +4,7 @@
  * @returns {boolean} - True nếu có ít nhất một tệp ảnh hoặc video, ngược lại False.
  */
 function ValidateFiles(files: File[][] | undefined): boolean {
-  console.log("ValidateFiles: ", files);
+  // console.log("ValidateFiles: ", files);
   if (!files || files.length === 0) {
     return false; // Không có tệp nào.
   }

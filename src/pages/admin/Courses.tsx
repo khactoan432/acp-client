@@ -133,7 +133,7 @@ const AdminExam: React.FC = () => {
           },
         });
         if (res) {
-          console.log("data course: ", res);
+          // console.log("data course: ", res);
           setAllCourse(res);
         }
       } catch (err) {

@@ -32,7 +32,7 @@ const Courses: React.FC = () => {
   useEffect(() => {
     dispatch(fetchUserCourses({ page: 1, limit: 4 }));
   }, [dispatch]);
-  console.log(userCourses);
+  // console.log(userCourses);
 
   const settings = {
     dots: true,
