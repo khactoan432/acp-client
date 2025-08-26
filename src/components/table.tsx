@@ -8,11 +8,10 @@ import {
   InputNumber,
   Space,
 } from "antd";
-import { debounce } from "lodash";
+import Loading from "./loading";
 
 // import component
 import MSInput from "./input/MsInput";
-import SearchInput from "./input/SeachInput";
 
 // import icons react
 import { FaAngleRight } from "react-icons/fa6";
