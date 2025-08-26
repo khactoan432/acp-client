@@ -373,7 +373,7 @@ const AdminAchievement: React.FC = () => {
   return (
     <div className="flex h-screen">
       <Nav />
-      <div className="flex flex-col flex-1">
+      <div className="flex flex-col flex-1 overflow-x-hidden">
         <AdminHeader />
         <div className="wrap-container-table w-full h-full bg-white">
           {isLoading && <Loading message="Loading data..." size="large" />}

@@ -393,7 +393,7 @@ const Table = <T extends Record<string, any>>({
         </div>
       </div>
       <div
-        className="container-table bg-primary relative px-5 py-3 mb-2"
+        className="container-table bg-primary relative py-3 mb-2"
         style={{
           overflowX: "auto",
           height: `calc(100% - ${firstHeight}px - ${secondHeight}px - 16px)`,
@@ -447,6 +447,7 @@ const Table = <T extends Record<string, any>>({
                       zIndex: 2,
                       left: 0,
                       width: "42px",
+                      minWidth: "42px",
                       borderLeft: "0.4px solid #d9d9d9",
                       borderTop: "0.4px solid #d9d9d9",
                       padding: "8px",
@@ -468,6 +469,7 @@ const Table = <T extends Record<string, any>>({
                       left: "42px",
                       zIndex: 2,
                       width: "42px",
+                      minWidth: "42px",
                       padding: "8px",
                       textAlign: "center",
                       borderLeft: "0.4px solid #d9d9d9",
@@ -526,6 +528,7 @@ const Table = <T extends Record<string, any>>({
                       right: 0,
                       zIndex: 2,
                       width: "42px",
+                      minWidth: "42px",
                       padding: "8px",
                       textAlign: "center",
                       borderRight: "0.4px solid #d9d9d9",
@@ -559,6 +562,7 @@ const Table = <T extends Record<string, any>>({
                           zIndex: 2,
                           left: 0,
                           width: "42px",
+                          minWidth: "42px",
                           borderLeft: "0.4px solid #d9d9d9",
                           borderTop: "0.4px solid #d9d9d9",
                           padding: "8px",
@@ -582,6 +586,7 @@ const Table = <T extends Record<string, any>>({
                           zIndex: 2,
                           left: "42px",
                           width: "42px",
+                          minWidth: "42px",
                           borderLeft: "0.4px solid #d9d9d9",
                           borderTop: "0.4px solid #d9d9d9",
                           borderRight: "0.4px solid #d9d9d9",
@@ -656,6 +661,7 @@ const Table = <T extends Record<string, any>>({
                           zIndex: 2,
                           right: 0,
                           width: "42px",
+                          minWidth: "42px",
                           borderLeft: "0.4px solid #d9d9d9",
                           borderTop: "0.4px solid #d9d9d9",
                           padding: "8px",

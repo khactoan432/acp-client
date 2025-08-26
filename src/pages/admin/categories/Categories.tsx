@@ -168,7 +168,6 @@ const AdminBanner: React.FC = () => {
   const createCategory = async (idex: string) => {
     const value = refCategories.current[idex].map((d) => d.getValue());
 
-
     const category = value.map((val) => ({
       _id: "",
       value: val,
@@ -355,7 +354,7 @@ const AdminBanner: React.FC = () => {
   return (
     <div className="flex h-screen">
       <Nav />
-      <div className="flex flex-col flex-1">
+      <div className="flex flex-col flex-1 overflow-x-hidden">
         <AdminHeader />
         <div className="w-full h-full bg-white">
           <div style={{ height: `calc(100% - 8px)` }} className="m-2 h-full">

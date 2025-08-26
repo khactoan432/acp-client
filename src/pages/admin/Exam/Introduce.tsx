@@ -806,7 +806,7 @@ const IntroduceExam: React.FC = () => {
   return (
     <div className="flex h-screen">
       <Nav />
-      <div className="flex flex-col flex-1">
+      <div className="flex flex-col flex-1 overflow-x-hidden">
         <AdminHeader />
         <div className="w-full h-full bg-white">
           <div style={{ height: `calc(100% - 8px)` }} className="m-2">
