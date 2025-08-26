@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 // import component
 import AdminHeader from "../../components/layout/Admin/Header";
@@ -22,6 +23,7 @@ interface Order {
 }
 const AdminOrder = () => {
   const header = localStorage.getItem("access_token");
+  const navigate = useNavigate();
   const [screenHeight, setScreenHeight] = useState(window.innerHeight - 56);
   const updateScreenHeight = () => {
     setScreenHeight(window.innerHeight - 56);
@@ -54,24 +56,159 @@ const AdminOrder = () => {
   const [data, setData] = useState<Order[]>([]);
   // const [selectedContent, setSelectedContent] = useState<any>(null);
 
+  // State cho phân trang, lọc, và sắp xếp
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(8);
+  const [sortConfig, setSortConfig] = useState({ key: "", direction: "asc" });
+  const [filterValues, setFilterValues] = useState<
+    Record<string, [number, number]>
+  >({});
+  const [filterRanges, setFilterRanges] = useState<
+    Record<string, { min: number; max: number }>
+  >({});
+  const [searchTerm, setSearchTerm] = useState(""); // Thêm state cho tìm kiếm
+  const [inputValue, setInputValue] = useState("");
+
+  // Hàm so sánh sâu để kiểm tra object
+  const deepEqual = (obj1: any, obj2: any): boolean => {
+    if (obj1 === obj2) return true;
+    if (
+      typeof obj1 !== "object" ||
+      typeof obj2 !== "object" ||
+      obj1 == null ||
+      obj2 == null
+    )
+      return false;
+    const keys1 = Object.keys(obj1);
+    const keys2 = Object.keys(obj2);
+    if (keys1.length !== keys2.length) return false;
+    for (const key of keys1) {
+      if (!keys2.includes(key) || !deepEqual(obj1[key], obj2[key]))
+        return false;
+    }
+    return true;
+  };
+
+  // Handle Enter key press to trigger search
+  const handleSearchKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      setSearchTerm(inputValue); // Update searchTerm only on Enter
+    }
+  };
+
+  // Fetch data
   useEffect(() => {
     const fetchData = async () => {
-      setIsLoading(true);
+      if (!header) {
+        toast.error("Vui lòng đăng nhập lại!");
+        navigate("/login");
+        return;
+      }
+      if (!searchTerm) {
+        setIsLoading(true);
+      }
       try {
-        const res = await getData("/api/admin/orders?type=COURSE", {
-          headers: {
-            Authorization: `Bearer ${header}`,
-          },
+        const queryParams = new URLSearchParams({
+          page: currentPage.toString(),
+          limit: rowsPerPage.toString(),
+          ...(sortConfig.key && {
+            sortKey: sortConfig.key,
+            sortDirection: sortConfig.direction,
+          }),
+          ...Object.entries(filterValues).reduce((acc, [key, [min, max]]) => {
+            acc[`filter[${key}][min]`] = min.toString();
+            acc[`filter[${key}][max]`] = max.toString();
+            return acc;
+          }, {} as Record<string, string>),
+          ...(searchTerm && { search: searchTerm }),
         });
-        setData(res.data);
-      } catch (e) {
-        // console.log("Error fetching data: ", e);
+        const res = await getData(
+          `/api/admin/orders?${queryParams.toString()}`,
+          {
+            headers: { Authorization: `Bearer ${header}` },
+          }
+        );
+        if (res && Array.isArray(res.data)) {
+          setData(res.data);
+          setTotalPages(res.totalPages || 1);
+          // Tính toán filterRanges
+          const numericFields = res.data.reduce(
+            (fields: string[], item: any) => {
+              Object.keys(item).forEach((key) => {
+                if (typeof item[key] === "number" && !fields.includes(key)) {
+                  fields.push(key);
+                }
+              });
+              return fields;
+            },
+            []
+          );
+          const initialRanges = numericFields.reduce(
+            (acc: Record<string, { min: number; max: number }>, field) => {
+              const values = res.data
+                .map((item: any) => item[field])
+                .filter((v: any) => typeof v === "number");
+              const min = values.length > 0 ? Math.min(...values) : 0;
+              const max = values.length > 0 ? Math.max(...values) : 0;
+              if (min !== max) {
+                acc[field] = { min, max };
+              }
+              return acc;
+            },
+            {}
+          );
+          setFilterRanges((prev) => {
+            if (!deepEqual(prev, initialRanges)) {
+              return initialRanges;
+            }
+            return prev;
+          });
+          setFilterValues((prev) => {
+            const newValues = {
+              ...prev,
+              ...Object.keys(initialRanges).reduce(
+                (acc, field) => ({
+                  ...acc,
+                  [field]: prev[field] || [
+                    initialRanges[field].min,
+                    initialRanges[field].max,
+                  ],
+                }),
+                {}
+              ),
+            };
+            if (!deepEqual(prev, newValues)) {
+              return newValues;
+            }
+            return prev;
+          });
+        } else {
+          console.error("Dữ liệu API không đúng định dạng:", res);
+          setData([]);
+          setTotalPages(1);
+          setFilterRanges({});
+          setFilterValues({});
+          toast.error("Không tìm thấy dữ liệu đơn hàng.");
+        }
+      } catch (error) {
+        toast.error(`Lỗi khi lấy dữ liệu: ${error.message}`);
+        console.error("Error fetching data: ", error);
       } finally {
         setIsLoading(false);
       }
     };
     fetchData();
-  }, [isFetchData]);
+  }, [
+    isFetchData,
+    currentPage,
+    rowsPerPage,
+    sortConfig,
+    filterValues,
+    searchTerm,
+    header,
+    navigate,
+  ]);
 
   const columns = [
     "code",
@@ -167,15 +304,13 @@ const AdminOrder = () => {
     }
   };
 
-  if (isLoading) {
-    return <Loading message="Đang tải dữ liệu..." size="large" />;
-  }
   return (
     <div className="flex h-screen">
       <Nav />
       <div className="flex flex-col flex-1">
         <AdminHeader />
-        <div className="w-full h-full bg-white">
+        <div className="wrap-container-table w-full h-full bg-white">
+          {isLoading && <Loading message="Đang tải dữ liệu..." size="large" />}
           <div style={{ height: `calc(100% - 8px)` }} className="m-2">
             <div
               ref={firstDivRef}
@@ -202,6 +337,19 @@ const AdminOrder = () => {
                   handleAction={handleActions}
                   actions={actions}
                   topAcctions="-10"
+                  totalPages={totalPages}
+                  currentPage={currentPage}
+                  rowsPerPage={rowsPerPage}
+                  setCurrentPage={setCurrentPage}
+                  setRowsPerPage={setRowsPerPage}
+                  sortConfig={sortConfig}
+                  setSortConfig={setSortConfig}
+                  filterValues={filterValues}
+                  setFilterValues={setFilterValues}
+                  filterRanges={filterRanges}
+                  searchTerm={inputValue}
+                  setSearchTerm={setInputValue}
+                  onSearchKeyPress={handleSearchKeyPress}
                 />
               )}
             </div>

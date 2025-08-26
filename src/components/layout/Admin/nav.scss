@@ -18,6 +18,10 @@
   transition: width 0.3s ease;
   width: 252px;
   background-color: #1e2753;
+  display: flex;
+  flex-direction: column;
+  background-color: #1e2753;
+  flex-shrink: 0;
 }
 
 .nav-container.collapsed {

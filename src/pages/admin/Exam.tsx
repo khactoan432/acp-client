@@ -98,7 +98,7 @@ const AdminExam: React.FC = () => {
         label: "Giá đề thi",
         value: "",
         type: "INPUT",
-        typeText: "number",
+        typeText: "money",
       },
       {
         name: "discount",
@@ -106,7 +106,7 @@ const AdminExam: React.FC = () => {
         label: "Giá ưu đãi",
         value: "",
         type: "INPUT",
-        typeText: "number",
+        typeText: "money",
       },
       {
         name: "image",
@@ -133,7 +133,14 @@ const AdminExam: React.FC = () => {
         if (selectedContent.hasOwnProperty(field.name)) {
           return {
             ...field,
-            value: selectedContent[field.name],
+            value:
+              field.typeText === "money" &&
+              typeof selectedContent[field.name] === "number"
+                ? selectedContent[field.name].toLocaleString("vi-VN", {
+                    style: "currency",
+                    currency: "VND",
+                  })
+                : selectedContent[field.name],
           };
         }
         if (field.name === "type") {
@@ -173,26 +180,142 @@ const AdminExam: React.FC = () => {
     };
     fetchCategories();
   }, []);
+  // Thêm state cho currentPage và totalPages
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(8);
+
+  const [sortConfig, setSortConfig] = useState({ key: "", direction: "asc" });
+  const [filterValues, setFilterValues] = useState<
+    Record<string, [number, number]>
+  >({});
+  const [filterRanges, setFilterRanges] = useState<
+    Record<string, { min: number; max: number }>
+  >({});
+
+  // Thêm hàm so sánh sâu để kiểm tra object
+  const deepEqual = (obj1, obj2) => {
+    if (obj1 === obj2) return true;
+    if (
+      typeof obj1 !== "object" ||
+      typeof obj2 !== "object" ||
+      obj1 == null ||
+      obj2 == null
+    )
+      return false;
+    const keys1 = Object.keys(obj1);
+    const keys2 = Object.keys(obj2);
+    if (keys1.length !== keys2.length) return false;
+    for (const key of keys1) {
+      if (!keys2.includes(key) || !deepEqual(obj1[key], obj2[key]))
+        return false;
+    }
+    return true;
+  };
+
   useEffect(() => {
     const fetchDataExam = async () => {
+      if (!header) {
+        toast.error("Vui lòng đăng nhập lại!");
+        navigate("/login");
+        return;
+      }
       setIsLoading(true);
       try {
-        const res = await getData("/api/admin/exams", {
-          headers: {
-            Authorization: `Bearer ${header}`,
-          },
+        const queryParams = new URLSearchParams({
+          page: currentPage.toString(),
+          limit: rowsPerPage.toString(),
+          ...(sortConfig.key && {
+            sortKey: sortConfig.key,
+            sortDirection: sortConfig.direction,
+          }),
+          ...Object.entries(filterValues).reduce((acc, [key, [min, max]]) => {
+            acc[`filter[${key}][min]`] = min.toString();
+            acc[`filter[${key}][max]`] = max.toString();
+            return acc;
+          }, {}),
         });
-        if (res) {
-          setAllExam(res);
+        const res = await getData(
+          `/api/admin/exams?${queryParams.toString()}`,
+          {
+            headers: { Authorization: `Bearer ${header}` },
+          }
+        );
+        if (res && Array.isArray(res.data)) {
+          setAllExam(res.data);
+          setTotalPages(res.totalPages || 1);
+          // Cập nhật filterRanges
+          const numericFields = res.data.reduce((fields, item) => {
+            Object.keys(item).forEach((key) => {
+              if (typeof item[key] === "number" && !fields.includes(key)) {
+                fields.push(key);
+              }
+            });
+            return fields;
+          }, []);
+          const initialRanges = numericFields.reduce((acc, field) => {
+            const values = res.data
+              .map((item) => item[field])
+              .filter((v) => typeof v === "number");
+            const min = values.length > 0 ? Math.min(...values) : 0;
+            const max = values.length > 0 ? Math.max(...values) : 0;
+            if (min !== max) {
+              acc[field] = { min, max };
+            }
+            return acc;
+          }, {});
+          // Chỉ cập nhật filterRanges nếu khác
+          setFilterRanges((prev) => {
+            if (!deepEqual(prev, initialRanges)) {
+              return initialRanges;
+            }
+            return prev;
+          });
+          // Chỉ cập nhật filterValues nếu khác
+          setFilterValues((prev) => {
+            const newValues = {
+              ...prev,
+              ...Object.keys(initialRanges).reduce(
+                (acc, field) => ({
+                  ...acc,
+                  [field]: prev[field] || [
+                    initialRanges[field].min,
+                    initialRanges[field].max,
+                  ],
+                }),
+                {}
+              ),
+            };
+            if (!deepEqual(prev, newValues)) {
+              return newValues;
+            }
+            return prev;
+          });
+        } else {
+          console.error("Dữ liệu API không đúng định dạng:", res);
+          setAllExam([]);
+          setTotalPages(1);
+          setFilterRanges({});
+          setFilterValues({});
+          toast.error("Không tìm thấy dữ liệu đề thi.");
         }
       } catch (err) {
-        console.error(err);
+        toast.error(`Lỗi khi lấy dữ liệu: ${err.message}`);
+        console.error("Lỗi khi gọi API:", err);
       } finally {
         setIsLoading(false);
       }
     };
     fetchDataExam();
-  }, [isFetchData]);
+  }, [
+    isFetchData,
+    currentPage,
+    rowsPerPage,
+    sortConfig,
+    filterValues,
+    header,
+    navigate,
+  ]);
   // data table exam
   const columnsExam = ["name", "link", "price", "discount", "image", "video"];
   const fieldSearch = ["name", "link"];
@@ -210,16 +333,6 @@ const AdminExam: React.FC = () => {
       const uploadedVideos = await Promise.all(
         video.map((file) => getSignedUrlAndUpload(file, "exams/video"))
       );
-
-      // console.log({
-      //   name,
-      //   link,
-      //   price,
-      //   discount,
-      //   type,
-      //   image: uploadedImages,
-      //   video: uploadedVideos,
-      // })
 
       // Gửi dữ liệu metadata lên backend
       await postData(
@@ -414,9 +527,6 @@ const AdminExam: React.FC = () => {
     setIdExam("");
   };
 
-  if (isLoading) {
-    return <Loading message="Đang tải dữ liệu..." size="large" />;
-  }
   return (
     <div className="flex h-screen">
       <Nav />
@@ -463,11 +573,22 @@ const AdminExam: React.FC = () => {
                   actions={actions}
                   filterPrice={true}
                   isAllowEpand={true}
+                  totalPages={totalPages}
+                  currentPage={currentPage}
+                  rowsPerPage={rowsPerPage}
+                  setCurrentPage={setCurrentPage}
+                  setRowsPerPage={setRowsPerPage}
+                  sortConfig={sortConfig}
+                  setSortConfig={setSortConfig}
+                  filterValues={filterValues}
+                  setFilterValues={setFilterValues}
+                  filterRanges={filterRanges}
                 />
               )}
             </div>
           </div>
         </div>
+        {isLoading && <Loading message="Đang tải dữ liệu..." size="large" />}
       </div>
       {isModalCreate && (
         <AdminModalV2

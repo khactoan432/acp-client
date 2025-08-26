@@ -19,7 +19,7 @@
 
 body {
   width: 100%;
-  font-family: "SF Mono", "monospace";
+  font-family: Montserrat !important;
   margin: 0;
   padding: 0;
   background-color: white;
@@ -46,6 +46,9 @@ body {
   ):not(.ant-select-customize-input):not(.ant-pagination-size-changer):hover
   .ant-select-selector {
   border-color: var(--color__hover-primary);
+}
+.wrap-container-table {
+  position: relative;
 }
 
 .ant-modal-header {

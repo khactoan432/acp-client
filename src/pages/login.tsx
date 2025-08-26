@@ -5,6 +5,7 @@ import { useDispatch } from "react-redux";
 import { postData } from "../axios";
 import Loading from "../components/loading";
 import { FaEye, FaEyeSlash } from "react-icons/fa"; // Import eye icons
+import './login.scss'
 
 const Login: React.FC = () => {
   const [isLoading, setIsLoading] = React.useState(false);
@@ -69,7 +70,7 @@ const Login: React.FC = () => {
   }
 
   return (
-    <div style={{ width: "100%", padding: "62px 0px" }}>
+    <div style={{ width: "100%", padding: "62px 0px" }} className="bg-login">
       <div style={styles.container}>
         <h1 className="text-color-secondary m-2" style={styles.title}>
           Sign In
@@ -156,7 +157,7 @@ const styles: {
     alignItems: "center",
     justifyContent: "center",
     borderRadius: "12px",
-    backgroundColor: "white",
+    backgroundColor: "#ffffff85",
   },
   title: {
     fontSize: "2rem",

@@ -19,6 +19,7 @@ import { FaRegEdit } from "react-icons/fa";
 import { MdOutlineDeleteOutline } from "react-icons/md";
 import { PiLockKeyLight } from "react-icons/pi";
 import { PiLockKeyOpen } from "react-icons/pi";
+import { useNavigate } from "react-router-dom";
 
 interface Teacher {
   _id: string;
@@ -33,6 +34,7 @@ interface Teacher {
 
 const AdminTeacher: React.FC = () => {
   const header = localStorage.getItem("access_token");
+  const navigate = useNavigate();
   const [screenHeight, setScreenHeight] = useState(window.innerHeight - 56);
   const updateScreenHeight = () => {
     setScreenHeight(window.innerHeight - 56);
@@ -72,25 +74,103 @@ const AdminTeacher: React.FC = () => {
   const [data, setData] = useState<Teacher[]>([]);
   const [selectedContent, setSelectedContent] = useState<any>(null);
 
-  // fetch data
+  // State cho phân trang, sắp xếp, và tìm kiếm
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(8);
+  const [sortConfig, setSortConfig] = useState({ key: "", direction: "asc" });
+  const [searchTerm, setSearchTerm] = useState("");
+  const [inputValue, setInputValue] = useState("");
+
+  // Hàm so sánh sâu để kiểm tra object
+  const deepEqual = (obj1: any, obj2: any): boolean => {
+    if (obj1 === obj2) return true;
+    if (
+      typeof obj1 !== "object" ||
+      typeof obj2 !== "object" ||
+      obj1 == null ||
+      obj2 == null
+    )
+      return false;
+    const keys1 = Object.keys(obj1);
+    const keys2 = Object.keys(obj2);
+    if (keys1.length !== keys2.length) return false;
+    for (const key of keys1) {
+      if (!keys2.includes(key) || !deepEqual(obj1[key], obj2[key]))
+        return false;
+    }
+    return true;
+  };
+
+  // Handle Enter key press to trigger search
+  const handleSearchKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      setSearchTerm(inputValue); // Cập nhật searchTerm khi nhấn Enter
+    }
+  };
+
+  // Callback khi tìm kiếm hoàn tất
+  const handleSearchComplete = () => {
+    // Không làm gì ở đây, chỉ để truyền vào Table
+  };
+
+  // Fetch data
   useEffect(() => {
     const fetchData = async () => {
-      setIsLoading(true);
+      if (!header) {
+        toast.error("Vui lòng đăng nhập lại!");
+        navigate("/login");
+        return;
+      }
+      if (!searchTerm) {
+        setIsLoading(true);
+      }
       try {
-        const res = await getData(`/api/admin/users?role=TEACHER`, {
-          headers: {
-            Authorization: `Bearer ${header}`,
-          },
+        const queryParams = new URLSearchParams({
+          role: "TEACHER",
+          page: currentPage.toString(),
+          limit: rowsPerPage.toString(),
+          ...(sortConfig.key && {
+            sortKey: sortConfig.key,
+            sortDirection: sortConfig.direction,
+          }),
+          ...(searchTerm && { search: searchTerm }),
         });
-        setData(res.data);
+        const res = await getData(
+          `/api/admin/users?${queryParams.toString()}`,
+          {
+            headers: { Authorization: `Bearer ${header}` },
+          }
+        );
+        if (res && Array.isArray(res.data)) {
+          setData(res.data);
+          setTotalPages(res.totalPages || 1);
+        } else {
+          console.error("Dữ liệu API không đúng định dạng:", res);
+          setData([]);
+          setTotalPages(1);
+          toast.error("Không tìm thấy dữ liệu giảng viên.");
+        }
       } catch (error) {
+        toast.error(`Lỗi khi lấy dữ liệu: ${error.message}`);
         console.error("Error fetching data: ", error);
       } finally {
-        setIsLoading(false);
+        if (!searchTerm) {
+          setIsLoading(false);
+        }
+        handleSearchComplete();
       }
     };
     fetchData();
-  }, [isFetchData]);
+  }, [
+    isFetchData,
+    currentPage,
+    rowsPerPage,
+    sortConfig,
+    searchTerm,
+    header,
+    navigate,
+  ]);
 
   let columns = ["name", "email", "codeforce_name", "phone_number", "image"];
 
@@ -365,17 +445,13 @@ const AdminTeacher: React.FC = () => {
     setIsModalVisible(false);
     setIdTeacher("");
   };
-
-  if (isLoading) {
-    return <Loading message="Loading data..." size="large" />;
-  }
-
   return (
     <div className="flex h-screen">
       <Nav />
       <div className="flex flex-col flex-1">
         <AdminHeader />
-        <div className="w-full h-full bg-white">
+        <div className="wrap-container-table w-full h-full bg-white">
+          {isLoading && <Loading message="Loading data..." size="large" />}
           <div style={{ height: `calc(100% - 8px)` }} className="m-2">
             <div
               ref={secondDivRef}
@@ -413,6 +489,19 @@ const AdminTeacher: React.FC = () => {
                   batchExecution={batchExecution}
                   handleAction={handleActions}
                   actions={actions}
+                  totalPages={totalPages}
+                  currentPage={currentPage}
+                  rowsPerPage={rowsPerPage}
+                  setCurrentPage={setCurrentPage}
+                  setRowsPerPage={setRowsPerPage}
+                  sortConfig={sortConfig}
+                  setSortConfig={setSortConfig}
+                  filterValues={{}} // Không hỗ trợ lọc giá
+                  setFilterValues={() => {}} // Không hỗ trợ lọc giá
+                  filterRanges={{}} // Không hỗ trợ lọc giá
+                  searchTerm={inputValue}
+                  setSearchTerm={setInputValue}
+                  onSearchKeyPress={handleSearchKeyPress}
                 />
               )}
             </div>

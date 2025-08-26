@@ -240,7 +240,7 @@ const Ranks = () => {
                 height: `calc(${screenHeight}px - ${firstHeight}px - 24px)`,
               }}
             >
-              {data && (
+              {/* {data && (
                 <Table
                   columns={columns}
                   fieldSearch={fieldSearch}
@@ -249,7 +249,7 @@ const Ranks = () => {
                   actions={actions}
                   batchExecution={batchExecution}
                 />
-              )}
+              )} */}
             </div>
           </div>
         </div>

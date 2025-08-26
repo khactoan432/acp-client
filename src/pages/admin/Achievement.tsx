@@ -69,25 +69,73 @@ const AdminAchievement: React.FC = () => {
   const [data, setData] = useState<Achievement[]>([]);
   const [selectedContent, setSelectedContent] = useState(null);
 
-  // fetch data
+  // State cho phân trang, sắp xếp, và tìm kiếm
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(8);
+  const [sortConfig, setSortConfig] = useState({ key: "", direction: "asc" });
+  const [searchTerm, setSearchTerm] = useState("");
+  const [inputValue, setInputValue] = useState("");
+
+  // Handle Enter key press to trigger search
+  const handleSearchKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      setSearchTerm(inputValue); // Cập nhật searchTerm khi nhấn Enter
+    }
+  };
+
+  // Callback khi tìm kiếm hoàn tất
+  const handleSearchComplete = () => {
+    // Không làm gì ở đây, chỉ để truyền vào Table
+  };
+
+  // Fetch data
   useEffect(() => {
     const fetchData = async () => {
-      setIsLoading(true);
+      if (!header) {
+        toast.error("Vui lòng đăng nhập lại!");
+        return;
+      }
+      if (!searchTerm) {
+        setIsLoading(true);
+      }
       try {
-        const res = await getData(`/api/admin/achievements`, {
-          headers: {
-            Authorization: `Bearer ${header}`,
-          },
+        const queryParams = new URLSearchParams({
+          page: currentPage.toString(),
+          limit: rowsPerPage.toString(),
+          ...(sortConfig.key && {
+            sortKey: sortConfig.key,
+            sortDirection: sortConfig.direction,
+          }),
+          ...(searchTerm && { search: searchTerm }),
         });
-        setData(res.data);
+        const res = await getData(
+          `/api/admin/achievements?${queryParams.toString()}`,
+          {
+            headers: { Authorization: `Bearer ${header}` },
+          }
+        );
+        if (res && Array.isArray(res.data)) {
+          setData(res.data);
+          setTotalPages(res.totalPages || 1);
+        } else {
+          console.error("Dữ liệu API không đúng định dạng:", res);
+          setData([]);
+          setTotalPages(1);
+          toast.error("Không tìm thấy dữ liệu thành tích.");
+        }
       } catch (error) {
+        toast.error(`Lỗi khi lấy dữ liệu: ${error.message}`);
         console.error("Error fetching data: ", error);
       } finally {
-        setIsLoading(false);
+        if (!searchTerm) {
+          setIsLoading(false);
+        }
+        handleSearchComplete();
       }
     };
     fetchData();
-  }, [isFetchData]);
+  }, [isFetchData, currentPage, rowsPerPage, sortConfig, searchTerm, header]);
 
   let columns = ["email_user", "prize", "competition", "image"];
 
@@ -322,16 +370,13 @@ const AdminAchievement: React.FC = () => {
     setIdAchivement("");
   };
 
-  if (isLoading) {
-    return <Loading message="Loading data..." size="large" />;
-  }
-
   return (
     <div className="flex h-screen">
       <Nav />
       <div className="flex flex-col flex-1">
         <AdminHeader />
-        <div className="w-full h-full bg-white">
+        <div className="wrap-container-table w-full h-full bg-white">
+          {isLoading && <Loading message="Loading data..." size="large" />}
           <div style={{ height: `calc(100% - 8px)` }} className="m-2">
             <div
               ref={secondDivRef}
@@ -369,6 +414,19 @@ const AdminAchievement: React.FC = () => {
                   batchExecution={batchExecution}
                   handleAction={handleActions}
                   actions={actions}
+                  totalPages={totalPages}
+                  currentPage={currentPage}
+                  rowsPerPage={rowsPerPage}
+                  setCurrentPage={setCurrentPage}
+                  setRowsPerPage={setRowsPerPage}
+                  sortConfig={sortConfig}
+                  setSortConfig={setSortConfig}
+                  filterValues={{}} // Không hỗ trợ lọc giá
+                  setFilterValues={() => {}} // Không hỗ trợ lọc giá
+                  filterRanges={{}} // Không hỗ trợ lọc giá
+                  searchTerm={inputValue}
+                  setSearchTerm={setInputValue}
+                  onSearchKeyPress={handleSearchKeyPress}
                 />
               )}
             </div>

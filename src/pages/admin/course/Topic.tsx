@@ -68,25 +68,77 @@ const ExamVideo: React.FC = () => {
   const [data, setData] = useState<Topic[]>([]);
   const [selectedContent, setSelectedContent] = useState(null);
   // fetch data
+  // State cho phân trang, sắp xếp, và tìm kiếm
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(8);
+  const [sortConfig, setSortConfig] = useState({ key: "", direction: "asc" });
+  const [searchTerm, setSearchTerm] = useState("");
+  const [inputValue, setInputValue] = useState("");
+
+  // Handle Enter key press to trigger search
+  const handleSearchKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      setSearchTerm(inputValue); // Cập nhật searchTerm khi nhấn Enter
+    }
+  };
+
+  // Fetch data
   useEffect(() => {
     const fetchData = async () => {
-      setIsLoading(true);
+      if (!header) {
+        toast.error("Vui lòng đăng nhập lại!");
+        navigate("/login");
+        return;
+      }
+      if (!searchTerm) {
+        setIsLoading(true);
+      }
       try {
-        const res = await getData(`/api/admin/topics/${idCourse}`, {
-          headers: {
-            Authorization: `Bearer ${header}`,
-          },
+        const queryParams = new URLSearchParams({
+          skip: ((currentPage - 1) * rowsPerPage).toString(),
+          limit: rowsPerPage.toString(),
+          ...(sortConfig.key && {
+            sortKey: sortConfig.key,
+            sortDirection: sortConfig.direction,
+          }),
+          ...(searchTerm && { search: searchTerm }),
         });
-        // console.log("res.data:", res.data);
-        setData(res.data);
+        const res = await getData(
+          `/api/admin/topics/${idCourse}?${queryParams.toString()}`,
+          {
+            headers: { Authorization: `Bearer ${header}` },
+          }
+        );
+        if (res && Array.isArray(res.data)) {
+          setData(res.data);
+          setTotalPages(res.totalPages || 1);
+        } else {
+          console.error("Dữ liệu API không đúng định dạng:", res);
+          setData([]);
+          setTotalPages(1);
+          toast.error("Không tìm thấy dữ liệu chương học.");
+        }
       } catch (error) {
+        toast.error(`Lỗi khi lấy dữ liệu: ${error.message}`);
         console.error("Error fetching data: ", error);
       } finally {
-        setIsLoading(false);
+        if (!searchTerm) {
+          setIsLoading(false);
+        }
       }
     };
     fetchData();
-  }, [isFetchData]);
+  }, [
+    isFetchData,
+    idCourse,
+    currentPage,
+    rowsPerPage,
+    sortConfig,
+    searchTerm,
+    header,
+    navigate,
+  ]);
 
   // define table header
   let columnsCourse = ["name"];
@@ -286,16 +338,13 @@ const ExamVideo: React.FC = () => {
     }
   };
 
-  if (isLoading) {
-    return <Loading message="Đang tải dữ liệu..." size="large" />;
-  }
-
   return (
     <div className="flex h-screen">
       <Nav />
       <div className="flex flex-col flex-1">
         <AdminHeader />
         <div className="w-full h-full bg-white">
+          {isLoading && <Loading message="Loading data..." size="large" />}
           <div style={{ height: `calc(100% - 8px)` }} className="m-2 h-full">
             <div ref={firstDivRef} className="bg-primary px-5 py-3 mb-2">
               <Button
@@ -343,12 +392,23 @@ const ExamVideo: React.FC = () => {
               {dataTopic && (
                 <Table
                   columns={columnsCourse}
+                  fieldSearch={fieldSearch}
                   data={dataTopic}
                   batchExecution={batchExecution}
                   handleAction={handleActions}
                   actions={actions}
                   topAcctions="-66"
-                  fieldSearch={fieldSearch}
+                  filterPrice={false}
+                  totalPages={totalPages}
+                  currentPage={currentPage}
+                  rowsPerPage={rowsPerPage}
+                  setCurrentPage={setCurrentPage}
+                  setRowsPerPage={setRowsPerPage}
+                  sortConfig={sortConfig}
+                  setSortConfig={setSortConfig}
+                  searchTerm={inputValue}
+                  setSearchTerm={setInputValue}
+                  onSearchKeyPress={handleSearchKeyPress}
                 />
               )}
             </div>

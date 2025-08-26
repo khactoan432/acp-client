@@ -56,6 +56,164 @@ const AdminExam: React.FC = () => {
   // data store
   const [allCourse, setAllCourse] = useState([]);
   const [selectedContent, setSelectedContent] = useState(null);
+
+  // State cho phân trang, lọc, sắp xếp, và tìm kiếm
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(8);
+  const [sortConfig, setSortConfig] = useState({ key: "", direction: "asc" });
+  const [filterValues, setFilterValues] = useState<
+    Record<string, [number, number]>
+  >({});
+  const [filterRanges, setFilterRanges] = useState<
+    Record<string, { min: number; max: number }>
+  >({});
+  const [searchTerm, setSearchTerm] = useState("");
+  const [inputValue, setInputValue] = useState(""); // Thêm state để lưu giá trị ô tìm kiếm
+
+  // Hàm so sánh sâu để kiểm tra object
+  const deepEqual = (obj1: any, obj2: any): boolean => {
+    if (obj1 === obj2) return true;
+    if (
+      typeof obj1 !== "object" ||
+      typeof obj2 !== "object" ||
+      obj1 == null ||
+      obj2 == null
+    )
+      return false;
+    const keys1 = Object.keys(obj1);
+    const keys2 = Object.keys(obj2);
+    if (keys1.length !== keys2.length) return false;
+    for (const key of keys1) {
+      if (!keys2.includes(key) || !deepEqual(obj1[key], obj2[key]))
+        return false;
+    }
+    return true;
+  };
+
+  // Handle Enter key press to trigger search
+  const handleSearchKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      setSearchTerm(inputValue); // Cập nhật searchTerm khi nhấn Enter
+    }
+  };
+
+  // Fetch data
+  useEffect(() => {
+    const fetchDataCourse = async () => {
+      if (!header) {
+        toast.error("Vui lòng đăng nhập lại!");
+        navigate("/login");
+        return;
+      }
+      // Chỉ bật isLoading khi không tìm kiếm
+      if (!searchTerm) {
+        setIsLoading(true);
+      }
+      try {
+        const queryParams = new URLSearchParams({
+          skip: ((currentPage - 1) * rowsPerPage).toString(),
+          limit: rowsPerPage.toString(),
+          ...(sortConfig.key && {
+            sortKey: sortConfig.key,
+            sortDirection: sortConfig.direction,
+          }),
+          ...Object.entries(filterValues).reduce((acc, [key, [min, max]]) => {
+            acc[`filter[${key}][min]`] = min.toString();
+            acc[`filter[${key}][max]`] = max.toString();
+            return acc;
+          }, {} as Record<string, string>),
+          ...(searchTerm && { search: searchTerm }),
+        });
+        const res = await getData(
+          `/api/admin/courses?${queryParams.toString()}`,
+          {
+            headers: { Authorization: `Bearer ${header}` },
+          }
+        );
+        if (res && Array.isArray(res.data)) {
+          setAllCourse(res.data);
+          setTotalPages(res.totalPages || 1);
+          // Tính toán filterRanges
+          const numericFields = res.data.reduce(
+            (fields: string[], item: any) => {
+              Object.keys(item).forEach((key) => {
+                if (typeof item[key] === "number" && !fields.includes(key)) {
+                  fields.push(key);
+                }
+              });
+              return fields;
+            },
+            []
+          );
+          const initialRanges = numericFields.reduce(
+            (acc: Record<string, { min: number; max: number }>, field) => {
+              const values = res.data
+                .map((item: any) => item[field])
+                .filter((v: any) => typeof v === "number");
+              const min = values.length > 0 ? Math.min(...values) : 0;
+              const max = values.length > 0 ? Math.max(...values) : 0;
+              if (min !== max) {
+                acc[field] = { min, max };
+              }
+              return acc;
+            },
+            {}
+          );
+          setFilterRanges((prev) => {
+            if (!deepEqual(prev, initialRanges)) {
+              return initialRanges;
+            }
+            return prev;
+          });
+          setFilterValues((prev) => {
+            const newValues = {
+              ...prev,
+              ...Object.keys(initialRanges).reduce(
+                (acc, field) => ({
+                  ...acc,
+                  [field]: prev[field] || [
+                    initialRanges[field].min,
+                    initialRanges[field].max,
+                  ],
+                }),
+                {}
+              ),
+            };
+            if (!deepEqual(prev, newValues)) {
+              return newValues;
+            }
+            return prev;
+          });
+        } else {
+          console.error("Dữ liệu API không đúng định dạng:", res);
+          setAllCourse([]);
+          setTotalPages(1);
+          setFilterRanges({});
+          setFilterValues({});
+          toast.error("Không tìm thấy dữ liệu khóa học.");
+        }
+      } catch (error) {
+        toast.error(`Lỗi khi lấy dữ liệu: ${error.message}`);
+        console.error("Error fetching data: ", error);
+      } finally {
+        if (!searchTerm) {
+          setIsLoading(false);
+        }
+      }
+    };
+    fetchDataCourse();
+  }, [
+    isFetchData,
+    currentPage,
+    rowsPerPage,
+    sortConfig,
+    filterValues,
+    searchTerm,
+    header,
+    navigate,
+  ]);
+
   // structure
   const [structData, setStructData] = useState([]);
   useEffect(() => {
@@ -73,7 +231,7 @@ const AdminExam: React.FC = () => {
         label: "Giá khoá học",
         value: "",
         type: "INPUT",
-        typeText: "number",
+        typeText: "money",
       },
       {
         name: "discount",
@@ -81,7 +239,7 @@ const AdminExam: React.FC = () => {
         label: "Giá ưu đãi",
         value: "",
         type: "INPUT",
-        typeText: "number",
+        typeText: "money",
       },
       {
         name: "image",
@@ -101,7 +259,14 @@ const AdminExam: React.FC = () => {
         if (selectedContent.hasOwnProperty(field.name)) {
           return {
             ...field,
-            value: selectedContent[field.name],
+            value:
+              field.typeText === "money" &&
+              typeof selectedContent[field.name] === "number"
+                ? selectedContent[field.name].toLocaleString("vi-VN", {
+                    style: "currency",
+                    currency: "VND",
+                  })
+                : selectedContent[field.name],
           };
         }
         if (field.name === "type") {
@@ -119,31 +284,9 @@ const AdminExam: React.FC = () => {
       });
       setIsModalUpdate(true);
     }
+    console.log("arr: ", arrStruct);
     setStructData(arrStruct);
   }, [isModalCreate, selectedContent]);
-
-  // get data
-  useEffect(() => {
-    const fetchDataCourse = async () => {
-      setIsLoading(true);
-      try {
-        const res = await getData("/api/admin/courses", {
-          headers: {
-            Authorization: `Bearer ${header}`,
-          },
-        });
-        if (res) {
-          // console.log("data course: ", res);
-          setAllCourse(res);
-        }
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchDataCourse();
-  }, [isFetchData]);
   // fake frame course
   let columnsCourse = ["name", "price", "discount", "image", "video"];
   const fieldSearch = ["name"];
@@ -358,15 +501,13 @@ const AdminExam: React.FC = () => {
     setIdCourse("");
   };
 
-  if (isLoading) {
-    return <Loading message="Đang tải dữ liệu..." size="large" />;
-  }
   return (
     <div className="flex h-screen">
       <Nav />
       <div className="flex flex-col flex-1">
         <AdminHeader />
-        <div className="w-full h-full bg-white">
+        <div className="wrap-container-table w-full h-full bg-white">
+          {isLoading && <Loading message="Loading data..." size="large" />}
           <div style={{ height: `calc(100% - 8px)` }} className="m-2">
             <div
               ref={firstDivRef}
@@ -407,6 +548,19 @@ const AdminExam: React.FC = () => {
                   topAcctions="-88"
                   filterPrice={true}
                   isAllowEpand={true}
+                  totalPages={totalPages}
+                  currentPage={currentPage}
+                  rowsPerPage={rowsPerPage}
+                  setCurrentPage={setCurrentPage}
+                  setRowsPerPage={setRowsPerPage}
+                  sortConfig={sortConfig}
+                  setSortConfig={setSortConfig}
+                  filterValues={filterValues}
+                  setFilterValues={setFilterValues}
+                  filterRanges={filterRanges}
+                  searchTerm={inputValue} // Truyền inputValue thay vì searchTerm
+                  setSearchTerm={setInputValue} // Cập nhật inputValue
+                  onSearchKeyPress={handleSearchKeyPress} // Truyền hàm xử lý nhấn Enter
                 />
               )}
             </div>

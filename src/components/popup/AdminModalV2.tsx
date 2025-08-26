@@ -27,7 +27,7 @@ type StructData = {
   options?: { option: string; value?: string[] }[];
   value?: any;
   type: TypeInput;
-  typeText?: "text" | "email" | "number" | "tel";
+  typeText?: "text" | "email" | "number" | "tel" | "money";
 };
 
 type AdminModalProps = {
@@ -173,7 +173,9 @@ const AdminModalV2: React.FC<AdminModalProps> = ({
 
     structData.forEach((field) => {
       if (field.type === "INPUT" && refValue.current[field.name]) {
-        finalData[field.name] = refValue.current[field.name].getValue();
+        const value = refValue.current[field.name].getValue();
+        finalData[field.name] =
+          field.typeText === "money" ? Number(value) : value;
       }
     });
 
@@ -225,6 +227,7 @@ const AdminModalV2: React.FC<AdminModalProps> = ({
 
     // onClose();
   };
+  console.log("dataStruct: ", structData);
 
   return (
     <Modal
@@ -248,9 +251,14 @@ const AdminModalV2: React.FC<AdminModalProps> = ({
                           refValue.current[field.name] = el!;
                         }}
                         placeholder={field.placeholder}
-                        type={field.typeText || "text"}
+                        type={field.typeText}
                         required={true}
-                        defaultValue={field.value || ""}
+                        defaultValue={
+                          field.typeText === "money" &&
+                          typeof field.value === "number"
+                            ? field.value.toString()
+                            : field.value || ""
+                        }
                         errorMessage="Invalid input"
                         className="mb-2"
                       />

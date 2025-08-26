@@ -66,3 +66,45 @@ tbody tr:hover,
   .ant-slider-handle::after {
   top: -1px;
 }
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-left-color: #1890ff; /* Màu primary của Ant Design */
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.spinner.small {
+  width: 20px;
+  height: 20px;
+}
+
+.spinner.medium {
+  width: 40px;
+  height: 40px;
+}
+
+.spinner.large {
+  width: 60px;
+  height: 60px;
+}
+
+.loading-message {
+  margin-top: 8px;
+  font-size: 14px;
+  color: #333;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

@@ -50,25 +50,73 @@ const Schedules = () => {
 
   const [dataAdvisories, setDataAdvisories] = useState<Advirory[]>([]);
 
+  // State cho phân trang, sắp xếp, và tìm kiếm
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(8);
+  const [sortConfig, setSortConfig] = useState({ key: "", direction: "asc" });
+  const [searchTerm, setSearchTerm] = useState("");
+  const [inputValue, setInputValue] = useState("");
+
+  // Handle Enter key press to trigger search
+  const handleSearchKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      setSearchTerm(inputValue); // Cập nhật searchTerm khi nhấn Enter
+    }
+  };
+
+  // Callback khi tìm kiếm hoàn tất
+  const handleSearchComplete = () => {
+    // Không làm gì ở đây, chỉ để truyền vào Table
+  };
+
+  // Fetch data
   useEffect(() => {
     const fetchData = async () => {
-      setIsLoading(true);
+      if (!header) {
+        toast.error("Vui lòng đăng nhập lại!");
+        return;
+      }
+      if (!searchTerm) {
+        setIsLoading(true);
+      }
       try {
-        const res = await getData("/api/admin/advisories", {
-          headers: {
-            Authorization: `Bearer ${header}`,
-          },
+        const queryParams = new URLSearchParams({
+          skip: ((currentPage - 1) * rowsPerPage).toString(),
+          limit: rowsPerPage.toString(),
+          ...(sortConfig.key && {
+            sortKey: sortConfig.key,
+            sortDirection: sortConfig.direction,
+          }),
+          ...(searchTerm && { search: searchTerm }),
         });
-        setDataAdvisories(res.data);
-        // console.log("res: ", res);
-      } catch (e) {
-        console.log("Error fetching data: ", e);
+        const res = await getData(
+          `/api/admin/advisories?${queryParams.toString()}`,
+          {
+            headers: { Authorization: `Bearer ${header}` },
+          }
+        );
+        if (res && Array.isArray(res.data)) {
+          setDataAdvisories(res.data);
+          setTotalPages(res.totalPages || 1);
+        } else {
+          console.error("Dữ liệu API không đúng định dạng:", res);
+          setDataAdvisories([]);
+          setTotalPages(1);
+          toast.error("Không tìm thấy dữ liệu lịch hẹn tư vấn.");
+        }
+      } catch (error) {
+        toast.error(`Lỗi khi lấy dữ liệu: ${error.message}`);
+        console.error("Error fetching data: ", error);
       } finally {
-        setIsLoading(false);
+        if (!searchTerm) {
+          setIsLoading(false);
+        }
+        handleSearchComplete();
       }
     };
     fetchData();
-  }, [isFetchData]);
+  }, [isFetchData, currentPage, rowsPerPage, sortConfig, searchTerm, header]);
   // fake frame course
   let columnsCourse = ["name", "phone_number", "email", "mindfulness_course"];
   let data = dataAdvisories;
@@ -153,15 +201,13 @@ const Schedules = () => {
     setIdAdvisory("");
   };
 
-  if (isLoading) {
-    return <Loading message="Đang tải dữ liệu..." size="large" />;
-  }
   return (
     <div className="flex h-screen">
       <Nav />
       <div className="flex flex-col flex-1">
         <AdminHeader />
-        <div className="w-full h-full bg-white">
+        <div className="wrap-container-table w-full h-full bg-white">
+          {isLoading && <Loading message="Đang tải dữ liệu..." size="large" />}
           <div style={{ height: `calc(100% - 8px)` }} className="m-2">
             <div
               ref={firstDivRef}
@@ -186,6 +232,19 @@ const Schedules = () => {
                   batchExecution={batchExecution}
                   handleAction={handleActions}
                   actions={actions}
+                  totalPages={totalPages}
+                  currentPage={currentPage}
+                  rowsPerPage={rowsPerPage}
+                  setCurrentPage={setCurrentPage}
+                  setRowsPerPage={setRowsPerPage}
+                  sortConfig={sortConfig}
+                  setSortConfig={setSortConfig}
+                  filterValues={{}} // Không hỗ trợ lọc giá
+                  setFilterValues={() => {}} // Không hỗ trợ lọc giá
+                  filterRanges={{}} // Không hỗ trợ lọc giá
+                  searchTerm={inputValue}
+                  setSearchTerm={setInputValue}
+                  onSearchKeyPress={handleSearchKeyPress}
                 />
               )}
             </div>

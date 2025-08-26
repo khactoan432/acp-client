@@ -65,28 +65,150 @@ const ExamVideo: React.FC = () => {
 
   //string
   const [idVideo, setIdVideo] = useState<string>("");
-  // store
+
   const [data, setData] = useState<VideoExam[]>([]);
   const [selectedContent, setSelectedContent] = useState(null);
-  // fetch data
+
+  // Thêm state cho phân trang, lọc, và sắp xếp
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(8);
+  const [sortConfig, setSortConfig] = useState({ key: "", direction: "asc" });
+  const [filterValues, setFilterValues] = useState<
+    Record<string, [number, number]>
+  >({});
+  const [filterRanges, setFilterRanges] = useState<
+    Record<string, { min: number; max: number }>
+  >({});
+
+  // Hàm so sánh sâu để kiểm tra object
+  const deepEqual = (obj1: any, obj2: any): boolean => {
+    if (obj1 === obj2) return true;
+    if (
+      typeof obj1 !== "object" ||
+      typeof obj2 !== "object" ||
+      obj1 == null ||
+      obj2 == null
+    )
+      return false;
+    const keys1 = Object.keys(obj1);
+    const keys2 = Object.keys(obj2);
+    if (keys1.length !== keys2.length) return false;
+    for (const key of keys1) {
+      if (!keys2.includes(key) || !deepEqual(obj1[key], obj2[key]))
+        return false;
+    }
+    return true;
+  };
+  // Fetch data
   useEffect(() => {
     const fetchData = async () => {
+      if (!header) {
+        toast.error("Vui lòng đăng nhập lại!");
+        navigate("/login");
+        return;
+      }
       setIsLoading(true);
       try {
-        const res = await getData(`/api/admin/exam/videos/${idExam}`, {
-          headers: {
-            Authorization: `Bearer ${header}`,
-          },
+        const queryParams = new URLSearchParams({
+          page: currentPage.toString(),
+          limit: rowsPerPage.toString(),
+          ...(sortConfig.key && {
+            sortKey: sortConfig.key,
+            sortDirection: sortConfig.direction,
+          }),
+          ...Object.entries(filterValues).reduce((acc, [key, [min, max]]) => {
+            acc[`filter[${key}][min]`] = min.toString();
+            acc[`filter[${key}][max]`] = max.toString();
+            return acc;
+          }, {} as Record<string, string>),
         });
-        setData(res.data);
+        const res = await getData(
+          `/api/admin/exam/videos/${idExam}?${queryParams.toString()}`,
+          {
+            headers: { Authorization: `Bearer ${header}` },
+          }
+        );
+        if (res && Array.isArray(res.data)) {
+          setData(res.data);
+          setTotalPages(res.totalPages || 1);
+          // Tính toán filterRanges
+          const numericFields = res.data.reduce(
+            (fields: string[], item: any) => {
+              Object.keys(item).forEach((key) => {
+                if (typeof item[key] === "number" && !fields.includes(key)) {
+                  fields.push(key);
+                }
+              });
+              return fields;
+            },
+            []
+          );
+          const initialRanges = numericFields.reduce(
+            (acc: Record<string, { min: number; max: number }>, field) => {
+              const values = res.data
+                .map((item: any) => item[field])
+                .filter((v: any) => typeof v === "number");
+              const min = values.length > 0 ? Math.min(...values) : 0;
+              const max = values.length > 0 ? Math.max(...values) : 0;
+              if (min !== max) {
+                acc[field] = { min, max };
+              }
+              return acc;
+            },
+            {}
+          );
+          setFilterRanges((prev) => {
+            if (!deepEqual(prev, initialRanges)) {
+              return initialRanges;
+            }
+            return prev;
+          });
+          setFilterValues((prev) => {
+            const newValues = {
+              ...prev,
+              ...Object.keys(initialRanges).reduce(
+                (acc, field) => ({
+                  ...acc,
+                  [field]: prev[field] || [
+                    initialRanges[field].min,
+                    initialRanges[field].max,
+                  ],
+                }),
+                {}
+              ),
+            };
+            if (!deepEqual(prev, newValues)) {
+              return newValues;
+            }
+            return prev;
+          });
+        } else {
+          console.error("Dữ liệu API không đúng định dạng:", res);
+          setData([]);
+          setTotalPages(1);
+          setFilterRanges({});
+          setFilterValues({});
+          toast.error("Không tìm thấy dữ liệu video đề thi.");
+        }
       } catch (error) {
+        toast.error(`Lỗi khi lấy dữ liệu: ${error.message}`);
         console.error("Error fetching data: ", error);
       } finally {
         setIsLoading(false);
       }
     };
     fetchData();
-  }, [isFetchData]);
+  }, [
+    isFetchData,
+    currentPage,
+    rowsPerPage,
+    sortConfig,
+    filterValues,
+    header,
+    navigate,
+    idExam,
+  ]);
 
   // define table header
   let columnsCourse = ["describe", "video"];
@@ -357,6 +479,18 @@ const ExamVideo: React.FC = () => {
                   actions={actions}
                   batchExecution={batchExecution}
                   fieldSearch={fieldSearch}
+                  filterPrice={false} // Không có trường số trong video
+                  isAllowEpand={true}
+                  totalPages={totalPages}
+                  currentPage={currentPage}
+                  rowsPerPage={rowsPerPage}
+                  setCurrentPage={setCurrentPage}
+                  setRowsPerPage={setRowsPerPage}
+                  sortConfig={sortConfig}
+                  setSortConfig={setSortConfig}
+                  filterValues={filterValues}
+                  setFilterValues={setFilterValues}
+                  filterRanges={filterRanges}
                 />
               )}
             </div>

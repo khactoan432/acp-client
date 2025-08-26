@@ -787,15 +787,13 @@ const Content: React.FC = () => {
     setFilteredData(sortedData);
   };
 
-  if (isLoading) {
-    return <Loading message="Đang tải dữ liệu..." size="large" />;
-  }
   return (
     <div className="flex h-screen">
       <Nav />
       <div className="flex flex-col flex-1">
         <AdminHeader />
-        <div className="w-full h-full bg-white">
+        <div className="wrap-container-table w-full h-full bg-white">
+          {isLoading && <Loading message="Loading data..." size="large" />}
           <div style={{ height: `calc(100% - 8px)` }} className="m-2">
             <div ref={firstDivRef} className="bg-primary px-5 py-3 mb-2">
               <Button
